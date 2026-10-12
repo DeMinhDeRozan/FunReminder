@@ -7,15 +7,15 @@ Live site available at: https://d28igba62yy5is.cloudfront.net/
 ## 🧰 Tech stack
 
 <p>
-  <img src="asset/Simple%20Storage%20Service.svg" width="60" height="60" alt="Amazon S3" title="Amazon S3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="asset/API%20Gateway.svg" width="60" height="60" alt="API Gateway" title="API Gateway">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="asset/Lambda.svg" width="60" height="60" alt="AWS Lambda" title="AWS Lambda">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="asset/EventBridge.svg" width="60" height="60" alt="EventBridge" title="EventBridge">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="asset/DynamoDB.svg" width="60" height="60" alt="DynamoDB" title="DynamoDB">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="asset/amazon-bedrock.svg" width="60" height="60" alt="Amazon Bedrock" title="Amazon Bedrock">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="asset/CloudFront.svg" width="60" height="60" alt="AWS CloudFront" title="AWS CloudFront">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="asset/HashiCorp%20Terraform.svg" width="60" height="60" alt="Terraform" title="Terraform">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="asset/GitHub%20Actions.svg" width="60" height="60" alt="GitHub Actions" title="GitHub Actions">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="asset/Simple%20Storage%20Service.svg" width="60" height="60" alt="Amazon S3" title="Amazon S3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="asset/API%20Gateway.svg" width="60" height="60" alt="API Gateway" title="API Gateway">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="asset/Lambda.svg" width="60" height="60" alt="AWS Lambda" title="AWS Lambda">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="asset/EventBridge.svg" width="60" height="60" alt="EventBridge" title="EventBridge">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="asset/DynamoDB.svg" width="60" height="60" alt="DynamoDB" title="DynamoDB">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="asset/amazon-bedrock.svg" width="60" height="60" alt="Amazon Bedrock" title="Amazon Bedrock">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="asset/CloudFront.svg" width="60" height="60" alt="AWS CloudFront" title="AWS CloudFront">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="asset/HashiCorp%20Terraform.svg" width="60" height="60" alt="Terraform" title="Terraform">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="asset/GitHub%20Actions.svg" width="60" height="60" alt="GitHub Actions" title="GitHub Actions">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="asset/claude-ai-icon.svg" width="60" height="60" alt="Claude Haiku 4.5" title="Claude Haiku 4.5">
 </p>
  
