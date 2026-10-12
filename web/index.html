@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Your Aussie Reminder Cobba</title>
+    <style>
+        :root { --primary: #0084ff; --bg: #f0f2f5; --bot: #e4e6eb; --user: #0084ff; --remind: #ff4757; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, sans-serif; background: var(--bg); overflow: hidden; }
+        .wrapper { display: flex; flex-direction: column; height: 100%; max-width: 500px; margin: 0 auto; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .header { padding: 12px 16px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #0084ff, #00c6ff); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; }
+        .chat-box { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; }
+        .msg { max-width: 75%; padding: 8px 14px; border-radius: 18px; font-size: 15px; animation: in 0.3s ease-out; word-wrap: break-word; }
+        .bot { align-self: flex-start; background: var(--bot); color: #050505; border-bottom-left-radius: 4px; }
+        .user { align-self: flex-end; background: var(--user); color: #fff; border-bottom-right-radius: 4px; }
+        .remind-alert { align-self: center; background: var(--remind) !important; color: white !important; font-weight: bold; text-align: center; border-radius: 12px; margin: 10px 0; animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pop { from { opacity: 0; scale: 0.8; } to { opacity: 1; scale: 1; } }
+        .input-bar { padding: 12px; border-top: 1px solid #eee; display: flex; align-items: center; gap: 8px; }
+        input { flex: 1; border: none; background: #f0f2f5; border-radius: 20px; padding: 10px 16px; outline: none; font-size: 15px; }
+        button { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <div style="display: flex; align-items: center;">
+            <div class="avatar">M</div>
+            <div><b>DeMinh DeRozan</b><br><small style="color: #31a24c;">● Online</small></div>
+        </div>
+        <button id="clearBtn" onclick="clearHistory()" style="font-size: 10px; color: #999; border: 1px solid #eee; border-radius: 4px; padding: 2px 5px;">Clear Chat</button>
+    </div>
+
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="input-bar">
+        <input type="text" id="userInput" placeholder="Type here, ya legend..." autocomplete="off">
+        <button onclick="handleSend()">SEND</button>
+    </div>
+</div>
+
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const bell = new Audio('audio.mp3'); 
+    bell.volume = 0.8;
+
+    let isSoundEnabled = false;
+
+    const SEND_URL  = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/reminder";
+    const CHECK_URL = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/check";
+
+    function unlockSound() {
+        if (isSoundEnabled) return;
+        
+        bell.play().then(() => {
+            bell.pause();
+            bell.currentTime = 0;
+            isSoundEnabled = true;
+            console.log("Sound enabled");
+        }).catch(e => console.error("Waiting for interaction..."));
+    }
+
+    window.onload = () => {
+        const history = JSON.parse(localStorage.getItem('mate_chat_history') || '[]');
+        if (history.length === 0) {
+            appendMessage("Scarnon? Put a task in and I'll remind ya! ✨", 'bot', null, false);
+        } else {
+            history.forEach(m => appendMessage(m.txt, m.side, null, false));
+        }
+    };
+
+    function saveHistory(txt, side) {
+        const history = JSON.parse(localStorage.getItem('mate_chat_history') || '[]');
+        history.push({ txt, side });
+        localStorage.setItem('mate_chat_history', JSON.stringify(history.slice(-50)));
+    }
+
+    function clearHistory() {
+        if (confirm("Delete all chat history?")) {
+            localStorage.removeItem('mate_chat_history');
+            chatBox.innerHTML = '';
+            appendMessage("History cleared, mate!", 'bot', null, false);
+        }
+    }
+
+    async function handleSend() {
+        unlockSound(); 
+
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        appendMessage(text, 'user');
+        userInput.value = '';
+
+        const tid = 'l-' + Date.now();
+        appendMessage("Hmm...", 'bot', tid, false);
+
+        try {
+            const res = await fetch(SEND_URL, {
+                method: 'POST',
+                body: JSON.stringify({ user_id: "web_user", task_input: text })
+            });
+            const data = await res.json();
+            const loadingMsg = document.getElementById(tid);
+            if (loadingMsg) loadingMsg.remove();
+            appendMessage(data.message || "Righto!", 'bot');
+        } catch (e) {
+            const loadingMsg = document.getElementById(tid);
+            if (loadingMsg) loadingMsg.remove();
+            appendMessage("Bloody hell, error!", 'bot');
+        }
+    }
+
+    async function autoCheck() {
+        try {
+            const res = await fetch(CHECK_URL);
+            const data = await res.json();
+            if (data.reminders && data.reminders.length > 0) {
+                data.reminders.forEach(m => {
+                    if (isSoundEnabled) {
+                        bell.currentTime = 0;
+                        bell.play().catch(e => console.error(e));
+                    }
+                    appendMessage("🚨 OI OI OI! " + m.toUpperCase(), 'remind-alert');
+                });
+            }
+        } catch (e) {}
+    }
+
+    function appendMessage(txt, side, id, save = true) {
+        const d = document.createElement('div');
+        d.className = 'msg ' + side;
+        if (id) d.id = id;
+        d.innerText = txt;
+        chatBox.appendChild(d);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        if (save) saveHistory(txt, side);
+    }
+
+    userInput.addEventListener("keydown", e => {
+        if (e.key === "Enter") handleSend();
+    });
+
+    // Ép unlock khi chạm vào bất cứ đâu
+    document.addEventListener('click', unlockSound, { once: true });
+    document.addEventListener('touchstart', unlockSound, { once: true });
+
+    setInterval(autoCheck, 15000);
+</script>
+</body>
+</html>
