@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="48" viewBox="0 0 800 48" role="img" aria-label="divider">
+  <defs>
+    <linearGradient id="line" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#64748B" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#94A3B8"/>
+      <stop offset="1" stop-color="#64748B" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow" x="-200%" y="-50%" width="500%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter>
+  </defs>
+  <rect x="0" y="35" width="800" height="3" rx="1.5" fill="url(#line)"/>
+  <g transform="translate(160 2)">
+    <g opacity="0">
+      <animate attributeName="opacity" values="0;0;1;0.25;1;0;0" keyTimes="0;0.70;0.72;0.76;0.80;0.88;1" dur="4.3s" begin="0.2s" repeatCount="indefinite"/>
+      <polyline points="0,0 -7,12 4,15 -9,34" fill="none" stroke="#FACC15" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
+      <polyline points="0,0 -7,12 4,15 -9,34" fill="none" stroke="#FFFBEB" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+      <polyline points="-3,10 6,20 2,27" fill="none" stroke="#FEF08A" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <circle cx="-9" cy="34" r="2" fill="#FEF08A" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.9;0.4;0.9;0;0" keyTimes="0;0.70;0.72;0.76;0.80;0.88;1" dur="4.3s" begin="0.2s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;2;8;14;10;4;2" keyTimes="0;0.70;0.72;0.76;0.80;0.88;1" dur="4.3s" begin="0.2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <g transform="translate(410 2)">
+    <g opacity="0">
+      <animate attributeName="opacity" values="0;0;1;0.25;1;0;0" keyTimes="0;0.70;0.72;0.76;0.80;0.88;1" dur="5.1s" begin="1.7s" repeatCount="indefinite"/>
+      <polyline points="0,0 -7,12 4,15 -9,34" fill="none" stroke="#FACC15" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
+      <polyline points="0,0 -7,12 4,15 -9,34" fill="none" stroke="#FFFBEB" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+      <polyline points="-3,10 6,20 2,27" fill="none" stroke="#FEF08A" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <circle cx="-9" cy="34" r="2" fill="#FEF08A" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.9;0.4;0.9;0;0" keyTimes="0;0.70;0.72;0.76;0.80;0.88;1" dur="5.1s" begin="1.7s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;2;8;14;10;4;2" keyTimes="0;0.70;0.72;0.76;0.80;0.88;1" dur="5.1s" begin="1.7s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <g transform="translate(640 2)">
+    <g opacity="0">
+      <animate attributeName="opacity" values="0;0;1;0.25;1;0;0" keyTimes="0;0.70;0.72;0.76;0.80;0.88;1" dur="3.7s" begin="0.9s" repeatCount="indefinite"/>
+      <polyline points="0,0 -7,12 4,15 -9,34" fill="none" stroke="#FACC15" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
+      <polyline points="0,0 -7,12 4,15 -9,34" fill="none" stroke="#FFFBEB" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+      <polyline points="-3,10 6,20 2,27" fill="none" stroke="#FEF08A" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <circle cx="-9" cy="34" r="2" fill="#FEF08A" opacity="0">
+      <animate attributeName="opacity" values="0;0;0.9;0.4;0.9;0;0" keyTimes="0;0.70;0.72;0.76;0.80;0.88;1" dur="3.7s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;2;8;14;10;4;2" keyTimes="0;0.70;0.72;0.76;0.80;0.88;1" dur="3.7s" begin="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>
