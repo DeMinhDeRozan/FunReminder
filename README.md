@@ -14,7 +14,7 @@ A fun alarm app: enter a **time** and a **reminder message**, and when the time 
   <img src="asset/DynamoDB.svg" width="60" height="60" alt="DynamoDB" title="DynamoDB">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="asset/amazon-bedrock.svg" width="60" height="60" alt="Amazon Bedrock" title="Amazon Bedrock">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="asset/HashiCorp%20Terraform.svg" width="60" height="60" alt="Terraform" title="Terraform">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="asset/GitHub%20Actions.svg" width="60" height="60" alt="GitHub Actions" title="GitHub Actions">
+  <img src="asset/GitHub%20Actions.svg" width="60" height="60" alt="GitHub Actions" title="GitHub Actions">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="asset/claude-ai-icon.svg" width="60" height="60" alt="Claude Haiku 4.5" title="Claude Haiku 4.5">
 </p>
 
