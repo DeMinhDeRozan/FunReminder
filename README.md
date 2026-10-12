@@ -92,7 +92,7 @@
 ### NEW DOMAIN FOR THIS WEB APPLICATION WILL BE ASSOCIATED SOON
 <pre align = "center">
                                                                               
-                                                                               ____________________
+                                                                              ____________________
                                                                                    |                    |        
                ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀                    ⢀⡠⠔⠂⠉⠉⠉⠉⠉⠀⠒⠠⠄⡀⠀⠀⠀⠀⠀⠀ ⠀|⠀DEMINH DEROZAN LE⠀ |⠀⠀⠀⠀
        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀                ⢀⡠⠔⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠒⠤⡀⠀⠀⠀⠀ |____________________|
