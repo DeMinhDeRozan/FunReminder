@@ -59,17 +59,17 @@ resource "aws_s3_bucket_policy" "public_read" {
 resource "aws_s3_object" "upload_index" {
   bucket       = data.aws_s3_bucket.reminderyoubro.id
   key          = "index.html"
-  source       = "../Web/index.html"
+  source       = "../web/index.html"
   content_type = "text/html"
-  etag         = filemd5("../Web/index.html")
+  etag         = filemd5("../web/index.html")
 }
 
 resource "aws_s3_object" "upload_audio" {
   bucket       = data.aws_s3_bucket.reminderyoubro.id
   key          = "audio.mp3" 
-  source       = "../Web/audio.mp3"  
+  source       = "../web/audio.mp3"  
   content_type = "audio/mpeg"        
-  etag         = filemd5("../Web/audio.mp3")
+  etag         = filemd5("../web/audio.mp3")
 }
 
 output "website_url" {
