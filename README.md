@@ -30,7 +30,7 @@ Live site available at: https://d28igba62yy5is.cloudfront.net/
 
 ## 🏗️ How it works
 
-1. Opens the web app and enters a time and a reminder message.
+1. Open the web app and enter a time and a reminder message.
 2. The app calls API Gateway, which routes to Lambda to call Bedrock to process message and save in DynamoDB (including time)
 3. EventBridge will scan the database every minute to check and trigger Lambda
 4. Lambda reads the message from DynamoDB and send message and sound back to user sessions
