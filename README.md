@@ -1,6 +1,6 @@
 # 🦘 FunReminder - Your Aussie Reminder
 
-A fun alarm app: enter a **time** and a **reminder message**, and when the time comes, FunReminder goes off with your reminder plus an iconic Aussie sound.
+A serverless web application running based on S3 and delivering content via CloudFront CDN, using AWS services to store, process and turn messages into alarm for any developers working with hundred of tabs at a time
 
 Live site available at: https://d28igba62yy5is.cloudfront.net/
 
