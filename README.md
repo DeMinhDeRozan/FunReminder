@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Serverless-FF9900?style=for-the-badge&logo=awslambda&logoColor=white" alt="Serverless">
+  <img src="https://img.shields.io/badge/AWS-FF9900?style=for-the-badge&logo=awslambda&logoColor=white" alt="AWS">
   <img src="https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white" alt="Terraform">
   <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions">
   <img src="https://img.shields.io/badge/Claude_Haiku_4.5-D97757?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Haiku 4.5">
