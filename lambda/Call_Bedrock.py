@@ -46,7 +46,7 @@ def lambda_handler(event, context):
                 }
         except Exception:
             pass
-
+#This prompt is not the exact one I use in real code
         prompt = f"""
 You are a JSON extraction API.
 
