@@ -52,6 +52,8 @@ All security configuration (least-privilege IAM roles, S3 access policies, Bedro
 └── .github/workflows/ # GitHub Actions pipelines
 ```
 
+
+### NEW DOMAIN FOR THIS WEB APPLICATION WILL BE ASSOCIATED SOON
 <pre align = "center">
                                                                               
                                                                              ____________________
