@@ -1,4 +1,6 @@
-<h1 align="center">🦘 FunReminder - Your Aussie Reminder</h1>
+<p align="center">
+  <img src="asset/banner.svg" width="800" alt="🦘 FunReminder - Your Aussie Reminder">
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Serverless-FF9900?style=for-the-badge&logo=awslambda&logoColor=white" alt="Serverless">
@@ -11,7 +13,9 @@
 
 🌐 Live site available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)**
 
----
+<p align="center">
+  <img src="asset/divider.svg" width="800" height="28" alt="">
+</p>
 
 ## 🧰 Tech stack
 
@@ -28,17 +32,21 @@
   <img src="asset/claude-ai-icon.svg" width="60" height="60" alt="Claude Haiku 4.5" title="Claude Haiku 4.5">
 </p>
 
----
+<p align="center">
+  <img src="asset/divider.svg" width="800" height="28" alt="">
+</p>
 
 ## ✨ Features
 
 - ⏰ Set an alarm by entering a time and a reminder message.
-- 🔊 When the alarm fires, it will play an iconic Aussie sound.
+- 🔊 When the alarm fires, it will play a iconic Aussie sound.
 - 🏗️ Infrastructure is fully managed as code (Terraform) and deployed automatically (GitHub Actions).
 - ☁️ Serverless architecture with no servers to manage.
 - 🪙 The number of messages (tokens) applied to the entire web app is limited everyday, you have to wait until the next day if it is unavailable.
 
----
+<p align="center">
+  <img src="asset/divider.svg" width="800" height="28" alt="">
+</p>
 
 ## 🏗️ How it works
 
@@ -52,13 +60,17 @@
 
 5️⃣ The alarm goes off with the reminder message and sound. 🔔
 
----
+<p align="center">
+  <img src="asset/divider.svg" width="800" height="28" alt="">
+</p>
 
 ## 🔐 Security
 
 > 🛡️ All security configuration (least-privilege IAM roles, S3 access policies, Bedrock invoke permissions, etc.) is defined in Terraform and applied automatically through GitHub Actions.
 
----
+<p align="center">
+  <img src="asset/divider.svg" width="800" height="28" alt="">
+</p>
 
 ## 📁 Project structure
 
@@ -71,7 +83,9 @@
 └── .github/workflows/  # 🤖 GitHub Actions pipelines
 ```
 
----
+<p align="center">
+  <img src="asset/divider.svg" width="800" height="28" alt="">
+</p>
 
 ### NEW DOMAIN FOR THIS WEB APPLICATION WILL BE ASSOCIATED SOON
 <pre align = "center">
