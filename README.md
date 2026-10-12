@@ -11,7 +11,9 @@
 
 > 💡 A serverless web application running based on S3 and delivering content via CloudFront CDN, using AWS services to store, process and turn messages into alarm for any developers working with hundred of tabs at a time
 
-🌐 Live site available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)**
+🌐 CloudFront live site available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)**
+
+🌏 Original live site available at: **[http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/](http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/)**
 
 <p align="center">
   <img src="asset/divider.svg" width="800" height="28" alt="">
