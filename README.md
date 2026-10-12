@@ -27,7 +27,7 @@ Live site available at: https://d28igba62yy5is.cloudfront.net/
 - When the alarm fires, it will play a iconic Aussie sound.
 - Infrastructure is fully managed as code (Terraform) and deployed automatically (GitHub Actions).
 - Serverless architecture with no servers to manage.
-- The number of messages (token) applied to the entire web app is limited everyday, you have to wait until the next day if it is unavailable
+- The number of messages (tokens) applied to the entire web app is limited everyday, you have to wait until the next day if it is unavailable
 
 ## 🏗️ How it works
 
