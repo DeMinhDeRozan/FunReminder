@@ -60,15 +60,13 @@
 
 2️⃣ The app calls API Gateway, which routes to Lambda to call Bedrock to process message and save in DynamoDB (including time).
 
-3️⃣ EventBridge will scan the database every minute to check and trigger Lambda.
+3️⃣ Lambda reads the message from DynamoDB and send message and sound back to user sessions.
 
-4️⃣ Lambda reads the message from DynamoDB and send message and sound back to user sessions.
+4️⃣ The alarm goes off with the reminder message and sound. 🔔
 
-5️⃣ The alarm goes off with the reminder message and sound. 🔔
+5️⃣ If an alarm is missed, an EventBridge scheduler running every 2 minutes will invoke Lambda sweeper to check any missing record.
 
-6️⃣ If an alarm is missed, an EventBridge scheduler running every minute will invoke Lambda sweeper to check any missing record.
-
-7️⃣ Any missing case will be reported to my email through SNS, so that I can check its issue.
+6️⃣ Any missing case will be reported to my email through SNS, so that I can check its issue.
 
 <p align="center">
   <img src="asset/divider.svg" width="800" height="28" alt="">
