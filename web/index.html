@@ -5,53 +5,200 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Your Aussie Reminder Cobba</title>
     <style>
-        :root { --primary: #0084ff; --bg: #f0f2f5; --bot: #e4e6eb; --user: #0084ff; --remind: #ff4757; }
+        /* Hybrid: Claude (warm cream, serif, terracotta) + GPT (clean column, pill composer)
+           + Gemini (gradient sparkle, soft glow, suggestion chips) */
+        :root {
+            --bg: #faf9f5;
+            --surface: #ffffff;
+            --ink: #1f1e1d;
+            --muted: #85827a;
+            --line: #e8e5dc;
+            --user: #efece3;
+            --accent: #d97757;
+            --accent-ink: #ffffff;
+            --alert-a: #ff5f6d;
+            --alert-b: #ffa24c;
+            --gem: linear-gradient(120deg, #4285f4 0%, #9b72cb 50%, #d96570 100%);
+            --shadow: 0 2px 18px rgba(60, 50, 30, 0.08);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #262624;
+                --surface: #30302e;
+                --ink: #ece9e1;
+                --muted: #9a978e;
+                --line: #3d3c39;
+                --user: #3a3936;
+                --shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+            }
+        }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: -apple-system, sans-serif; background: var(--bg); overflow: hidden; }
-        .wrapper { display: flex; flex-direction: column; height: 100%; max-width: 500px; margin: 0 auto; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .header { padding: 12px 16px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
-        .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #0084ff, #00c6ff); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; }
-        .chat-box { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; }
-        .msg { max-width: 75%; padding: 8px 14px; border-radius: 18px; font-size: 15px; animation: in 0.3s ease-out; word-wrap: break-word; }
-        .bot { align-self: flex-start; background: var(--bot); color: #050505; border-bottom-left-radius: 4px; }
-        .user { align-self: flex-end; background: var(--user); color: #fff; border-bottom-right-radius: 4px; }
-        .remind-alert { align-self: center; background: var(--remind) !important; color: white !important; font-weight: bold; text-align: center; border-radius: 12px; margin: 10px 0; animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pop { from { opacity: 0; scale: 0.8; } to { opacity: 1; scale: 1; } }
-        .input-bar { padding: 12px; border-top: 1px solid #eee; display: flex; align-items: center; gap: 8px; }
-        input { flex: 1; border: none; background: #f0f2f5; border-radius: 20px; padding: 10px 16px; outline: none; font-size: 15px; }
-        button { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; padding: 5px 10px; }
-        .hint { font-size: 11px; color: #999; text-align: center; padding: 6px 12px 0; }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg); color: var(--ink);
+        }
+        /* soft Gemini-style glow behind everything */
+        body::before {
+            content: ""; position: fixed; inset: -20% -10% auto -10%; height: 55%;
+            background:
+                radial-gradient(40% 60% at 25% 20%, rgba(66,133,244,.14), transparent 70%),
+                radial-gradient(40% 60% at 70% 10%, rgba(217,101,112,.13), transparent 70%),
+                radial-gradient(35% 55% at 50% 30%, rgba(155,114,203,.12), transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+        .wrapper {
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column; height: 100%;
+            max-width: 760px; margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+            backdrop-filter: blur(8px);
+        }
+        .who { display: flex; align-items: center; gap: 12px; }
+        .logo {
+            width: 46px; height: 46px; border-radius: 50%; padding: 2px; background: var(--gem);
+            display: flex; align-items: center; justify-content: center; color: #fff;
+            box-shadow: 0 4px 14px rgba(155,114,203,.35); overflow: hidden;
+        }
+        .logo img {
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center 40%;
+            background: #fff; display: block;
+        }
+        .logo svg { width: 20px; height: 20px; display: none; }
+        .name { font-family: Georgia, "Times New Roman", serif; font-size: 18px; font-weight: 600; letter-spacing: -.2px; }
+        .status { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-top: 1px; }
+        .dot { width: 7px; height: 7px; border-radius: 50%; background: #34c759; box-shadow: 0 0 0 3px rgba(52,199,89,.2); }
+        .ghost-btn {
+            background: transparent; border: 1px solid var(--line); color: var(--muted);
+            border-radius: 999px; padding: 6px 12px; font-size: 12px; cursor: pointer; transition: .2s;
+        }
+        .ghost-btn:hover { color: var(--ink); border-color: var(--muted); }
+
+        /* Chat */
+        .chat-box {
+            flex: 1; overflow-y: auto; padding: 8px 18px 20px;
+            display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth;
+        }
+        .chat-box::-webkit-scrollbar { width: 6px; }
+        .chat-box::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+        .row { display: flex; gap: 12px; animation: in .35s ease-out; }
+        .row.user { justify-content: flex-end; }
+        .row.remind-alert { justify-content: center; }
+        .spark {
+            flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--gem); padding: 2px;
+            display: flex; align-items: center; justify-content: center; color: #fff; margin-top: 0; overflow: hidden;
+        }
+        .spark img {
+            width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center 40%;
+            background: #fff; display: block;
+        }
+        .spark svg { width: 15px; height: 15px; }
+        .msg { font-size: 15.5px; line-height: 1.6; word-wrap: break-word; white-space: pre-wrap; }
+        .bot { max-width: 85%; color: var(--ink); padding-top: 3px; }
+        .user .msg, .msg.user {
+            max-width: 80%; background: var(--user); padding: 10px 16px; border-radius: 22px 22px 6px 22px;
+        }
+        .msg.remind-alert {
+            max-width: 92%; text-align: center; font-weight: 700; letter-spacing: .3px; color: #fff;
+            padding: 14px 20px; border-radius: 18px;
+            background: linear-gradient(120deg, var(--alert-a), var(--alert-b));
+            box-shadow: 0 8px 28px rgba(255,95,109,.35);
+            animation: pop .45s cubic-bezier(.175,.885,.32,1.275);
+        }
+        .typing { display: inline-flex; gap: 4px; align-items: center; height: 24px; }
+        .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce 1.2s infinite; }
+        .typing i:nth-child(2) { animation-delay: .15s; }
+        .typing i:nth-child(3) { animation-delay: .3s; }
+        @keyframes bounce { 0%,60%,100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-5px); opacity: 1; } }
+        @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        @keyframes pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+
+        /* Suggestion chips (Gemini) */
+        .chips { display: flex; gap: 8px; overflow-x: auto; padding: 0 18px 10px; scrollbar-width: none; }
+        .chips::-webkit-scrollbar { display: none; }
+        .chip {
+            flex: none; background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+            border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor: pointer; transition: .2s;
+            box-shadow: var(--shadow);
+        }
+        .chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+        /* Composer (GPT pill + Claude warmth) */
+        .composer { padding: 0 18px calc(14px + env(safe-area-inset-bottom)); }
+        .input-bar {
+            display: flex; align-items: center; gap: 8px; background: var(--surface);
+            border: 1px solid var(--line); border-radius: 28px; padding: 6px 6px 6px 20px;
+            box-shadow: var(--shadow); transition: .2s;
+        }
+        .input-bar:focus-within {
+            border-color: transparent;
+            box-shadow: 0 0 0 2px var(--accent), 0 6px 26px rgba(217,119,87,.2);
+        }
+        input {
+            flex: 1; border: none; background: transparent; color: var(--ink);
+            padding: 10px 0; outline: none; font-size: 16px; font-family: inherit;
+        }
+        input::placeholder { color: var(--muted); }
+        .send {
+            flex: none; width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
+            background: var(--accent); color: var(--accent-ink); display: flex; align-items: center; justify-content: center;
+            transition: .2s;
+        }
+        .send:hover { transform: scale(1.06); filter: brightness(1.05); }
+        .send:active { transform: scale(.94); }
+        .send svg { width: 18px; height: 18px; }
+        .hint { font-size: 11.5px; color: var(--muted); text-align: center; padding-top: 8px; }
     </style>
 </head>
 <body>
 <div class="wrapper">
     <div class="header">
-        <div style="display: flex; align-items: center;">
-            <div class="avatar">M</div>
-            <div><b>DeMinh DeRozan</b><br><small style="color: #31a24c;">● Online</small></div>
+        <div class="who">
+            <div class="logo">
+                <img src="kangaroo.png" alt="Roo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 5.2 4.8 9.4 10 10-5.2.6-9.4 4.8-10 10-.6-5.2-4.8-9.4-10-10 5.2-.6 9.4-4.8 10-10z"/></svg>
+            </div>
+            <div>
+                <div class="name">DeMinh DeRozan</div>
+                <div class="status"><span class="dot"></span>Online</div>
+            </div>
         </div>
-        <button id="clearBtn" onclick="clearHistory()" style="font-size: 10px; color: #999; border: 1px solid #eee; border-radius: 4px; padding: 2px 5px;">Clear Chat</button>
+        <button id="clearBtn" class="ghost-btn" onclick="clearHistory()">Clear chat</button>
     </div>
 
     <div class="chat-box" id="chatBox"></div>
 
-    <div class="hint">Keep this tab open to get reminded.</div>
-    <div class="input-bar">
-        <input type="text" id="userInput" placeholder="Type here, ya legend..." autocomplete="off">
-        <button onclick="handleSend()">SEND</button>
+    <div class="chips" id="chips">
+        <button class="chip" onclick="useChip(this)">Remind me in 10 mins to drink water 💧</button>
+        <button class="chip" onclick="useChip(this)">Tomorrow 9am team meeting</button>
+        <button class="chip" onclick="useChip(this)">Today 6pm call mum</button>
+    </div>
+
+    <div class="composer">
+        <div class="input-bar">
+            <input type="text" id="userInput" placeholder="Type here, ya legend..." autocomplete="off">
+            <button class="send" onclick="handleSend()" aria-label="Send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            </button>
+        </div>
+        <div class="hint">Keep this tab open to get reminded.</div>
     </div>
 </div>
 
 <script>
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
-    
+    const chips = document.getElementById('chips');
+
     const audioList = [
         'https://d28igba62yy5is.cloudfront.net/audio.mp3',
         'https://d28igba62yy5is.cloudfront.net/audioo.mp3'
     ];
-    
+
     let currentAudioObj = new Audio(audioList[0]);
     currentAudioObj.volume = 0.8;
 
@@ -59,6 +206,8 @@
     const CHECK_URL = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/check";
     const POLL_MS = 15000;
     const ORIGINAL_TITLE = document.title;
+
+    const SPARK_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 5.2 4.8 9.4 10 10-5.2.6-9.4 4.8-10 10-.6-5.2-4.8-9.4-10-10 5.2-.6 9.4-4.8 10-10z"/></svg>';
 
     function getUserId() {
         try {
@@ -80,22 +229,22 @@
 
     function unlockSound() {
         if (isSoundEnabled) return;
-        currentAudioObj.muted = true;                       
+        currentAudioObj.muted = true;
         currentAudioObj.play().then(() => {
             currentAudioObj.pause();
             currentAudioObj.currentTime = 0;
             currentAudioObj.muted = false;
             isSoundEnabled = true;
             UNLOCK_EVENTS.forEach(ev => document.removeEventListener(ev, unlockSound));
-        }).catch(() => { currentAudioObj.muted = false; }); 
+        }).catch(() => { currentAudioObj.muted = false; });
     }
     UNLOCK_EVENTS.forEach(ev => document.addEventListener(ev, unlockSound));
 
     function playBell() {
         if (!isSoundEnabled) return;
-        
+
         const randomUrl = audioList[Math.floor(Math.random() * audioList.length)];
-        
+
         const bell = new Audio(randomUrl);
         bell.volume = 0.8;
         bell.currentTime = 0;
@@ -109,6 +258,7 @@
             appendMessage("Scarnon? Put a task in and I'll remind ya! ✨", 'bot', null, false);
         } else {
             history.forEach(m => appendMessage(m.txt, m.side, null, false));
+            chips.style.display = 'none';
         }
         autoCheck();
     };
@@ -124,7 +274,13 @@
             localStorage.removeItem('mate_chat_history');
             chatBox.innerHTML = '';
             appendMessage("History cleared, mate!", 'bot', null, false);
+            chips.style.display = 'flex';
         }
+    }
+
+    function useChip(el) {
+        userInput.value = el.innerText.replace(/\s*[\u{1F300}-\u{1FAFF}]\s*$/u, '');
+        userInput.focus();
     }
 
     /* Send */
@@ -134,11 +290,12 @@
         const text = userInput.value.trim();
         if (!text) return;
 
+        chips.style.display = 'none';
         appendMessage(text, 'user');
         userInput.value = '';
 
         const tid = 'l-' + Date.now();
-        appendMessage("Hmm...", 'bot', tid, false);
+        appendMessage("", 'bot', tid, false, true);
 
         try {
             const res = await fetch(SEND_URL, {
@@ -160,11 +317,11 @@
     let checking = false;
 
     async function autoCheck() {
-        if (checking) return;                  
+        if (checking) return;
         checking = true;
         try {
             const res = await fetch(CHECK_URL + '?userId=' + encodeURIComponent(USER_ID), { cache: 'no-store' });
-            if (!res.ok) return;             
+            if (!res.ok) return;
             const data = await res.json();
             const list = data.reminders || [];
             if (list.length > 0) {
@@ -189,12 +346,32 @@
     setInterval(autoCheck, POLL_MS);
 
     /* UI */
-    function appendMessage(txt, side, id, save = true) {
+    function appendMessage(txt, side, id, save = true, typing = false) {
+        const row = document.createElement('div');
+        row.className = 'row ' + side;
+        if (id) row.id = id;
+
+        if (side === 'bot') {
+            const spark = document.createElement('div');
+            spark.className = 'spark';
+            const im = document.createElement('img');
+            im.src = 'kangaroo.png';
+            im.alt = 'Roo';
+            im.onerror = () => { spark.innerHTML = SPARK_SVG; };
+            spark.appendChild(im);
+            row.appendChild(spark);
+        }
+
         const d = document.createElement('div');
         d.className = 'msg ' + side;
-        if (id) d.id = id;
-        d.innerText = txt;
-        chatBox.appendChild(d);
+        if (typing) {
+            d.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+        } else {
+            d.innerText = txt;
+        }
+        row.appendChild(d);
+
+        chatBox.appendChild(row);
         chatBox.scrollTop = chatBox.scrollHeight;
         if (save) saveHistory(txt, side);
     }
