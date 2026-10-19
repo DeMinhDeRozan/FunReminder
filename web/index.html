@@ -46,15 +46,20 @@
 <script>
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
-    const bell = new Audio('https://d28igba62yy5is.cloudfront.net/audio.mp3');
-    bell.volume = 0.8;
+    
+    const audioList = [
+        'https://d28igba62yy5is.cloudfront.net/audio.mp3',
+        'https://d28igba62yy5is.cloudfront.net/audioo.mp3'
+    ];
+    
+    let currentAudioObj = new Audio(audioList[0]);
+    currentAudioObj.volume = 0.8;
 
     const SEND_URL  = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/reminder";
     const CHECK_URL = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/check";
     const POLL_MS = 15000;
     const ORIGINAL_TITLE = document.title;
 
-  
     function getUserId() {
         try {
             let id = localStorage.getItem('mate_user_id');
@@ -64,7 +69,7 @@
             }
             return id;
         } catch (e) {
-            return 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10); // localStorage bị chặn
+            return 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
         }
     }
     const USER_ID = getUserId();
@@ -75,19 +80,24 @@
 
     function unlockSound() {
         if (isSoundEnabled) return;
-        bell.muted = true;                       
-        bell.play().then(() => {
-            bell.pause();
-            bell.currentTime = 0;
-            bell.muted = false;
+        currentAudioObj.muted = true;                       
+        currentAudioObj.play().then(() => {
+            currentAudioObj.pause();
+            currentAudioObj.currentTime = 0;
+            currentAudioObj.muted = false;
             isSoundEnabled = true;
             UNLOCK_EVENTS.forEach(ev => document.removeEventListener(ev, unlockSound));
-        }).catch(() => { bell.muted = false; }); 
+        }).catch(() => { currentAudioObj.muted = false; }); 
     }
     UNLOCK_EVENTS.forEach(ev => document.addEventListener(ev, unlockSound));
 
     function playBell() {
         if (!isSoundEnabled) return;
+        
+        const randomUrl = audioList[Math.floor(Math.random() * audioList.length)];
+        
+        const bell = new Audio(randomUrl);
+        bell.volume = 0.8;
         bell.currentTime = 0;
         bell.play().catch(e => console.error(e));
     }
