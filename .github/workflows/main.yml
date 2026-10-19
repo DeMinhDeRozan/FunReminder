@@ -42,3 +42,10 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
         working-directory: ./Terraform
+        
+      - name: Sync to S3
+        run: |
+          aws s3 sync ./web s3://reminderyoubro --delete
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_ID }}" \
+            --paths "/*"
