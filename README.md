@@ -11,7 +11,7 @@
 
 > 💡 A serverless web application running based on S3 and delivering content via CloudFront CDN, using AWS services to store, process and turn messages into alarm for any developers working with hundred of tabs at a time
 
-<h3>⌯✈︎ Main live site available at: **[https://deminh.com/1/](https://deminh.com/1/)** </h3>
+⌯✈︎ Main live site available at: **[deminh.com/1/](https://deminh.com/1/)**
     
 🌐 CloudFront live site available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)**
 
