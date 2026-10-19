@@ -46,7 +46,7 @@
 <script>
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
-    const bell = new Audio('audio.mp3');
+    const bell = new Audio('https://d28igba62yy5is.cloudfront.net/audio.mp3');
     bell.volume = 0.8;
 
     const SEND_URL  = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/reminder";
@@ -54,7 +54,7 @@
     const POLL_MS = 15000;
     const ORIGINAL_TITLE = document.title;
 
-    // Mỗi trình duyệt có một userId riêng, để chỉ nhận đúng reminder của mình
+  
     function getUserId() {
         try {
             let id = localStorage.getItem('mate_user_id');
@@ -69,20 +69,20 @@
     }
     const USER_ID = getUserId();
 
-    /* ---------- Sound ---------- */
+    /*  Sound  */
     let isSoundEnabled = false;
     const UNLOCK_EVENTS = ['click', 'touchstart', 'keydown'];
 
     function unlockSound() {
         if (isSoundEnabled) return;
-        bell.muted = true;                       // mở khóa trong im lặng, không bị kêu thử
+        bell.muted = true;                       
         bell.play().then(() => {
             bell.pause();
             bell.currentTime = 0;
             bell.muted = false;
             isSoundEnabled = true;
             UNLOCK_EVENTS.forEach(ev => document.removeEventListener(ev, unlockSound));
-        }).catch(() => { bell.muted = false; }); // thất bại thì lần tương tác sau thử lại
+        }).catch(() => { bell.muted = false; }); 
     }
     UNLOCK_EVENTS.forEach(ev => document.addEventListener(ev, unlockSound));
 
@@ -92,7 +92,7 @@
         bell.play().catch(e => console.error(e));
     }
 
-    /* ---------- Chat history ---------- */
+    /* Chat history */
     window.onload = () => {
         const history = JSON.parse(localStorage.getItem('mate_chat_history') || '[]');
         if (history.length === 0) {
@@ -100,7 +100,7 @@
         } else {
             history.forEach(m => appendMessage(m.txt, m.side, null, false));
         }
-        autoCheck(); // kiểm tra ngay khi mở trang, đỡ phải chờ vòng đầu
+        autoCheck();
     };
 
     function saveHistory(txt, side) {
@@ -117,7 +117,7 @@
         }
     }
 
-    /* ---------- Send ---------- */
+    /* Send */
     async function handleSend() {
         unlockSound();
 
@@ -131,7 +131,6 @@
         appendMessage("Hmm...", 'bot', tid, false);
 
         try {
-            // Không đặt Content-Type để tránh preflight CORS (giữ nguyên như bản cũ)
             const res = await fetch(SEND_URL, {
                 method: 'POST',
                 body: JSON.stringify({ user_id: USER_ID, task_input: text })
@@ -147,15 +146,15 @@
         }
     }
 
-    /* ---------- Polling ---------- */
+    /* Polling */
     let checking = false;
 
     async function autoCheck() {
-        if (checking) return;                    // tránh hai lần gọi chồng nhau
+        if (checking) return;                  
         checking = true;
         try {
             const res = await fetch(CHECK_URL + '?userId=' + encodeURIComponent(USER_ID), { cache: 'no-store' });
-            if (!res.ok) return;                 // lỗi server: thử lại ở vòng sau
+            if (!res.ok) return;             
             const data = await res.json();
             const list = data.reminders || [];
             if (list.length > 0) {
@@ -170,7 +169,6 @@
         }
     }
 
-    // Tab nền bị trình duyệt làm chậm timer, nên quay lại tab là kiểm tra ngay
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
             document.title = ORIGINAL_TITLE;
@@ -180,7 +178,7 @@
 
     setInterval(autoCheck, POLL_MS);
 
-    /* ---------- UI ---------- */
+    /* UI */
     function appendMessage(txt, side, id, save = true) {
         const d = document.createElement('div');
         d.className = 'msg ' + side;
