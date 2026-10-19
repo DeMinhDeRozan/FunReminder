@@ -21,6 +21,7 @@
         .input-bar { padding: 12px; border-top: 1px solid #eee; display: flex; align-items: center; gap: 8px; }
         input { flex: 1; border: none; background: #f0f2f5; border-radius: 20px; padding: 10px 16px; outline: none; font-size: 15px; }
         button { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; padding: 5px 10px; }
+        .hint { font-size: 11px; color: #999; text-align: center; padding: 6px 12px 0; }
     </style>
 </head>
 <body>
@@ -35,6 +36,7 @@
 
     <div class="chat-box" id="chatBox"></div>
 
+    <div class="hint">Keep this tab open to get reminded.</div>
     <div class="input-bar">
         <input type="text" id="userInput" placeholder="Type here, ya legend..." autocomplete="off">
         <button onclick="handleSend()">SEND</button>
@@ -44,25 +46,53 @@
 <script>
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
-    const bell = new Audio('audio.mp3'); 
+    const bell = new Audio('audio.mp3');
     bell.volume = 0.8;
-
-    let isSoundEnabled = false;
 
     const SEND_URL  = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/reminder";
     const CHECK_URL = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/check";
+    const POLL_MS = 15000;
+    const ORIGINAL_TITLE = document.title;
+
+    // Mỗi trình duyệt có một userId riêng, để chỉ nhận đúng reminder của mình
+    function getUserId() {
+        try {
+            let id = localStorage.getItem('mate_user_id');
+            if (!id) {
+                id = (crypto.randomUUID ? crypto.randomUUID() : 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10));
+                localStorage.setItem('mate_user_id', id);
+            }
+            return id;
+        } catch (e) {
+            return 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10); // localStorage bị chặn
+        }
+    }
+    const USER_ID = getUserId();
+
+    /* ---------- Sound ---------- */
+    let isSoundEnabled = false;
+    const UNLOCK_EVENTS = ['click', 'touchstart', 'keydown'];
 
     function unlockSound() {
         if (isSoundEnabled) return;
-        
+        bell.muted = true;                       // mở khóa trong im lặng, không bị kêu thử
         bell.play().then(() => {
             bell.pause();
             bell.currentTime = 0;
+            bell.muted = false;
             isSoundEnabled = true;
-            console.log("Sound enabled");
-        }).catch(e => console.error("Waiting for interaction..."));
+            UNLOCK_EVENTS.forEach(ev => document.removeEventListener(ev, unlockSound));
+        }).catch(() => { bell.muted = false; }); // thất bại thì lần tương tác sau thử lại
+    }
+    UNLOCK_EVENTS.forEach(ev => document.addEventListener(ev, unlockSound));
+
+    function playBell() {
+        if (!isSoundEnabled) return;
+        bell.currentTime = 0;
+        bell.play().catch(e => console.error(e));
     }
 
+    /* ---------- Chat history ---------- */
     window.onload = () => {
         const history = JSON.parse(localStorage.getItem('mate_chat_history') || '[]');
         if (history.length === 0) {
@@ -70,6 +100,7 @@
         } else {
             history.forEach(m => appendMessage(m.txt, m.side, null, false));
         }
+        autoCheck(); // kiểm tra ngay khi mở trang, đỡ phải chờ vòng đầu
     };
 
     function saveHistory(txt, side) {
@@ -86,8 +117,9 @@
         }
     }
 
+    /* ---------- Send ---------- */
     async function handleSend() {
-        unlockSound(); 
+        unlockSound();
 
         const text = userInput.value.trim();
         if (!text) return;
@@ -99,9 +131,10 @@
         appendMessage("Hmm...", 'bot', tid, false);
 
         try {
+            // Không đặt Content-Type để tránh preflight CORS (giữ nguyên như bản cũ)
             const res = await fetch(SEND_URL, {
                 method: 'POST',
-                body: JSON.stringify({ user_id: "web_user", task_input: text })
+                body: JSON.stringify({ user_id: USER_ID, task_input: text })
             });
             const data = await res.json();
             const loadingMsg = document.getElementById(tid);
@@ -114,22 +147,40 @@
         }
     }
 
+    /* ---------- Polling ---------- */
+    let checking = false;
+
     async function autoCheck() {
+        if (checking) return;                    // tránh hai lần gọi chồng nhau
+        checking = true;
         try {
-            const res = await fetch(CHECK_URL);
+            const res = await fetch(CHECK_URL + '?userId=' + encodeURIComponent(USER_ID), { cache: 'no-store' });
+            if (!res.ok) return;                 // lỗi server: thử lại ở vòng sau
             const data = await res.json();
-            if (data.reminders && data.reminders.length > 0) {
-                data.reminders.forEach(m => {
-                    if (isSoundEnabled) {
-                        bell.currentTime = 0;
-                        bell.play().catch(e => console.error(e));
-                    }
-                    appendMessage("🚨 OI OI OI! " + m.toUpperCase(), 'remind-alert');
-                });
+            const list = data.reminders || [];
+            if (list.length > 0) {
+                playBell();
+                list.forEach(m => appendMessage("🚨 OI OI OI! " + String(m).toUpperCase(), 'remind-alert'));
+                if (document.hidden) document.title = "🚨 Reminder!";
             }
-        } catch (e) {}
+        } catch (e) {
+            console.error(e);
+        } finally {
+            checking = false;
+        }
     }
 
+    // Tab nền bị trình duyệt làm chậm timer, nên quay lại tab là kiểm tra ngay
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            document.title = ORIGINAL_TITLE;
+            autoCheck();
+        }
+    });
+
+    setInterval(autoCheck, POLL_MS);
+
+    /* ---------- UI ---------- */
     function appendMessage(txt, side, id, save = true) {
         const d = document.createElement('div');
         d.className = 'msg ' + side;
@@ -143,12 +194,6 @@
     userInput.addEventListener("keydown", e => {
         if (e.key === "Enter") handleSend();
     });
-
-    // Ép unlock khi chạm vào bất cứ đâu
-    document.addEventListener('click', unlockSound, { once: true });
-    document.addEventListener('touchstart', unlockSound, { once: true });
-
-    setInterval(autoCheck, 15000);
 </script>
 </body>
 </html>
