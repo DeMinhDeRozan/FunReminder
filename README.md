@@ -11,11 +11,11 @@
 
 > 💡 A serverless web application running based on S3 and delivering content via CloudFront CDN, using AWS services to store, process and turn messages into alarm for any developers working with hundred of tabs at a time
 
-⌯✈︎ Main live site available at: **[deminh.com/1/](https://deminh.com/1/)**
+⌯✈︎ Main live site available at: **[deminh.com/1/](https://deminh.com/1/)**.
     
-🌐 CloudFront live site available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)**
+🌐 CloudFront live site available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)**.
 
-🌏 Original live site available at: **[http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/](http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/)**
+🌏 Original live site NOT available at: **[http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/](http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/)** (403 Forbidden - OAC established).
 
 <p align="center">
   <img src="asset/divider.svg" width="800" height="28" alt="">
@@ -45,10 +45,11 @@
 
 - ⏰ Set an alarm by entering a time and a reminder message.
 - 🔊 When the alarm fires, it will play an iconic Aussie sound.
+- ⏱️ Short polling is performed every 15s to invoke Lambda scanning.
 - 🏗️ Infrastructure is fully managed as code (Terraform) and deployed automatically (GitHub Actions).
 - ❌ Missing alarms will be detected by EventBridge scheduler, later reported to me (admin).
 - ☁️ Serverless architecture with no servers to manage.
-- 🪙 The number of messages (tokens) applied to the entire web app is limited everyday, you have to wait until the next day if it is unavailable.
+- 🪙 The number of messages (tokens) applied to the web app is limited everyday, you have to wait until the next day if it is unavailable.
 
 <p align="center">
   <img src="asset/divider.svg" width="800" height="28" alt="">
@@ -60,9 +61,9 @@
 
 2️⃣ The app calls API Gateway, which routes to Lambda to call Bedrock to process message and save in DynamoDB (including time).
 
-3️⃣ Lambda reads the message from DynamoDB and send message and sound back to user sessions.
+3️⃣ Every 15s, frontend performs short polling to call API Gateway invoking Lambda to scan table.
 
-4️⃣ The alarm goes off with the reminder message and sound. 🔔
+4️⃣ Lambda reads the message from DynamoDB and send the alarm back to user sessions.
 
 5️⃣ If an alarm is missed, an EventBridge scheduler running every 2 minutes will invoke Lambda sweeper to check any missing record.
 
