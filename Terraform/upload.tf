@@ -2,12 +2,12 @@ provider "aws" {
   region = "ap-southeast-2"
 }
 
-# Bucket đã tồn tại sẵn, Terraform chỉ đọc (không tạo mới)
+
 data "aws_s3_bucket" "reminderyoubro" {
   bucket = "reminderyoubro"
 }
 
-# Cho phép bucket policy public (cần để CloudFront đọc qua website endpoint)
+
 resource "aws_s3_bucket_public_access_block" "example" {
   bucket = data.aws_s3_bucket.reminderyoubro.id
 
@@ -25,8 +25,7 @@ resource "aws_s3_bucket_website_configuration" "mate_web_config" {
   }
 }
 
-# Policy: public đọc file + admin full quyền
-# (bỏ điều kiện aws:SourceVpc vì CloudFront không nằm trong VPC nên bị 403)
+
 resource "aws_s3_bucket_policy" "public_read" {
   bucket = data.aws_s3_bucket.reminderyoubro.id
 
@@ -76,13 +75,3 @@ output "website_url" {
   value = aws_s3_bucket_website_configuration.mate_web_config.website_endpoint
 }
 
-# --- Tuỳ chọn: remote backend để dùng với GitHub Actions ---
-# Bỏ comment và đổi tên bucket (bucket state phải tạo tay trước, khác bucket web)
-#
-# terraform {
-#   backend "s3" {
-#     bucket = "ten-bucket-state-rieng"
-#     key    = "funreminder/terraform.tfstate"
-#     region = "ap-southeast-2"
-#   }
-# }
