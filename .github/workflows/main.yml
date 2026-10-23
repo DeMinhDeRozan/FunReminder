@@ -1,4 +1,4 @@
-name: Deploy Infrastructure
+name: Deploy
 
 on:
   push:
@@ -6,46 +6,19 @@ on:
     paths:
       - 'Terraform/**'
       - 'web/**'
-      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
-  terraform:
-    name: Terraform Apply
+  trigger:
     runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com
-
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ap-southeast-2
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.12.2
-
-      - name: Terraform Init
-        run: terraform init -input=false
-        working-directory: ./Terraform
-
-      - name: Terraform Plan
-        run: terraform plan -input=false
-        working-directory: ./Terraform
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
-        working-directory: ./Terraform
-        
-      - name: Sync to S3
+      - name: Trigger private deployment
+        env:
+          GH_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
         run: |
-          aws s3 sync ./web s3://reminderyoubro --delete
-          aws cloudfront create-invalidation \
-            --distribution-id "${{ vars.CLOUDFRONT_ID }}" \
-            --paths "/*"
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            /repos/DeMinhDeRozan/FunReminder_GitHubActions/dispatches \
+            -f event_type=deploy
