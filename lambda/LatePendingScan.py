@@ -14,6 +14,7 @@ TZ = ZoneInfo("Australia/Melbourne")
 GRACE_MINUTES = 2                      
 SNS_TOPIC_ARN = os.environ.get("SNS_TOPIC_ARN", "")
 
+
 dynamodb = boto3.resource("dynamodb", region_name=REGION)
 table = dynamodb.Table(TABLE_NAME)
 sns = boto3.client("sns", region_name=REGION)
