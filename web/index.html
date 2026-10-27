@@ -78,6 +78,7 @@
             background: transparent; border: 1px solid var(--line); color: var(--muted);
             border-radius: 999px; padding: 6px 12px; font-size: 12px; cursor: pointer; transition: .2s;
         }
+        .actions { display: flex; gap: 8px; align-items: center; }
         .ghost-btn:hover { color: var(--ink); border-color: var(--muted); }
 
         /* Chat */
@@ -188,7 +189,10 @@
                 <div class="status"><span class="dot"></span>Online</div>
             </div>
         </div>
-        <button id="clearBtn" class="ghost-btn" onclick="clearHistory()">Clear chat</button>
+        <div class="actions">
+            <button id="modeBtn" class="ghost-btn" onclick="toggleMode()" title="Switch alarm sound">🔔 Original</button>
+            <button id="clearBtn" class="ghost-btn" onclick="clearHistory()">Clear chat</button>
+        </div>
     </div>
 
     <div class="chat-box" id="chatBox"></div>
@@ -271,9 +275,35 @@
         return audioList[Math.floor(Math.random() * audioList.length)];
     }
 
+    /* Alarm mode: 'original' = the two bell mp3s, 'special' = generated M1/M2/M5 voice */
+    let voiceMode = 'special';
+    try {
+        const saved = localStorage.getItem('mate_voice_mode');
+        if (saved === 'original' || saved === 'special') voiceMode = saved;
+    } catch (e) {}
+
+    function renderModeBtn() {
+        const b = document.getElementById('modeBtn');
+        if (b) b.textContent = voiceMode === 'special' ? '🎙️ Special' : '🔔 Original';
+    }
+
+    function toggleMode() {
+        voiceMode = voiceMode === 'special' ? 'original' : 'special';
+        try { localStorage.setItem('mate_voice_mode', voiceMode); } catch (e) {}
+        renderModeBtn();
+        appendMessage(
+            voiceMode === 'special'
+                ? "Special mode on, mate! Ya'll get the proper voice 🎙️"
+                : "Original mode on! Back to the good old bell 🔔",
+            'bot', null, false
+        );
+    }
+    renderModeBtn();
+
     /* Build the CloudFront URL for a generated TTS file, or null if there isn't one */
     function reminderAudioUrl(reminder) {
         if (
+            voiceMode !== 'special' ||
             !reminder ||
             typeof reminder !== 'object' ||
             reminder.audioStatus !== 'READY' ||
@@ -414,7 +444,7 @@
         try {
             const res = await fetch(SEND_URL, {
                 method: 'POST',
-                body: JSON.stringify({ user_id: USER_ID, task_input: text }),
+                body: JSON.stringify({ user_id: USER_ID, task_input: text, voice_mode: voiceMode }),
                 signal: controller.signal
             });
             const data = await res.json();
