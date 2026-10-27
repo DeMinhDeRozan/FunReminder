@@ -435,6 +435,19 @@
         }
     }
 
+    function taskToText(v) {
+        if (v == null) return '';
+        if (typeof v === 'string') return v;
+        if (Array.isArray(v)) return v.map(taskToText).join(' ');
+        if (typeof v === 'object') {
+            for (const k of ['S', 'task', 'Task', 'text', 'message', 'title', 'content']) {
+                if (k in v) return taskToText(v[k]);
+            }
+            return JSON.stringify(v);
+        }
+        return String(v);
+    }
+
     /* Polling */
     let checking = false;
 
@@ -457,7 +470,7 @@
                 enqueueReminderAudio(reminders);
 
                 reminders.forEach(r => appendMessage(
-                    "🚨 OI OI OI! " + String(r.task || 'Reminder').toUpperCase(),
+                    "🚨 OI OI OI! " + (taskToText(r.task) || 'Reminder').toUpperCase(),
                     'remind-alert'
                 ));
 
