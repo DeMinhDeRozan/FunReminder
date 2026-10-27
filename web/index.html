@@ -78,6 +78,12 @@
             background: transparent; border: 1px solid var(--line); color: var(--muted);
             border-radius: 999px; padding: 6px 12px; font-size: 12px; cursor: pointer; transition: .2s;
         }
+        .sound-banner {
+            margin: 0 18px 8px; padding: 10px 14px; border-radius: 14px; text-align: center; cursor: pointer;
+            font-size: 13.5px; font-weight: 600; color: #fff; background: linear-gradient(120deg, var(--alert-a), var(--alert-b));
+            box-shadow: 0 4px 16px rgba(255,95,109,.3); user-select: none;
+        }
+        .sound-banner.hidden { display: none; }
         .actions { display: flex; gap: 8px; align-items: center; }
         .ghost-btn:hover { color: var(--ink); border-color: var(--muted); }
 
@@ -203,6 +209,8 @@
         <button class="chip" onclick="useChip(this)">Today 6pm call mum</button>
     </div>
 
+    <div id="soundBanner" class="sound-banner" onclick="unlockSound()">🔊 Tap here to turn on alarm sound</div>
+
     <div class="composer">
         <div class="input-bar">
             <input type="text" id="userInput" placeholder="Type here, ya legend..." autocomplete="off">
@@ -256,7 +264,8 @@
 
     /*  Sound  */
     let isSoundEnabled = false;
-    const UNLOCK_EVENTS = ['click', 'touchstart', 'keydown'];
+    const UNLOCK_EVENTS = ['click', 'touchend', 'pointerup', 'keydown'];
+    const lockedQueue = []; // reminders that fired while sound was still locked
 
     function unlockSound() {
         if (isSoundEnabled) return;
@@ -267,6 +276,9 @@
             currentAudioObj.muted = false;
             isSoundEnabled = true;
             UNLOCK_EVENTS.forEach(ev => document.removeEventListener(ev, unlockSound));
+            const b = document.getElementById('soundBanner');
+            if (b) b.classList.add('hidden');
+            if (lockedQueue.length) enqueueReminderAudio(lockedQueue.splice(0));
         }).catch(() => { currentAudioObj.muted = false; });
     }
     UNLOCK_EVENTS.forEach(ev => document.addEventListener(ev, unlockSound));
@@ -331,7 +343,11 @@
 
     function enqueueReminderAudio(reminders) {
         if (!isSoundEnabled) {
-            console.warn('Audio is not unlocked yet by a user interaction.');
+            // Browser still blocks audio: remember it, nag the user, play once they tap.
+            lockedQueue.push(...reminders);
+            const b = document.getElementById('soundBanner');
+            if (b) { b.classList.remove('hidden'); b.textContent = '🔊 Reminder fired! Tap here to hear it'; }
+            try { if (navigator.vibrate) navigator.vibrate([300, 150, 300]); } catch (e) {}
             return;
         }
 
