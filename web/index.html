@@ -229,6 +229,8 @@
 
     const SEND_URL  = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/reminder";
     const CHECK_URL = "https://rpjf4296xk.execute-api.ap-southeast-2.amazonaws.com/Production/check";
+    const AUDIO_BASE_URL = "https://d28igba62yy5is.cloudfront.net/";
+    const FETCH_TIMEOUT_MS = 28000; // API Gateway cuts at ~29s
     const POLL_MS = 15000;
     const ORIGINAL_TITLE = document.title;
 
@@ -265,15 +267,99 @@
     }
     UNLOCK_EVENTS.forEach(ev => document.addEventListener(ev, unlockSound));
 
+    function pickBellUrl() {
+        return audioList[Math.floor(Math.random() * audioList.length)];
+    }
+
+    /* Build the CloudFront URL for a generated TTS file, or null if there isn't one */
+    function reminderAudioUrl(reminder) {
+        if (
+            !reminder ||
+            typeof reminder !== 'object' ||
+            reminder.audioStatus !== 'READY' ||
+            !reminder.audioS3Key
+        ) {
+            return null;
+        }
+
+        const key = String(reminder.audioS3Key)
+            .split('/')
+            .map(segment => encodeURIComponent(segment))
+            .join('/');
+
+        return AUDIO_BASE_URL + key;
+    }
+
+    /*
+     * Play each fired reminder one after another on the SAME audio element that
+     * was unlocked by the user's first tap (iOS/Safari only allow that one).
+     * Order of preference: Supertonic voice -> old bell. Any load/play error
+     * (404, expired by the S3 lifecycle rule, etc.) falls back to the bell.
+     */
+    const audioQueue = [];
+    let queuePlaying = false;
+
+    function enqueueReminderAudio(reminders) {
+        if (!isSoundEnabled) {
+            console.warn('Audio is not unlocked yet by a user interaction.');
+            return;
+        }
+
+        audioQueue.push(...reminders);
+        if (!queuePlaying) playNextInQueue();
+    }
+
+    function playNextInQueue() {
+        const reminder = audioQueue.shift();
+
+        if (!reminder) {
+            queuePlaying = false;
+            return;
+        }
+
+        queuePlaying = true;
+
+        const el = currentAudioObj;
+        const ttsUrl = reminderAudioUrl(reminder);
+        let stage = ttsUrl ? 'tts' : 'bell';
+        const failed = {};
+
+        const next = () => {
+            el.onended = null;
+            el.onerror = null;
+            playNextInQueue();
+        };
+
+        const start = url => {
+            el.src = url;
+            el.currentTime = 0;
+            el.volume = 0.8;
+            el.play().catch(fail);
+        };
+
+        // Called for play() rejection AND the element's error event; once per stage.
+        function fail(err) {
+            if (failed[stage]) return;
+            failed[stage] = true;
+            console.error('Audio failed (' + stage + '):', err);
+
+            if (stage === 'tts') {
+                stage = 'bell';
+                start(pickBellUrl());
+            } else {
+                next();
+            }
+        }
+
+        el.onended = next;
+        el.onerror = fail;
+
+        start(ttsUrl || pickBellUrl());
+    }
+
     function playBell() {
         if (!isSoundEnabled) return;
-
-        const randomUrl = audioList[Math.floor(Math.random() * audioList.length)];
-
-        const bell = new Audio(randomUrl);
-        bell.volume = 0.8;
-        bell.currentTime = 0;
-        bell.play().catch(e => console.error(e));
+        enqueueReminderAudio([{ audioStatus: 'LEGACY' }]);
     }
 
     /* Chat history */
@@ -322,10 +408,14 @@
         const tid = 'l-' + Date.now();
         appendMessage("", 'bot', tid, false, true);
 
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
         try {
             const res = await fetch(SEND_URL, {
                 method: 'POST',
-                body: JSON.stringify({ user_id: USER_ID, task_input: text })
+                body: JSON.stringify({ user_id: USER_ID, task_input: text }),
+                signal: controller.signal
             });
             const data = await res.json();
             const loadingMsg = document.getElementById(tid);
@@ -334,7 +424,14 @@
         } catch (e) {
             const loadingMsg = document.getElementById(tid);
             if (loadingMsg) loadingMsg.remove();
-            appendMessage("Bloody hell, error!", 'bot');
+            appendMessage(
+                e && e.name === 'AbortError'
+                    ? "Server's slow as, mate. It might've saved, so check before ya retry!"
+                    : "Bloody hell, error!",
+                'bot'
+            );
+        } finally {
+            clearTimeout(timer);
         }
     }
 
@@ -350,8 +447,20 @@
             const data = await res.json();
             const list = data.reminders || [];
             if (list.length > 0) {
-                playBell();
-                list.forEach(m => appendMessage("🚨 OI OI OI! " + String(m).toUpperCase(), 'remind-alert'));
+                // Old API returned plain strings, new one returns objects.
+                const reminders = list.map(r =>
+                    typeof r === 'string'
+                        ? { task: r, audioStatus: 'LEGACY' }
+                        : r
+                );
+
+                enqueueReminderAudio(reminders);
+
+                reminders.forEach(r => appendMessage(
+                    "🚨 OI OI OI! " + String(r.task || 'Reminder').toUpperCase(),
+                    'remind-alert'
+                ));
+
                 if (document.hidden) document.title = "🚨 Reminder!";
             }
         } catch (e) {
@@ -424,4 +533,3 @@
 </script>
 </body>
 </html>
-
