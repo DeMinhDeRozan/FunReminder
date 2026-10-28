@@ -9,14 +9,6 @@
   <img src="asset/banner.svg" width="800" alt="🦘 FunReminder - Your Aussie Reminder">
 </p>
 
-
-<p align="center">
-  <img src="https://img.shields.io/badge/CLOUD-FF9900?style=for-the-badge&logo=awslambda&logoColor=white" alt="CLOUD">
-  <img src="https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white" alt="Terraform">
-  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions">
-  <img src="https://img.shields.io/badge/Claude_Haiku_4.5-D97757?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Haiku 4.5">
-</p>
-
 > 💡 A serverless web application running based on S3 and delivering content via CloudFront CDN, using AWS services to store, process and turn messages into alarm for any developers working with hundred of tabs at a time
 
 ⌯✈︎ Main live site available at: **[deminh.com/1/](https://deminh.com/1/)**.
