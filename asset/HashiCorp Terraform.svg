@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><g fill-rule="evenodd"><path d="M77.941 44.5v36.836L46.324 62.918V26.082zm0 0" fill="#5c4ee5"/><path d="M81.41 81.336l31.633-18.418V26.082L81.41 44.5zm0 0" fill="#4040b2"/><path d="M11.242 42.36L42.86 60.776V23.941L11.242 5.523zm0 0M77.941 85.375L46.324 66.957v36.82l31.617 18.418zm0 0" fill="#5c4ee5"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24.0 -24.0 176.0 176.0"><g fill-rule="evenodd"><path d="M77.941 44.5v36.836L46.324 62.918V26.082zm0 0" fill="#5c4ee5"/><path d="M81.41 81.336l31.633-18.418V26.082L81.41 44.5zm0 0" fill="#4040b2"/><path d="M11.242 42.36L42.86 60.776V23.941L11.242 5.523zm0 0M77.941 85.375L46.324 66.957v36.82l31.617 18.418zm0 0" fill="#5c4ee5"/></g>
+<g id="neon-led" style="mix-blend-mode:normal">
+  <defs>
+    <filter id="neon-blur" filterUnits="userSpaceOnUse" x="-24.0" y="-24.0" width="176.0" height="176.0">
+      <feGaussianBlur stdDeviation="3.52"/>
+    </filter>
+    <filter id="neon-blur-wide" filterUnits="userSpaceOnUse" x="-24.0" y="-24.0" width="176.0" height="176.0">
+      <feGaussianBlur stdDeviation="7.744"/>
+    </filter>
+  </defs>
+  <g filter="url(#neon-blur-wide)"><rect x="-6.4" y="-6.4" width="140.8" height="140.8" rx="14.4" pathLength="100" fill="none" stroke="#9a5cff" stroke-width="10.944" stroke-linecap="round" stroke-opacity="1" stroke-dasharray="26 24"><animate attributeName="stroke-dashoffset" from="0" to="-100" dur="3.6s" repeatCount="indefinite"/></rect></g>
+  <g filter="url(#neon-blur)"><rect x="-6.4" y="-6.4" width="140.8" height="140.8" rx="14.4" pathLength="100" fill="none" stroke="#9a5cff" stroke-width="6.08" stroke-linecap="round" stroke-opacity="1" stroke-dasharray="26 24"><animate attributeName="stroke-dashoffset" from="0" to="-100" dur="3.6s" repeatCount="indefinite"/></rect></g>
+  <rect x="-6.4" y="-6.4" width="140.8" height="140.8" rx="14.4" pathLength="100" fill="none" stroke="#9a5cff" stroke-width="3.04" stroke-linecap="round" stroke-opacity="0.7" ><animate attributeName="stroke-opacity" values="0.55;0.85;0.55" dur="3.6s" repeatCount="indefinite"/></rect>
+  <rect x="-6.4" y="-6.4" width="140.8" height="140.8" rx="14.4" pathLength="100" fill="none" stroke="#b385ff" stroke-width="2.736" stroke-linecap="round" stroke-opacity="1" stroke-dasharray="26 24"><animate attributeName="stroke-dashoffset" from="0" to="-100" dur="3.6s" repeatCount="indefinite"/></rect>
+  <rect x="-6.4" y="-6.4" width="140.8" height="140.8" rx="14.4" pathLength="100" fill="none" stroke="#d9c1ff" stroke-width="1.368" stroke-linecap="round" stroke-opacity="1" stroke-dasharray="26 24"><animate attributeName="stroke-dashoffset" from="0" to="-100" dur="3.6s" repeatCount="indefinite"/></rect>
+</g>
+</svg>

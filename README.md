@@ -13,7 +13,7 @@
 
 ⌯✈︎ Main live site available at: **[deminh.com/1/](https://deminh.com/1/)**.
     
-🌐 CloudFront live site available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)**.
+🌐 CloudFront live site NOT available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)** (Permanently moved).
 
 🌏 Original live site NOT available at: **[http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/](http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/)** (403 Forbidden - OAC established).
 
