@@ -1,6 +1,6 @@
 <h1 align="center">
   <img src="asset/roo_left.png" height="72" align="middle" alt="">
-  Fun Reminder: Your Aussie Bell-Ringer on Browsers
+  Fun Reminder: Your Aussie Bell-Ringer
   <img src="asset/roo_right.png" height="72" align="middle" alt="">
 </h1>
 
