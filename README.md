@@ -30,7 +30,8 @@
   <img src="asset/EventBridge.svg" width="55" height="55" alt="Amazon EventBridge" title="Amazon EventBridge">&nbsp;&nbsp;
   <img src="asset/DynamoDB.svg" width="55" height="55" alt="Amazon DynamoDB" title="Amazon DynamoDB">&nbsp;&nbsp;
   <img src="asset/amazon-bedrock.svg" width="55" height="55" alt="Amazon Bedrock" title="Amazon Bedrock">&nbsp;&nbsp;
-  <img src="asset/CloudFront.svg" width="55" height="55" alt="Amazon CloudFront" title="Amazon CloudFront">&nbsp;&nbsp;
+  <img src="asset/CloudFront.svg" width="55" height="55" alt="Amazon CloudFront" title="Amazon CloudFront">
+  <br>
   <img src="asset/SNS.svg" width="55" height="55" alt="Amazon Simple Notification Service" title="Amazon SNS">&nbsp;&nbsp;
   <img src="asset/GCPCE.svg" width="55" height="55" alt="Google Cloud Platform Compute Engine" title="GCP Compute Engine">&nbsp;&nbsp;
   <img src="asset/supertonic.svg" width="55" height="55" alt="Supertone Supertonic 3" title="Supertone Supertonic 3">&nbsp;&nbsp;
