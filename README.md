@@ -18,7 +18,11 @@
 🌏 Original live site NOT available at: **[http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/](http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/)** (403 Forbidden - OAC established).
 
 <p align="center">
-  <img src="asset/divider.svg" width="800" height="28" alt="">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
+    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+  </picture>
 </p>
 
 ## 🧰 Tech stack
@@ -40,7 +44,11 @@
   <img src="asset/claude-ai-icon.svg" width="63" height="63" alt="Claude Haiku 4.5" title="Claude Haiku 4.5">
 
 <p align="center">
-  <img src="asset/divider.svg" width="800" height="28" alt="">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
+    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+  </picture>
 </p>
 
 ## ✨ Features
@@ -54,7 +62,11 @@
 - 🪙 The number of messages (tokens) applied to the web app is limited everyday, you have to wait until the next day if it is unavailable.
 
 <p align="center">
-  <img src="asset/divider.svg" width="800" height="28" alt="">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
+    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+  </picture>
 </p>
 
 ## 🏗️ How it works
@@ -74,7 +86,11 @@
 7️⃣ Any missing case will be reported to my email through SNS, so that I can investigate the issue.
 
 <p align="center">
-  <img src="asset/divider.svg" width="800" height="28" alt="">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
+    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+  </picture>
 </p>
 
 ## 🔐 Security
@@ -82,7 +98,11 @@
 > 🛡️ All security configuration (least-privilege IAM roles, S3 access policies, Bedrock invoke permissions, etc.) is defined in Terraform and applied automatically through GitHub Actions.
 
 <p align="center">
-  <img src="asset/divider.svg" width="800" height="28" alt="">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
+    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+  </picture>
 </p>
 
 ## 📁 Project structure
@@ -97,7 +117,11 @@
 ```
 
 <p align="center">
-  <img src="asset/divider.svg" width="800" height="28" alt="">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
+    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+  </picture>
 </p>
 
 <pre align = "center">
