@@ -1,12 +1,12 @@
-<p align="center">
-  <img src="asset/banner.svg" width="800" alt="🦘 FunReminder - Your Aussie Reminder">
-</p>
-
-<h2 align="center">
+<h1 align="center">
   <img src="asset/roo_left.png" height="72" align="middle" alt="">
   Fun Reminder: Your Aussie Bell-Ringer on Browsers
   <img src="asset/roo_right.png" height="72" align="middle" alt="">
-</h2>
+</h1>
+
+<p align="center">
+  <img src="asset/banner.svg" width="800" alt="🦘 FunReminder - Your Aussie Reminder">
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/CLOUD-FF9900?style=for-the-badge&logo=awslambda&logoColor=white" alt="CLOUD">
