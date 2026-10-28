@@ -2,6 +2,12 @@
   <img src="asset/banner.svg" width="800" alt="🦘 FunReminder - Your Aussie Reminder">
 </p>
 
+<h2 align="center">
+  <img src="asset/roo_left.png" height="72" align="middle" alt="">
+  Fun Reminder: Your Aussie Bell-Ringer on Browsers
+  <img src="asset/roo_right.png" height="72" align="middle" alt="">
+</h2>
+
 <p align="center">
   <img src="https://img.shields.io/badge/CLOUD-FF9900?style=for-the-badge&logo=awslambda&logoColor=white" alt="CLOUD">
   <img src="https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white" alt="Terraform">
@@ -13,15 +19,15 @@
 
 ⌯✈︎ Main live site available at: **[deminh.com/1/](https://deminh.com/1/)**.
     
-🌐 CloudFront live site NOT available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)**. (Permanently Moved)
+🌐 CloudFront live site available at: **[https://d28igba62yy5is.cloudfront.net/](https://d28igba62yy5is.cloudfront.net/)**.
 
 🌏 Original live site NOT available at: **[http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/](http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/)** (403 Forbidden - OAC established).
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+    <source media="(prefers-color-scheme: dark)" srcset="asset/divider-dino-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/divider-dino-light.svg">
+    <img src="asset/divider-dino-light.svg" width="800" height="90" alt="">
   </picture>
 </p>
 
@@ -45,9 +51,9 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+    <source media="(prefers-color-scheme: dark)" srcset="asset/divider-dino-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/divider-dino-light.svg">
+    <img src="asset/divider-dino-light.svg" width="800" height="90" alt="">
   </picture>
 </p>
 
@@ -63,9 +69,9 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+    <source media="(prefers-color-scheme: dark)" srcset="asset/divider-dino-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/divider-dino-light.svg">
+    <img src="asset/divider-dino-light.svg" width="800" height="90" alt="">
   </picture>
 </p>
 
@@ -87,9 +93,9 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+    <source media="(prefers-color-scheme: dark)" srcset="asset/divider-dino-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/divider-dino-light.svg">
+    <img src="asset/divider-dino-light.svg" width="800" height="90" alt="">
   </picture>
 </p>
 
@@ -99,9 +105,9 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+    <source media="(prefers-color-scheme: dark)" srcset="asset/divider-dino-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/divider-dino-light.svg">
+    <img src="asset/divider-dino-light.svg" width="800" height="90" alt="">
   </picture>
 </p>
 
@@ -118,9 +124,9 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
+    <source media="(prefers-color-scheme: dark)" srcset="asset/divider-dino-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="asset/divider-dino-light.svg">
+    <img src="asset/divider-dino-light.svg" width="800" height="90" alt="">
   </picture>
 </p>
 
