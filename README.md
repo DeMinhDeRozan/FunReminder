@@ -24,20 +24,20 @@
 ## 🧰 Tech stack
 
 <p align="center">
-  <img src="asset/Simple%20Storage%20Service.svg" width="55" height="55" alt="Amazon S3" title="Amazon S3">&nbsp;&nbsp;
-  <img src="asset/API%20Gateway.svg" width="55" height="55" alt="Amazon API Gateway" title="Amazon API Gateway">&nbsp;&nbsp;
-  <img src="asset/Lambda.svg" width="55" height="55" alt="Amazon Lambda" title="Amazon Lambda">&nbsp;&nbsp;
-  <img src="asset/EventBridge.svg" width="55" height="55" alt="Amazon EventBridge" title="Amazon EventBridge">&nbsp;&nbsp;
-  <img src="asset/DynamoDB.svg" width="55" height="55" alt="Amazon DynamoDB" title="Amazon DynamoDB">&nbsp;&nbsp;
-  <img src="asset/amazon-bedrock.svg" width="55" height="55" alt="Amazon Bedrock" title="Amazon Bedrock">&nbsp;&nbsp;
-  <img src="asset/CloudFront.svg" width="55" height="55" alt="Amazon CloudFront" title="Amazon CloudFront">
+  <img src="asset/Simple%20Storage%20Service.svg" width="63" height="63" alt="Amazon S3" title="Amazon S3">&nbsp;&nbsp;
+  <img src="asset/API%20Gateway.svg" width="63" height="63" alt="Amazon API Gateway" title="Amazon API Gateway">&nbsp;&nbsp;
+  <img src="asset/Lambda.svg" width="63" height="63" alt="Amazon Lambda" title="Amazon Lambda">&nbsp;&nbsp;
+  <img src="asset/EventBridge.svg" width="63" height="63" alt="Amazon EventBridge" title="Amazon EventBridge">&nbsp;&nbsp;
+  <img src="asset/DynamoDB.svg" width="63" height="63" alt="Amazon DynamoDB" title="Amazon DynamoDB">&nbsp;&nbsp;
+  <img src="asset/amazon-bedrock.svg" width="63" height="63" alt="Amazon Bedrock" title="Amazon Bedrock">&nbsp;&nbsp;
+  <img src="asset/CloudFront.svg" width="63" height="63" alt="Amazon CloudFront" title="Amazon CloudFront">
   <br>
-  <img src="asset/SNS.svg" width="55" height="55" alt="Amazon Simple Notification Service" title="Amazon SNS">&nbsp;&nbsp;
-  <img src="asset/GCPCE.svg" width="55" height="55" alt="Google Cloud Platform Compute Engine" title="GCP Compute Engine">&nbsp;&nbsp;
-  <img src="asset/supertonic.svg" width="55" height="55" alt="Supertone Supertonic 3" title="Supertone Supertonic 3">&nbsp;&nbsp;
-  <img src="asset/HashiCorp%20Terraform.svg" width="55" height="55" alt="Terraform" title="Terraform">&nbsp;&nbsp;
-  <img src="asset/GitHub%20Actions.svg" width="55" height="55" alt="GitHub Actions" title="GitHub Actions">&nbsp;&nbsp;
-  <img src="asset/claude-ai-icon.svg" width="55" height="55" alt="Claude Haiku 4.5" title="Claude Haiku 4.5">
+  <img src="asset/SNS.svg" width="63" height="63" alt="Amazon Simple Notification Service" title="Amazon SNS">&nbsp;&nbsp;
+  <img src="asset/GCPCE.svg" width="63" height="63" alt="Google Cloud Platform Compute Engine" title="GCP Compute Engine">&nbsp;&nbsp;
+  <img src="asset/supertonic.svg" width="63" height="63" alt="Supertone Supertonic 3" title="Supertone Supertonic 3">&nbsp;&nbsp;
+  <img src="asset/HashiCorp%20Terraform.svg" width="63" height="63" alt="Terraform" title="Terraform">&nbsp;&nbsp;
+  <img src="asset/GitHub%20Actions.svg" width="63" height="63" alt="GitHub Actions" title="GitHub Actions">&nbsp;&nbsp;
+  <img src="asset/claude-ai-icon.svg" width="63" height="63" alt="Claude Haiku 4.5" title="Claude Haiku 4.5">
 
 <p align="center">
   <img src="asset/divider.svg" width="800" height="28" alt="">
