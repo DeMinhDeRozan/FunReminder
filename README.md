@@ -41,29 +41,23 @@
   <img src="asset/claude-ai-icon.svg" width="63" height="63" alt="Claude Haiku 4.5" title="Claude Haiku 4.5">
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
-  </picture>
+  <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
+  <img src="asset/dark_dino.svg#gh-dark-mode-only" width="800" height="90" alt="">
 </p>
 
 ## ✨ Features
 
 - ⏰ Set an alarm by entering a time and a reminder message.
-- 🔊 When the alarm fires, it will play an iconic Aussie sound.
+- 🔊 A GCP server will handle the "special" alarm and convert it to corresponding speech.
 - ⏱️ Short polling is performed every 15s to invoke Lambda scanning.
 - 🏗️ Infrastructure is fully managed as code (Terraform) and deployed automatically (GitHub Actions).
 - ❌ Missing alarms will be detected by EventBridge scheduler, later reported to me (admin).
-- ☁️ Hybrid architecture with a GCP server and AWS serverless website
+- ☁️ Hybrid architecture with a GCP server and AWS serverless website.
 - 🪙 The number of messages (tokens) applied to the web app is limited everyday, you have to wait until the next day if it is unavailable.
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
-  </picture>
+  <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
+  <img src="asset/dark_dino.svg#gh-dark-mode-only" width="800" height="90" alt="">
 </p>
 
 ## 🏗️ How it works
@@ -83,11 +77,8 @@
 7️⃣ Any missing case will be reported to my email through SNS, so that I can investigate the issue.
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
-  </picture>
+  <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
+  <img src="asset/dark_dino.svg#gh-dark-mode-only" width="800" height="90" alt="">
 </p>
 
 ## 🔐 Security
@@ -95,30 +86,23 @@
 > 🛡️ All security configuration (least-privilege IAM roles, S3 access policies, Bedrock invoke permissions, etc.) is defined in Terraform and applied automatically through GitHub Actions.
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
-  </picture>
+  <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
+  <img src="asset/dark_dino.svg#gh-dark-mode-only" width="800" height="90" alt="">
 </p>
 
 ## 📁 Project structure
 
 ```
 .
-├── web/                # 🌐 Static web UI (deployed to S3)
-├── lambda/             # ⚡ serverless functions
-├── terraform/          # 🧱 IaC
+├── web/                # 🌐 Static web UI (S3)
+├── private/            # ⚡ serverless functions and 🧱 IaC, not available in this repo
 ├── asset/              # 🎨 Service icons
 └── .github/workflows/  # 🤖 GitHub Actions pipelines
 ```
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
-  </picture>
+  <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
+  <img src="asset/dark_dino.svg#gh-dark-mode-only" width="800" height="90" alt="">
 </p>
 
 <pre align = "center">
