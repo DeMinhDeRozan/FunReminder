@@ -18,11 +18,8 @@
 🌏 Original live site NOT available at: **[http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/](http://reminderyoubro.s3-website-ap-southeast-2.amazonaws.com/)** (403 Forbidden - OAC established).
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="asset/dark_dino.svg">
-    <source media="(prefers-color-scheme: light)" srcset="asset/light_dino.svg">
-    <img src="asset/light_dino.svg" width="800" height="90" alt="">
-  </picture>
+  <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
+  <img src="asset/dark_dino.svg#gh-dark-mode-only" width="800" height="90" alt="">
 </p>
 
 ## 🧰 Tech stack
