@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="72" viewBox="0 0 640 72" role="img" aria-label="Fun Reminder: Your Aussie Bell-Ringer">
+  <defs>
+    <!-- gradient chạy ngang, reflect + dịch đúng 2 chu kỳ (640) nên vòng lặp liền mạch -->
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="320" y2="0" spreadMethod="reflect">
+      <stop offset="0" stop-color="#FF9900"/>
+      <stop offset="0.33" stop-color="#FF3D81"/>
+      <stop offset="0.66" stop-color="#8957E5"/>
+      <stop offset="1" stop-color="#1FB6FF"/>
+      <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="640 0" dur="6s" repeatCount="indefinite"/>
+    </linearGradient>
+  </defs>
+  <text x="10" y="51" textLength="620" lengthAdjust="spacingAndGlyphs"
+        font-family="'Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif" font-size="36" font-weight="800"
+        fill="url(#g)">Fun Reminder: Your Aussie Bell-Ringer</text>
+</svg>
