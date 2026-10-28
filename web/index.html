@@ -180,6 +180,20 @@
         .send:active { transform: scale(.94); }
         .send svg { width: 18px; height: 18px; }
         .hint { font-size: 11.5px; color: var(--muted); text-align: center; padding-top: 8px; }
+
+        /* Yes / No under a "keep this tab open" warning */
+        .confirm-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .confirm-btn {
+            border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+            border-radius: 999px; padding: 9px 16px; font-size: 14px; font-family: inherit;
+            cursor: pointer; box-shadow: var(--shadow); transition: .2s;
+        }
+        .confirm-btn.yes { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+        .confirm-btn:hover:not(:disabled) { transform: translateY(-1px); }
+        .confirm-btn:active:not(:disabled) { transform: scale(.96); }
+        .confirm-btn:disabled { opacity: .45; cursor: default; }
+        .confirm-btn.picked:disabled { opacity: 1; }
+        .confirm-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     </style>
 </head>
 <body>
@@ -441,16 +455,8 @@
     }
 
     /* Send */
-    async function handleSend() {
-        unlockSound();
-
-        const text = userInput.value.trim();
-        if (!text) return;
-
-        chips.style.display = 'none';
-        appendMessage(text, 'user');
-        userInput.value = '';
-
+    // POST to the bot and show the reply. Adds Yes/No buttons when the server asks for confirmation.
+    async function talkToBot(payload) {
         const tid = 'l-' + Date.now();
         appendMessage("", 'bot', tid, false, true);
 
@@ -460,13 +466,18 @@
         try {
             const res = await fetch(SEND_URL, {
                 method: 'POST',
-                body: JSON.stringify({ user_id: USER_ID, task_input: text, voice_mode: voiceMode }),
+                body: JSON.stringify({ user_id: USER_ID, voice_mode: voiceMode, ...payload }),
                 signal: controller.signal
             });
             const data = await res.json();
             const loadingMsg = document.getElementById(tid);
             if (loadingMsg) loadingMsg.remove();
-            appendMessage(data.message || "Righto!", 'bot');
+
+            if (data.needs_confirm && data.pending_id) {
+                appendConfirm(data.message || "Keep this tab open, yeah?", data.pending_id);
+            } else {
+                appendMessage(data.message || "Righto!", 'bot');
+            }
         } catch (e) {
             const loadingMsg = document.getElementById(tid);
             if (loadingMsg) loadingMsg.remove();
@@ -479,6 +490,49 @@
         } finally {
             clearTimeout(timer);
         }
+    }
+
+    async function handleSend() {
+        unlockSound();
+
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        chips.style.display = 'none';
+        appendMessage(text, 'user');
+        userInput.value = '';
+
+        await talkToBot({ task_input: text });
+    }
+
+    // Far-away reminder: nothing is saved until the user picks one of these.
+    function appendConfirm(txt, pendingId) {
+        const row = appendMessage(txt, 'bot');
+        const wrap = document.createElement('div');
+        wrap.className = 'confirm-row';
+
+        const options = [
+            { action: 'confirm', label: 'Yeah, keep it open', cls: 'yes' },
+            { action: 'cancel',  label: 'Nah, forget it',     cls: 'no' }
+        ];
+
+        options.forEach(o => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'confirm-btn ' + o.cls;
+            b.textContent = o.label;
+            b.addEventListener('click', async () => {
+                unlockSound(); // a tap is a user gesture, so this also turns the alarm sound on
+                wrap.querySelectorAll('button').forEach(x => { x.disabled = true; });
+                b.classList.add('picked');
+                appendMessage(o.label, 'user');
+                await talkToBot({ action: o.action, pending_id: pendingId });
+            });
+            wrap.appendChild(b);
+        });
+
+        row.querySelector('.msg').appendChild(wrap);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function taskToText(v) {
@@ -569,6 +623,7 @@
         chatBox.appendChild(row);
         chatBox.scrollTop = chatBox.scrollHeight;
         if (save) saveHistory(txt, side);
+        return row;
     }
 
     userInput.addEventListener("keydown", e => {
