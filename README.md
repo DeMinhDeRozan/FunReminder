@@ -24,18 +24,19 @@
 ## 🧰 Tech stack
 
 <p align="center">
-  <img src="asset/Simple%20Storage%20Service.svg" width="60" height="60" alt="Amazon S3" title="Amazon S3">&nbsp;&nbsp;&nbsp;
-  <img src="asset/API%20Gateway.svg" width="60" height="60" alt="Amazon API Gateway" title="Amazon API Gateway">&nbsp;&nbsp;&nbsp;
-  <img src="asset/Lambda.svg" width="60" height="60" alt="Amazon Lambda" title="Amazon Lambda">&nbsp;&nbsp;&nbsp;
-  <img src="asset/EventBridge.svg" width="60" height="60" alt="Amazon EventBridge" title="Amazon EventBridge">&nbsp;&nbsp;&nbsp;
-  <img src="asset/DynamoDB.svg" width="60" height="60" alt="Amazon DynamoDB" title="Amazon DynamoDB">&nbsp;&nbsp;&nbsp;
-  <img src="asset/amazon-bedrock.svg" width="60" height="60" alt="Amazon Bedrock" title="Amazon Bedrock">&nbsp;&nbsp;&nbsp;
-  <img src="asset/CloudFront.svg" width="60" height="60" alt="Amazon CloudFront" title="Amazon CloudFront">&nbsp;&nbsp;&nbsp;
-  <img src="asset/SNS.svg" width="60" height="60" alt="Amazon Simple Notification Service" title="Amazon SNS">&nbsp;&nbsp;&nbsp;
-  <img src="asset/HashiCorp%20Terraform.svg" width="60" height="60" alt="Terraform" title="Terraform">&nbsp;&nbsp;&nbsp;
-  <img src="asset/GitHub%20Actions.svg" width="60" height="60" alt="GitHub Actions" title="GitHub Actions">&nbsp;&nbsp;&nbsp;
-  <img src="asset/claude-ai-icon.svg" width="60" height="60" alt="Claude Haiku 4.5" title="Claude Haiku 4.5">
-</p>
+  <img src="asset/Simple%20Storage%20Service.svg" width="55" height="55" alt="Amazon S3" title="Amazon S3">&nbsp;&nbsp;
+  <img src="asset/API%20Gateway.svg" width="55" height="55" alt="Amazon API Gateway" title="Amazon API Gateway">&nbsp;&nbsp;
+  <img src="asset/Lambda.svg" width="55" height="55" alt="Amazon Lambda" title="Amazon Lambda">&nbsp;&nbsp;
+  <img src="asset/EventBridge.svg" width="55" height="55" alt="Amazon EventBridge" title="Amazon EventBridge">&nbsp;&nbsp;
+  <img src="asset/DynamoDB.svg" width="55" height="55" alt="Amazon DynamoDB" title="Amazon DynamoDB">&nbsp;&nbsp;
+  <img src="asset/amazon-bedrock.svg" width="55" height="55" alt="Amazon Bedrock" title="Amazon Bedrock">&nbsp;&nbsp;
+  <img src="asset/CloudFront.svg" width="55" height="55" alt="Amazon CloudFront" title="Amazon CloudFront">&nbsp;&nbsp;
+  <img src="asset/SNS.svg" width="55" height="55" alt="Amazon Simple Notification Service" title="Amazon SNS">&nbsp;&nbsp;
+  <img src="asset/GCPCE.svg" width="55" height="55" alt="Google Cloud Platform Compute Engine" title="GCP Compute Engine">&nbsp;&nbsp;
+  <img src="asset/supertonic.svg" width="55" height="55" alt="Supertone Supertonic 3" title="Supertone Supertonic 3">&nbsp;&nbsp;
+  <img src="asset/HashiCorp%20Terraform.svg" width="55" height="55" alt="Terraform" title="Terraform">&nbsp;&nbsp;
+  <img src="asset/GitHub%20Actions.svg" width="55" height="55" alt="GitHub Actions" title="GitHub Actions">&nbsp;&nbsp;
+  <img src="asset/claude-ai-icon.svg" width="55" height="55" alt="Claude Haiku 4.5" title="Claude Haiku 4.5">
 
 <p align="center">
   <img src="asset/divider.svg" width="800" height="28" alt="">
@@ -59,15 +60,17 @@
 
 1️⃣ Open the web app and enter a time and a reminder message.
 
-2️⃣ The app calls API Gateway, which routes to Lambda to call Bedrock to process message and save in DynamoDB (including time).
+2️⃣ The app calls API Gateway, which routes the request to Lambda. Lambda calls Amazon Bedrock to process the reminder message.
 
-3️⃣ Every 15s, frontend performs short polling to call API Gateway invoking Lambda to scan table.
+3️⃣ Lambda calls the TTS server running on a VM to convert the processed message into an audio alarm. Lambda retrieves the generated audio and uploads the audio information to S3, and the reminder time and message to DynamoDB.
 
-4️⃣ Lambda reads the message from DynamoDB and send the alarm back to user sessions.
+4️⃣ Every 15 seconds, the frontend performs short polling by calling API Gateway, which invokes Lambda to check DynamoDB for any due reminders.
 
-5️⃣ If an alarm is missed, an EventBridge scheduler running every 2 minutes will invoke Lambda sweeper to check any missing record.
+5️⃣ Lambda reads the due reminder and sends the reminder information, including the generated audio (on S3), back to the user's session.
 
-6️⃣ Any missing case will be reported to my email through SNS, so that I can check its issue.
+6️⃣ If an alarm is missed, an EventBridge Scheduler running every 2 minutes invokes a Lambda sweeper to check for any missing records.
+
+7️⃣ Any missing case will be reported to my email through SNS, so that I can investigate the issue.
 
 <p align="center">
   <img src="asset/divider.svg" width="800" height="28" alt="">
