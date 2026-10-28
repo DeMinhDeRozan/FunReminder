@@ -64,7 +64,7 @@
 - ⏱️ Short polling is performed every 15s to invoke Lambda scanning.
 - 🏗️ Infrastructure is fully managed as code (Terraform) and deployed automatically (GitHub Actions).
 - ❌ Missing alarms will be detected by EventBridge scheduler, later reported to me (admin).
-- ☁️ Serverless architecture with no servers to manage.
+- ☁️ Hybrid architecture with a GCP server and AWS serverless website
 - 🪙 The number of messages (tokens) applied to the web app is limited everyday, you have to wait until the next day if it is unavailable.
 
 <p align="center">
@@ -81,7 +81,7 @@
 
 2️⃣ The app calls API Gateway, which routes the request to Lambda. Lambda calls Amazon Bedrock to process the reminder message.
 
-3️⃣ Lambda calls the TTS server running on a VM to convert the processed message into an audio alarm. Lambda retrieves the generated audio and uploads the audio information to S3, and the reminder time and message to DynamoDB.
+3️⃣ Lambda calls the TTS server running on a GCP VM to convert the processed message into an audio alarm. Lambda retrieves the generated audio and uploads the audio information to S3, and the reminder time and message to DynamoDB.
 
 4️⃣ Every 15 seconds, the frontend performs short polling by calling API Gateway, which invokes Lambda to check DynamoDB for any due reminders.
 
