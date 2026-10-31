@@ -115,7 +115,7 @@
 
 
 ## 🤝 Credit
-This project includes <a href="https://github.com/supertone-oss-archive/supertonic">Supertone Supertonic Text-to-Speech, which is used for non-profit goals</a>
+This project includes <a href="https://github.com/supertone-oss-archive/supertonic">Supertone Supertonic Text-to-Speech</a>, which is used for non-profit goals.
 <pre align = "center">
                                                                               
                                                                             ____________________
