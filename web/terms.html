@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Terms of Service – FunReminder</title>
+    <style>
+        :root {
+            --bg: #faf9f5;
+            --surface: #ffffff;
+            --ink: #1f1e1d;
+            --muted: #6f6c64;
+            --line: #e8e5dc;
+            --accent: #b85a3b;
+            --highlight: #fff3cd;
+            --highlight-text: #856404;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                color-scheme: dark;
+                --bg: #262624;
+                --surface: #30302e;
+                --ink: #ece9e1;
+                --muted: #a8a59c;
+                --line: #3d3c39;
+                --accent: #e8957a;
+                --highlight: #3d3423;
+                --highlight-text: #f0d589;
+            }
+        }
+        * { box-sizing: border-box; }
+        html { scroll-padding-top: 16px; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            padding: max(24px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom));
+        }
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 32px 28px 36px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+        }
+        h1 { font-size: 28px; line-height: 1.2; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
+        h2 { font-size: 18px; margin: 32px 0 8px; }
+        p, ul { margin: 0 0 12px; }
+        ul { padding-left: 22px; }
+        li { margin-bottom: 8px; }
+        a { color: var(--accent); font-weight: 500; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+        a:hover { text-decoration-thickness: 2px; }
+        a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+        .meta { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+        .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; font-size: 14px; font-weight: 600; text-decoration: none; color: var(--muted); transition: color 0.2s; }
+        .back:hover { color: var(--accent); }
+        .tldr {
+            background: var(--highlight);
+            color: var(--highlight-text);
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        @media (max-width: 520px) { main { padding: 24px 18px 28px; } h1 { font-size: 24px; } }
+    </style>
+</head>
+<body>
+<main>
+    <a class="back" href="./">← Back to FunReminder (Let's nag ya)</a>
+
+    <h1>Terms of Service <span>📜</span></h1>
+    <p class="meta">Effective 6 November 2026. FunReminder is run by DeMinh DeRozan Le, based in Melbourne, Australia. The app lives at <a href="https://deminh.com/1/">deminh.com/1/</a>.</p>
+
+    <div class="tldr">
+        <strong>The TL;DR:</strong> I'm a free reminder bot. I try my best not to miss your alarms, but I'm a side project, not a life-support system. Don't hack me, don't abuse the API, and don't blame me if you miss your flight. Here are the official rules so Google stays happy.
+    </div>
+
+    <h2>1. Agreement to Terms</h2>
+    <p>By using FunReminder (the "App"), you agree to these Terms of Service. If you don't agree, that's fair enough—but you shouldn't use the App. These Terms apply to everyone, including guests and logged-in users.</p>
+
+    <h2>2. What is FunReminder?</h2>
+    <p>FunReminder is a free, personal, non-commercial web application that sets spoken or ringing reminders. It uses AI to parse your text and text-to-speech engines to yell at you (in a friendly Aussie way).</p>
+
+    <h2>3. Acceptable Use (Don't be a dickhead)</h2>
+    <ul>
+        <li>You agree to use the App only for lawful, personal purposes.</li>
+        <li><strong>No hacking:</strong> Don't try to reverse engineer, DDoS, scrape, or bypass the security limits (like the guest limits or token caps) of the App.</li>
+        <li><strong>No malicious prompts:</strong> Don't try to prompt-inject the AI to make it say inappropriate things, break the law, or reveal internal system instructions. I have security guards for that.</li>
+        <li>I reserve the right to ban your IP or account if you abuse the service.</li>
+    </ul>
+
+    <h2>4. Accounts & Guest Limits</h2>
+    <p>You can use the App as a guest or by logging in with Google. If you log in, you are responsible for keeping your account secure. Guests are limited to a small number of free reminders. I reserve the right to change these limits at any time to keep the server bill from ruining my life.</p>
+
+    <h2>5. Service Availability & "As Is" Disclaimer</h2>
+    <ul>
+        <li><strong>Provided "As Is":</strong> The App is provided on an "as is" and "as available" basis. I don't guarantee it will be 100% bug-free, uninterrupted, or accurate.</li>
+        <li><strong>Don't use for critical stuff:</strong> Do not rely on FunReminder for life-critical, medical, financial, or legal reminders. If you ask me to remind you to take your heart medication, and the server crashes, I am not legally or financially responsible.</li>
+        <li><strong>Tab rule:</strong> As I'm sure you know by now, reminders only work if your browser tab stays open. If you close the tab, the reminder won't fire.</li>
+    </ul>
+
+    <h2>6. Intellectual Property</h2>
+    <p>I own the code, the branding, and the bot's cheeky personality. You own the text you type in. By using the App, you grant me the temporary right to process your text (via AWS Bedrock and my TTS server) solely to provide the reminder service to you.</p>
+
+    <h2>7. Limitation of Liability</h2>
+    <p>To the maximum extent permitted by law, I shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses, resulting from your use of the App.</p>
+
+    <h2>8. Privacy</h2>
+    <p>Your use of the App is also governed by my <a href="./privacy.html">Privacy Policy</a>, which explains how I handle your data.</p>
+
+    <h2>9. Governing Law</h2>
+    <p>These Terms shall be governed by and defined following the laws of Victoria, Australia. I reserve the right to update these Terms at any time. If I do, I'll change the date at the top of this page.</p>
+
+    <h2>10. Contact</h2>
+    <p>Got questions or want to complain about the swearing? Drop me a line at: <br>
+    <a href="mailto:deminhderozan@gmail.com">deminhderozan@gmail.com</a></p>
+</main>
+</body>
+</html>
