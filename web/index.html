@@ -234,6 +234,7 @@
             </button>
         </div>
         <div class="hint" id="hint">Keep this tab open to get reminded.</div>
+        <div class="hint">FunReminder &middot; <a href="privacy.html" style="color:inherit">Privacy policy</a></div>
     </div>
 </div>
 
@@ -279,9 +280,9 @@
 
     /*  Auth: Cognito Hosted UI + Google (Authorization Code + PKCE, no secret)  */
     const AUTH_CFG = {
-        domain:   "https://ap-southeast-2bgprvp1sb.auth.ap-southeast-2.amazoncognito.com", 
-        clientId: "2ko9snclu8sr5ql6fq09mfu8nm",                                        
-        redirect: location.origin + location.pathname,                         
+        domain:   "https://YOUR-DOMAIN.auth.ap-southeast-2.amazoncognito.com", // Cognito domain
+        clientId: "YOUR_APP_CLIENT_ID",                                        // SPA app client (no secret)
+        redirect: location.origin + location.pathname,                         // must be in Cognito "Allowed callback URLs"
         scope:    "openid email profile"
     };
     const AUTH_KEY = 'mate_auth';
@@ -356,6 +357,7 @@
         const p = new URLSearchParams(location.search);
         if (!p.has('code') && !p.has('error')) return;
 
+        if (p.has('error')) console.warn('Cognito login error:', p.get('error'), p.get('error_description'));
         window.history.replaceState(null, '', location.pathname);
         const saved = JSON.parse(sessionStorage.getItem('mate_pkce') || 'null');
         sessionStorage.removeItem('mate_pkce');
@@ -374,7 +376,7 @@
             const u = currentUser();
             authNote = "Logged in" + (u && u.email ? " as " + u.email : "") + ". No more guest limit!";
         } catch (e) {
-            console.error(e);
+            console.error('Cognito token exchange failed:', e);
             authNote = "Login didn't go through, mate. Give it another crack.";
         }
     }
