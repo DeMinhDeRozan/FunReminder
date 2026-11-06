@@ -872,6 +872,8 @@
     let _sysImgEl = null;
     let _sysImgReady = false;
     let _sysBusy = false;
+    let _sysLastAt = 0;        // chống hù dồn dập khi spam tin off-topic
+    let _sysQueued = false;    // phản hồi tới lúc tab đang ẩn: hù khi quay lại
     let _sysCleanupTimer = null;
 
 
@@ -1035,7 +1037,7 @@
     }
 
     function _sysIsMalicious(data) {
-        return !!(data && (data.injection === true || data.banned === true));
+        return !!(data && (data.injection === true || data.banned === true || data.offtopic === true));
     }
 
     function _sysCleanup() {
@@ -1118,7 +1120,14 @@
     }
 
     function _triggerSysDiag(forced) {
-        if (_sysBusy || document.hidden || _sysReduceMotion.matches) return;
+        if (_sysReduceMotion.matches) return;
+        if (document.hidden) {
+            if (!forced) _sysQueued = true;   // lịch chuông giờ (forced) thì bỏ, còn phản hồi chat thì hoãn
+            return;
+        }
+        if (_sysBusy) return;
+        if (!forced && Date.now() - _sysLastAt < 2500) return;
+        _sysLastAt = Date.now();
 
         try {
             _sysBusy = true;
@@ -1153,6 +1162,13 @@
     }
 
     window.triggerSlendrina = _triggerSysDiag;
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && _sysQueued) {
+            _sysQueued = false;
+            setTimeout(() => _triggerSysDiag(), 400);
+        }
+    });
     window.triggerEdgePeek = () => _triggerSysDiag('A');
 
     /* ============================================================
