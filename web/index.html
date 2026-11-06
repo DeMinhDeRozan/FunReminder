@@ -66,6 +66,115 @@
             max-width: 760px; margin: 0 auto;
         }
 
+        /* ============================================================
+           USER AVATAR + POPOVER  ← NEW
+           ============================================================ */
+        .user-avatar-btn {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            cursor: pointer;
+            overflow: hidden;
+            padding: 0;
+            z-index: 50;
+            display: none;            /* toggled via JS */
+            align-items: center;
+            justify-content: center;
+            color: var(--ink);
+            font-family: var(--serif);
+            font-size: 16px;
+            font-weight: 700;
+            transition: transform .15s, border-color .2s, box-shadow .2s;
+        }
+        .user-avatar-btn:hover { border-color: var(--accent); }
+        .user-avatar-btn:active { transform: scale(.94); }
+        .user-avatar-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .user-avatar-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .user-avatar-btn span { display: block; line-height: 1; }
+
+        /* Khi đã login, đẩy đồng hồ sang trái nhường chỗ cho avatar */
+        .wrapper.logged-in .clock-block { padding-right: 52px; }
+
+        .user-popover {
+            position: absolute;
+            top: 60px;
+            right: 18px;
+            width: 280px;
+            max-width: calc(100vw - 24px);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+            z-index: 60;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px) scale(.97);
+            transition: opacity .18s, transform .18s, visibility .18s;
+        }
+        .user-popover.open {
+            opacity: 1; visibility: visible; transform: none;
+        }
+        .user-popover-head {
+            display: flex; align-items: center; gap: 12px;
+            padding-bottom: 14px; border-bottom: 1px solid var(--line);
+            margin-bottom: 12px;
+        }
+        .user-popover-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--user); overflow: hidden; flex: none;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--serif); font-size: 18px; font-weight: 700;
+            color: var(--ink);
+        }
+        .user-popover-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-popover-info { min-width: 0; flex: 1; }
+        .user-popover-name {
+            font-family: var(--serif); font-size: 14px; font-weight: 700;
+            color: var(--ink);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .user-popover-email {
+            font-family: var(--mono); font-size: 11px; color: var(--muted);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            margin-top: 3px;
+        }
+        .user-popover-links { display: flex; flex-direction: column; gap: 2px; }
+        .user-popover-links a {
+            display: flex; align-items: center; gap: 8px;
+            padding: 9px 10px;
+            color: var(--ink); text-decoration: none;
+            font-size: 13px;
+            border-radius: 8px;
+            transition: background .15s;
+        }
+        .user-popover-links a:hover { background: var(--user); }
+        .user-popover-links a .icon { font-size: 14px; width: 18px; text-align: center; }
+        .user-popover-logout {
+            width: 100%; margin-top: 10px; padding: 10px;
+            border: 1px solid var(--line); background: transparent;
+            color: var(--fail);
+            border-radius: 10px;
+            font-family: inherit; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: .15s;
+        }
+        .user-popover-logout:hover {
+            background: rgba(255,69,58,.1);
+            border-color: rgba(255,69,58,.4);
+        }
+        .user-popover-logout:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+        @media (max-width: 560px) {
+            .user-avatar-btn { top: 10px; right: 12px; width: 34px; height: 34px; font-size: 14px; }
+            .user-popover { top: 52px; right: 12px; }
+            .wrapper.logged-in .clock-block { padding-right: 46px; }
+        }
+
         /* ===== Notification banner ===== */
         .notif-banner {
             position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
@@ -109,7 +218,7 @@
         .status { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px rgba(52,199,89,.2); }
 
-        .clock-block { grid-area: clock; text-align: right; user-select: none; }
+        .clock-block { grid-area: clock; text-align: right; user-select: none; transition: padding .25s ease; }
         .clock-main {
             font-family: var(--mono); font-size: 26px; font-weight: 600;
             letter-spacing: 0.02em; line-height: 1; font-variant-numeric: tabular-nums;
@@ -231,6 +340,21 @@
             font-family: var(--mono); font-size: 10px; opacity: 0.5;
             letter-spacing: 0.1em; margin-top: 10px; text-transform: uppercase;
         }
+        .alarm-actions {
+            display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap;
+        }
+        .alarm-action-btn {
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(245,184,0,.4);
+            color: var(--alarm); border-radius: 999px;
+            padding: 6px 12px; font-size: 12px;
+            font-family: inherit; cursor: pointer;
+            transition: .2s;
+        }
+        .alarm-action-btn:hover:not(:disabled) { background: rgba(245,184,0,.15); }
+        .alarm-action-btn:disabled { opacity: .5; cursor: default; }
+        .alarm-action-btn.success { border-color: var(--success); color: var(--success); background: rgba(52,199,89,.12); }
+        .alarm-action-btn.fail    { border-color: var(--fail);    color: var(--fail);    background: rgba(255,69,58,.12); }
         @keyframes alarmPop {
             from { opacity: 0; transform: translateY(6px) scale(.96); }
             to   { opacity: 1; transform: none; }
@@ -279,6 +403,23 @@
 
         /* ===== Composer ===== */
         .composer { padding: 0 18px calc(14px + env(safe-area-inset-bottom)); position: relative; }
+
+        .repeat-row {
+            display: flex; gap: 6px; align-items: center;
+            padding: 0 4px 8px; overflow-x: auto; scrollbar-width: none;
+        }
+        .repeat-row::-webkit-scrollbar { display: none; }
+        .repeat-label {
+            font-family: var(--mono); font-size: 10px; color: var(--muted);
+            letter-spacing: 0.1em; text-transform: uppercase; flex: none;
+        }
+        .repeat-chip {
+            flex: none; background: transparent; border: 1px solid var(--line);
+            color: var(--muted); border-radius: 999px; padding: 4px 10px;
+            font-size: 11px; cursor: pointer; font-family: inherit; transition: .2s;
+        }
+        .repeat-chip.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+        .repeat-chip:hover:not(.active) { color: var(--ink); border-color: var(--muted); }
 
         .input-bar {
             display: flex; align-items: center; gap: 8px; background: var(--surface);
@@ -455,7 +596,45 @@
     <span id="notifBannerText">Enable desktop notifications</span>
 </div>
 
-<div class="wrapper">
+<div class="wrapper" id="wrapper">
+
+    <!-- ===== USER AVATAR (top-right, shown when logged in) ===== -->
+    <button class="user-avatar-btn" id="userAvatarBtn"
+            aria-label="User menu" aria-haspopup="true" aria-expanded="false"
+            onclick="toggleUserPopover(event)">
+        <img id="userAvatarImg" alt="" style="display:none">
+        <span id="userAvatarInitial">U</span>
+    </button>
+
+    <!-- ===== USER POPOVER ===== -->
+    <div class="user-popover" id="userPopover" role="menu" aria-hidden="true">
+        <div class="user-popover-head">
+            <div class="user-popover-avatar">
+                <img id="popoverAvatarImg" alt="" style="display:none">
+                <span id="popoverAvatarInitial">U</span>
+            </div>
+            <div class="user-popover-info">
+                <div class="user-popover-name" id="popoverName">User</div>
+                <div class="user-popover-email" id="popoverEmail">email@example.com</div>
+            </div>
+        </div>
+        <div class="user-popover-links">
+            <a href="privacy.html" target="_blank" rel="noopener"
+               onclick="closeUserPopover()">
+                <span class="icon">🔒</span> Privacy policy
+            </a>
+            <a href="terms.html" target="_blank" rel="noopener"
+               onclick="closeUserPopover()">
+                <span class="icon">📄</span> Terms of service
+            </a>
+            <a href="mailto:hello@funreminder.app"
+               onclick="closeUserPopover()">
+                <span class="icon">✉️</span> Contact
+            </a>
+        </div>
+        <button class="user-popover-logout" onclick="logout()">Log out</button>
+    </div>
+
     <div class="header">
         <div class="who">
             <div class="logo">
@@ -504,6 +683,14 @@
 
     <div class="composer">
         <button class="scroll-bottom" id="scrollBottom" aria-label="Scroll to bottom">↓</button>
+
+        <div class="repeat-row" id="repeatRow">
+            <span class="repeat-label">Repeat</span>
+            <button class="repeat-chip active" data-repeat="once"     onclick="setRepeat(this)">Once</button>
+            <button class="repeat-chip"        data-repeat="daily"    onclick="setRepeat(this)">Daily</button>
+            <button class="repeat-chip"        data-repeat="weekly"   onclick="setRepeat(this)">Weekly</button>
+            <button class="repeat-chip"        data-repeat="weekdays" onclick="setRepeat(this)">Weekdays</button>
+        </div>
 
         <div class="input-bar">
             <input type="text" id="userInput" placeholder="Type here, ya legend..." autocomplete="off">
@@ -698,9 +885,6 @@
         lastMessageAt = atMs;
     }
 
-    /* ============================================================
-       ALARM FLASH
-       ============================================================ */
     function flashAlarm() {
         alarmFlash.animate(
             [{ opacity: 1 }, { opacity: 0 }],
@@ -726,8 +910,8 @@
     const USER_ID = getUserId();
 
     const AUTH_CFG = {
-        domain:   "https://ap-southeast-2bgprvp1sb.auth.ap-southeast-2.amazoncognito.com",
-        clientId: "2ko9snclu8sr5ql6fq09mfu8nm",
+        domain:   "https://YOUR-DOMAIN.auth.ap-southeast-2.amazoncognito.com",
+        clientId: "YOUR_APP_CLIENT_ID",
         redirect: location.origin + location.pathname,
         scope:    "openid email profile"
     };
@@ -842,23 +1026,148 @@
         return t ? { Authorization: 'Bearer ' + t } : {};
     }
 
+    /* ============================================================
+       LOGOUT — có safety cho config placeholder
+       ============================================================ */
     function logout() {
         writeAuth(null);
+        closeUserPopover();
+
+        // Nếu config vẫn là placeholder, không redirect Cognito (sẽ 404).
+        if (AUTH_CFG.domain.includes('YOUR-DOMAIN')) {
+            renderAuthUI();
+            appendMessage("Logged out (placeholder config, no Cognito redirect).", 'bot', null, false);
+            return;
+        }
+
         location.href = AUTH_CFG.domain + '/logout?' + new URLSearchParams({
             client_id: AUTH_CFG.clientId,
             logout_uri: AUTH_CFG.redirect
         });
     }
+
     function authClick() { if (readAuth()) logout(); else startLogin(); }
 
+    /* ============================================================
+       USER AVATAR + POPOVER  ← NEW
+       ============================================================ */
+    function getInitial(u) {
+        const n = (u && (u.name || u.given_name)) || '';
+        const e = (u && u.email) || '';
+        return (n || e || 'U').trim().charAt(0).toUpperCase() || 'U';
+    }
+    function getPicture(u) {
+        return (u && (u.picture || u.picture_url)) || null;
+    }
+
+    function setAvatarImages(u) {
+        const pic = getPicture(u);
+        const initial = getInitial(u);
+
+        // Small avatar button
+        const smallImg = document.getElementById('userAvatarImg');
+        const smallInitial = document.getElementById('userAvatarInitial');
+        if (pic) {
+            smallImg.src = pic;
+            smallImg.style.display = 'block';
+            smallInitial.style.display = 'none';
+            smallImg.onerror = () => {
+                smallImg.style.display = 'none';
+                smallInitial.style.display = 'block';
+                smallInitial.textContent = initial;
+            };
+        } else {
+            smallImg.style.display = 'none';
+            smallInitial.style.display = 'block';
+            smallInitial.textContent = initial;
+        }
+
+        // Popover avatar
+        const bigImg = document.getElementById('popoverAvatarImg');
+        const bigInitial = document.getElementById('popoverAvatarInitial');
+        if (pic) {
+            bigImg.src = pic;
+            bigImg.style.display = 'block';
+            bigInitial.style.display = 'none';
+            bigImg.onerror = () => {
+                bigImg.style.display = 'none';
+                bigInitial.style.display = 'block';
+                bigInitial.textContent = initial;
+            };
+        } else {
+            bigImg.style.display = 'none';
+            bigInitial.style.display = 'block';
+            bigInitial.textContent = initial;
+        }
+
+        // Text
+        document.getElementById('popoverName').textContent =
+            (u && (u.name || u.given_name)) || 'User';
+        document.getElementById('popoverEmail').textContent =
+            (u && u.email) || 'No email on file';
+    }
+
+    function toggleUserPopover(e) {
+        if (e) e.stopPropagation();
+        const popover = document.getElementById('userPopover');
+        const btn = document.getElementById('userAvatarBtn');
+        const isOpen = popover.classList.toggle('open');
+        popover.setAttribute('aria-hidden', String(!isOpen));
+        btn.setAttribute('aria-expanded', String(isOpen));
+        if (isOpen) {
+            const u = currentUser();
+            if (u) setAvatarImages(u);
+        }
+    }
+    function closeUserPopover() {
+        const popover = document.getElementById('userPopover');
+        const btn = document.getElementById('userAvatarBtn');
+        popover.classList.remove('open');
+        popover.setAttribute('aria-hidden', 'true');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    // Đóng popover khi click bên ngoài
+    document.addEventListener('click', (e) => {
+        const popover = document.getElementById('userPopover');
+        const btn = document.getElementById('userAvatarBtn');
+        if (!popover || !popover.classList.contains('open')) return;
+        if (popover.contains(e.target)) return;
+        if (btn && btn.contains(e.target)) return;
+        closeUserPopover();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeUserPopover();
+    });
+
+    /* ============================================================
+       RENDER AUTH UI
+       ============================================================ */
     function renderAuthUI() {
         const btn = document.getElementById('authBtn');
         const hint = document.getElementById('hint');
+        const wrapper = document.getElementById('wrapper');
+        const avatarBtn = document.getElementById('userAvatarBtn');
         const u = currentUser();
-        if (btn) {
-            btn.textContent = u ? 'Log out' : 'Log in';
-            btn.title = u && u.email ? u.email : 'Log in with Google';
+
+        if (u) {
+            // Logged in
+            wrapper.classList.add('logged-in');
+            if (btn) btn.style.display = 'none';
+            if (avatarBtn) avatarBtn.style.display = 'flex';
+            setAvatarImages(u);
+        } else {
+            // Logged out
+            wrapper.classList.remove('logged-in');
+            if (btn) {
+                btn.style.display = '';
+                btn.textContent = 'Log in';
+                btn.title = 'Log in with Google';
+            }
+            if (avatarBtn) avatarBtn.style.display = 'none';
+            closeUserPopover();
         }
+
         if (hint) {
             hint.textContent = u
                 ? 'Signed in' + (u.email ? ' as ' + u.email : '') + '. Keep this tab open to get reminded.'
@@ -872,17 +1181,11 @@
     }
 
     /* ============================================================
-       NOTIFICATIONS  ← NEW
+       NOTIFICATIONS
        ============================================================ */
     function updateNotifBanner() {
-        if (!('Notification' in window)) {
-            notifBanner.classList.add('hidden');
-            return;
-        }
-        if (Notification.permission === 'granted') {
-            notifBanner.classList.add('hidden');
-            return;
-        }
+        if (!('Notification' in window)) { notifBanner.classList.add('hidden'); return; }
+        if (Notification.permission === 'granted') { notifBanner.classList.add('hidden'); return; }
         if (Notification.permission === 'denied') {
             notifBanner.classList.remove('hidden');
             notifBanner.classList.add('blocked');
@@ -906,57 +1209,52 @@
             updateNotifBanner();
             if (result === 'granted') {
                 new Notification('Notifications on!', {
-                    body: 'You\'ll get pinged here even when the tab is hidden.',
+                    body: "You'll get pinged here even when the tab is hidden.",
                     icon: ROO_IMG,
                     tag: 'notif-test'
                 });
             }
-        } catch (e) {
-            console.error('Notification request failed:', e);
-        }
+        } catch (e) { console.error('Notification request failed:', e); }
     }
 
     function showSystemNotification(reminder) {
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
         try {
             const title = '🚨 ' + (reminder.task || 'Reminder');
-            const body = 'Your reminder just went off.';
+            const body = reminder.recurrence
+                ? 'Repeats ' + recurrenceLabel(reminder.recurrence)
+                : 'One-time reminder';
             const n = new Notification(title, {
-                body,
-                icon: ROO_IMG,
+                body, icon: ROO_IMG,
                 tag: reminder.id || 'reminder-' + Date.now(),
                 requireInteraction: true
             });
             n.onclick = () => { window.focus(); n.close(); };
-        } catch (e) {
-            console.error('Notification failed:', e);
-        }
+        } catch (e) { console.error('Notification failed:', e); }
     }
 
     /* ============================================================
-       ALARM HISTORY  ← NEW
+       ALARM HISTORY
        ============================================================ */
     function normalizeTaskText(text) {
         return (text || '').toLowerCase().replace(/[!?.]+$/g, '').replace(/\s+/g, ' ').trim();
     }
-
     function loadAlarmHistory() {
         try { return JSON.parse(localStorage.getItem(ALARM_HISTORY_KEY) || '[]'); }
         catch (e) { return []; }
     }
-
     function recordAlarmFired(reminder) {
         const h = loadAlarmHistory();
         h.push({
             task: reminder.task || 'Reminder',
             at: Date.now(),
+            recurrence: reminder.recurrence || null,
             id: reminder.id || null
         });
         try { localStorage.setItem(ALARM_HISTORY_KEY, JSON.stringify(h.slice(-MAX_ALARM_HISTORY))); } catch (e) {}
         updateHistoryBadge();
         renderFamiliarBar();
     }
-
     function getFamiliarTasks() {
         const h = loadAlarmHistory();
         const counts = {};
@@ -972,7 +1270,6 @@
             .sort((a, b) => b.count - a.count || b.lastAt - a.lastAt)
             .slice(0, 5);
     }
-
     function updateHistoryBadge() {
         const btn = document.getElementById('historyBtn');
         if (!btn) return;
@@ -985,7 +1282,6 @@
             btn.removeAttribute('data-badge');
         }
     }
-
     function renderFamiliarBar() {
         if (!familiarBar) return;
         const items = getFamiliarTasks();
@@ -1021,20 +1317,31 @@
     }
 
     /* ============================================================
-       HISTORY PANEL  ← NEW
+       RECURRENCE
+       ============================================================ */
+    let selectedRecurrence = 'once';
+    function setRepeat(el) {
+        document.querySelectorAll('.repeat-chip').forEach(x => x.classList.remove('active'));
+        el.classList.add('active');
+        selectedRecurrence = el.dataset.repeat;
+    }
+    function recurrenceLabel(r) {
+        switch (r) {
+            case 'daily':    return 'daily';
+            case 'weekly':   return 'weekly';
+            case 'weekdays': return 'weekdays';
+            default:         return null;
+        }
+    }
+
+    /* ============================================================
+       HISTORY PANEL
        ============================================================ */
     const historyPanel = document.getElementById('historyPanel');
     const historyBody = document.getElementById('historyBody');
 
-    function openHistory() {
-        renderHistoryPanel();
-        historyPanel.classList.add('open');
-        historyPanel.setAttribute('aria-hidden', 'false');
-    }
-    function closeHistory() {
-        historyPanel.classList.remove('open');
-        historyPanel.setAttribute('aria-hidden', 'true');
-    }
+    function openHistory() { renderHistoryPanel(); historyPanel.classList.add('open'); historyPanel.setAttribute('aria-hidden', 'false'); }
+    function closeHistory() { historyPanel.classList.remove('open'); historyPanel.setAttribute('aria-hidden', 'true'); }
     function renderHistoryPanel() {
         const items = loadAlarmHistory().slice().reverse();
         historyBody.innerHTML = '';
@@ -1050,7 +1357,7 @@
             row.className = 'history-item';
             const icon = document.createElement('span');
             icon.className = 'history-item-icon';
-            icon.textContent = '🔔';
+            icon.textContent = item.recurrence ? '🔁' : '🔔';
             const content = document.createElement('div');
             content.className = 'history-item-content';
             const task = document.createElement('div');
@@ -1061,7 +1368,7 @@
             const when = new Date(item.at);
             const dateStr = when.toLocaleDateString('en-AU', { day: '2-digit', month: 'short' });
             const timeStr = when.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: false });
-            meta.textContent = `${dateStr} · ${timeStr}`;
+            meta.textContent = `${dateStr} · ${timeStr}` + (item.recurrence ? ' · ' + recurrenceLabel(item.recurrence) : '');
             content.appendChild(task);
             content.appendChild(meta);
             row.appendChild(icon);
@@ -1075,7 +1382,6 @@
             historyBody.appendChild(row);
         });
     }
-
     document.getElementById('historyClose').addEventListener('click', closeHistory);
     document.getElementById('historyDone').addEventListener('click', closeHistory);
     document.getElementById('historyClear').addEventListener('click', () => {
@@ -1184,7 +1490,7 @@
     }
 
     /* ============================================================
-       LOAD / HISTORY
+       LOAD / CHAT HISTORY
        ============================================================ */
     window.onload = async () => {
         await handleAuthCallback();
@@ -1288,6 +1594,7 @@
         userInput.value = '';
         updateSendBtn();
         const payload = { task_input: text };
+        if (selectedRecurrence !== 'once') payload.recurrence = selectedRecurrence;
         await talkToBot(payload);
     }
 
@@ -1338,6 +1645,66 @@
     }
 
     /* ============================================================
+       CANCEL REMINDER
+       ============================================================ */
+    async function sendCancelAction(reminderId, all) {
+        try {
+            const res = await fetch(SEND_URL, {
+                method: 'POST',
+                headers: await authHeaders(),
+                body: JSON.stringify({
+                    user_id: USER_ID,
+                    action: all ? 'delete_all_reminders' : 'delete_reminder',
+                    reminder_id: reminderId
+                })
+            });
+            const data = await res.json().catch(() => ({}));
+            const ok = res.ok && (data.ok === true || data.success === true || data.deleted === true);
+            return { ok, message: data.message || data.error || null };
+        } catch (e) {
+            console.error('Cancel failed:', e);
+            return { ok: false, message: 'Network error' };
+        }
+    }
+
+    async function handleCancelOne(btn, reminder) {
+        if (!reminder.id || btn.disabled) return;
+        btn.disabled = true;
+        const original = btn.textContent;
+        btn.textContent = 'Cancelling...';
+        const result = await sendCancelAction(reminder.id, false);
+        if (result.ok) {
+            btn.textContent = '✓ Cancelled';
+            btn.classList.add('success');
+            btn.parentElement.querySelectorAll('button').forEach(b => { b.disabled = true; });
+        } else {
+            btn.textContent = '✗ Failed';
+            btn.classList.add('fail');
+            btn.disabled = false;
+            setTimeout(() => { btn.textContent = original; btn.classList.remove('fail'); }, 2500);
+        }
+    }
+
+    async function handleCancelAll(btn, reminder) {
+        if (!reminder.id || btn.disabled) return;
+        if (!confirm('Cancel all future repeats of this alarm?')) return;
+        btn.disabled = true;
+        const original = btn.textContent;
+        btn.textContent = 'Cancelling...';
+        const result = await sendCancelAction(reminder.id, true);
+        if (result.ok) {
+            btn.textContent = '✓ All cancelled';
+            btn.classList.add('success');
+            btn.parentElement.querySelectorAll('button').forEach(b => { b.disabled = true; });
+        } else {
+            btn.textContent = '✗ Failed';
+            btn.classList.add('fail');
+            btn.disabled = false;
+            setTimeout(() => { btn.textContent = original; btn.classList.remove('fail'); }, 2500);
+        }
+    }
+
+    /* ============================================================
        POLLING
        ============================================================ */
     let checking = false;
@@ -1356,11 +1723,12 @@
 
     function normalizeReminder(r) {
         if (typeof r === 'string') {
-            return { task: r, id: null, audioStatus: 'LEGACY' };
+            return { task: r, id: null, recurrence: null, audioStatus: 'LEGACY' };
         }
         return {
             task: r.task || r.Task || r.message || r.text || r.title || r.content || '',
             id: r.id || r.reminder_id || r.reminderId || null,
+            recurrence: r.recurrence || r.repeat || r.rrule || null,
             audioStatus: r.audioStatus || 'LEGACY',
             audioS3Key: r.audioS3Key || null
         };
@@ -1422,7 +1790,8 @@
 
         const label = document.createElement('div');
         label.className = 'alarm-label';
-        label.textContent = 'Alarm';
+        const rec = recurrenceLabel(reminder.recurrence);
+        label.textContent = rec ? '🔁 ' + rec : 'Alarm';
 
         const task = document.createElement('div');
         task.className = 'alarm-task';
@@ -1437,14 +1806,30 @@
         card.appendChild(task);
         card.appendChild(time);
 
+        if (reminder.id) {
+            const actions = document.createElement('div');
+            actions.className = 'alarm-actions';
+            const b1 = document.createElement('button');
+            b1.type = 'button';
+            b1.className = 'alarm-action-btn';
+            b1.textContent = 'Cancel this';
+            b1.addEventListener('click', () => handleCancelOne(b1, reminder));
+            const b2 = document.createElement('button');
+            b2.type = 'button';
+            b2.className = 'alarm-action-btn';
+            b2.textContent = 'Cancel all future';
+            b2.addEventListener('click', () => handleCancelAll(b2, reminder));
+            actions.appendChild(b1);
+            actions.appendChild(b2);
+            card.appendChild(actions);
+        }
+
         row.appendChild(card);
         chatBox.appendChild(row);
         chatBox.scrollTop = chatBox.scrollHeight;
         lastMessageAt = when;
 
-        if (save) {
-            saveHistory(null, 'remind-alert', when, { reminder });
-        }
+        if (save) saveHistory(null, 'remind-alert', when, { reminder });
         return row;
     }
 
@@ -1504,7 +1889,6 @@
         if (e.key === 'Enter') handleSend();
     });
 
-    /* Scroll-to-bottom */
     function updateScrollBtn() {
         const gap = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
         scrollBottom.classList.toggle('show', gap > 300);
@@ -1532,4 +1916,3 @@
 </script>
 </body>
 </html>
-
