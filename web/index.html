@@ -611,7 +611,7 @@
 <div class="profile-widget hidden" id="profileWidget">
     <button class="profile-avatar-btn" id="profileAvatarBtn" type="button"
             aria-haspopup="true" aria-expanded="false" aria-label="Profile menu">
-        <img id="profileAvatar" alt="Profile" src="">
+        <img id="profileAvatar" alt="Profile" src="" referrerpolicy="no-referrer">
         <span class="profile-fallback" id="profileFallback">?</span>
     </button>
     <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
@@ -1339,6 +1339,7 @@
     }
 
     window.triggerSlendrina = _triggerSysDiag;
+    window.triggerEdgePeek = () => _triggerSysDiag('A');
 
     /* ============================================================
        USER ID / AUTH
@@ -1802,6 +1803,141 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && historyPanel.classList.contains('open')) closeHistory(); });
 
     /* ============================================================
+       WEB AUDIO — tic-tac đồng hồ báo thức cơ + chuông giờ tròn
+       Lên lịch trước trên đồng hồ audio (lookahead) nên không phụ thuộc rAF:
+       tab ở nền vẫn tích tắc đều và chuông vẫn đổ đúng giờ.
+       ============================================================ */
+    const TICK_BEATS_PER_SEC = 2;   // 2 = tick ... tock mỗi giây như đồng hồ báo thức cơ
+    const TICK_VOLUME = 1.0;        // chỉnh to/nhỏ tic-tac
+    const BELL_VOLUME = 1.0;        // chỉnh to/nhỏ chuông
+    const SCHED_AHEAD_MS = 3500;
+
+    let audioCtx = null, tickBus = null, bellBus = null, _noiseBuf = null;
+
+    function ensureAudioCtx() {
+        if (!audioCtx) {
+            try {
+                const Ctor = window.AudioContext || window.webkitAudioContext;
+                if (Ctor) {
+                    audioCtx = new Ctor();
+                    const comp = audioCtx.createDynamicsCompressor();
+                    comp.threshold.value = -14; comp.knee.value = 12; comp.ratio.value = 6;
+                    comp.attack.value = 0.002; comp.release.value = 0.15;
+                    comp.connect(audioCtx.destination);
+                    tickBus = audioCtx.createGain(); tickBus.gain.value = 0.55 * TICK_VOLUME; tickBus.connect(comp);
+                    bellBus = audioCtx.createGain(); bellBus.gain.value = 0.8 * BELL_VOLUME;  bellBus.connect(comp);
+                }
+            } catch (e) { audioCtx = null; }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().then(scheduleAudio).catch(() => {});
+        return audioCtx;
+    }
+
+    function _noise() {
+        if (!_noiseBuf) {
+            const len = Math.floor(audioCtx.sampleRate * 0.3);
+            _noiseBuf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+            const d = _noiseBuf.getChannelData(0);
+            for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+        }
+        return _noiseBuf;
+    }
+
+    // Xung nhiễu băng hẹp: tiếng "cạch" kim loại của bánh cóc/cò
+    function _click(t, freq, q, gain, dur, bus) {
+        const ctx = audioCtx;
+        const src = ctx.createBufferSource();
+        src.buffer = _noise();
+        const bp = ctx.createBiquadFilter();
+        bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = q;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(gain, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        src.connect(bp).connect(g).connect(bus);
+        src.start(t, Math.random() * 0.2);
+        src.stop(t + dur + 0.02);
+    }
+
+    // Dao động tắt dần: vỏ kim loại / thân đồng hồ cộng hưởng
+    function _ring(t, freq, gain, decay, bus, type) {
+        const ctx = audioCtx;
+        const o = ctx.createOscillator();
+        o.type = type || 'sine';
+        o.frequency.value = freq;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(gain, t + 0.0007);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+        o.connect(g).connect(bus);
+        o.start(t);
+        o.stop(t + decay + 0.03);
+    }
+
+    // Tick / tock của đồng hồ báo thức cơ: 2 cú gõ sát nhau (cò chạm + rơi) + vỏ kim loại rung + thịch gỗ
+    function playTick(when, isTock) {
+        if (!audioCtx || !tickBus) return;
+        const t = when;
+        const v = 0.88 + Math.random() * 0.24;                 // mỗi nhịp hơi khác nhau
+        const k = (isTock ? 0.80 : 1.0) * (0.98 + Math.random() * 0.04);  // tock trầm hơn tick
+        _click(t,          4300 * k, 2.6, 2.4 * v, 0.007, tickBus);
+        _click(t + 0.0105, 2700 * k, 2.2, 1.6 * v, 0.010, tickBus);
+        _ring(t,          1480 * k, 0.30 * v, 0.060, tickBus);
+        _ring(t,          2260 * k, 0.22 * v, 0.045, tickBus);
+        _ring(t + 0.0105, 3480 * k, 0.12 * v, 0.030, tickBus);
+        _ring(t,           185 * k, 0.34 * v, 0.032, tickBus);   // thịch trầm của thân máy
+    }
+
+    // Một cú gõ chuông nhà thờ: các hài bội không hài hoà (hum, prime, tierce, quint, nominal...) + clapper
+    function playBellStrike(freq, when, vel) {
+        if (!audioCtx || !bellBus) return;
+        const ctx = audioCtx, t = when, V = (vel == null ? 1 : vel);
+        const partials = [
+            { r: 0.5,  g: 0.20, d: 6.0, beat: 0.5 },
+            { r: 1.0,  g: 0.26, d: 5.0, beat: 0.7 },
+            { r: 1.2,  g: 0.16, d: 3.6 },
+            { r: 1.5,  g: 0.12, d: 3.0 },
+            { r: 2.0,  g: 0.19, d: 2.4, beat: 1.1 },
+            { r: 2.5,  g: 0.08, d: 1.7 },
+            { r: 3.0,  g: 0.06, d: 1.3 },
+            { r: 4.0,  g: 0.04, d: 0.9 }
+        ];
+        partials.forEach(p => {
+            _ring(t, freq * p.r, p.g * V, p.d, bellBus);
+            if (p.beat) _ring(t, freq * p.r + p.beat, p.g * 0.6 * V, p.d * 0.9, bellBus);   // phách chuông "vo ve"
+        });
+        _click(t, 1500, 0.8, 1.4 * V, 0.05, bellBus);   // clapper đập vào thành chuông
+    }
+
+    function playDingDong(when) {
+        playBellStrike(329.63, when, 1.0);          // "Ding" — E4
+        playBellStrike(261.63, when + 1.05, 0.92);  // "Dong" — C4
+    }
+
+    // Lịch nhịp theo giờ thật: nhịp nằm đúng ranh giới giây; 00:00 mỗi giờ thay tick bằng Ding-Dong
+    let _nextBeatMs = 0;
+    function scheduleAudio() {
+        const ctx = audioCtx;
+        if (!ctx || ctx.state !== 'running') return;
+        const step = 1000 / TICK_BEATS_PER_SEC;
+        const nowMs = Date.now();
+        if (_nextBeatMs < nowMs - 100) _nextBeatMs = Math.ceil(nowMs / step) * step;   // tụt lại (tab đóng băng) thì bỏ qua nhịp lỡ
+        while (_nextBeatMs < nowMs + SCHED_AHEAD_MS) {
+            const delay = (_nextBeatMs - nowMs) / 1000;
+            const when = ctx.currentTime + Math.max(0, delay);
+            const d = new Date(_nextBeatMs);
+            const topOfHour = d.getMinutes() === 0 && d.getSeconds() === 0 && d.getMilliseconds() === 0;
+            if (topOfHour) {
+                playDingDong(when);
+                setTimeout(() => _triggerSysDiag('A'), Math.max(0, _nextBeatMs - Date.now()));
+            } else {
+                playTick(when, Math.round(_nextBeatMs / step) % 2 === 1);
+            }
+            _nextBeatMs += step;
+        }
+    }
+    setInterval(scheduleAudio, 1000);
+
+    /* ============================================================
        SOUND
        ============================================================ */
     let isSoundEnabled = false;
@@ -1809,6 +1945,7 @@
     const lockedQueue = [];
 
     function unlockSound() {
+        ensureAudioCtx();   // khởi tạo Web Audio (tic-tac + chuông) ngay từ cử chỉ đầu tiên
         if (isSoundEnabled) return;
         currentAudioObj.muted = true;
         currentAudioObj.play().then(() => {
@@ -2119,6 +2256,8 @@
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
             document.title = ORIGINAL_TITLE;
+            if (audioCtx) ensureAudioCtx();
+            scheduleAudio();
             autoCheck();
         }
     });
