@@ -210,6 +210,7 @@
             </div>
         </div>
         <div class="actions">
+            <button id="authBtn" class="ghost-btn" onclick="authClick()">Log in</button>
             <button id="modeBtn" class="ghost-btn" onclick="toggleMode()" title="Switch alarm sound">🔔 Original</button>
             <button id="clearBtn" class="ghost-btn" onclick="clearHistory()">Clear chat</button>
         </div>
@@ -232,7 +233,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
             </button>
         </div>
-        <div class="hint">Keep this tab open to get reminded.</div>
+        <div class="hint" id="hint">Keep this tab open to get reminded.</div>
     </div>
 </div>
 
@@ -274,7 +275,160 @@
             return 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
         }
     }
-    const USER_ID = getUserId();
+    const USER_ID = getUserId();   // guest id only; ignored by the server once logged in
+
+    /*  Auth: Cognito Hosted UI + Google (Authorization Code + PKCE, no secret)  */
+    const AUTH_CFG = {
+        domain:   "https://ap-southeast-2bgprvp1sb.auth.ap-southeast-2.amazoncognito.com", 
+        clientId: "2ko9snclu8sr5ql6fq09mfu8nm",                                        
+        redirect: location.origin + location.pathname,                         
+        scope:    "openid email profile"
+    };
+    const AUTH_KEY = 'mate_auth';
+    const GUEST_MAX = 2;
+    let authNote = '';
+
+    function b64url(bytes) {
+        let s = '';
+        new Uint8Array(bytes).forEach(b => { s += String.fromCharCode(b); });
+        return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+    function randomString(n) { return b64url(crypto.getRandomValues(new Uint8Array(n))); }
+
+    function readAuth() {
+        try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch (e) { return null; }
+    }
+    function writeAuth(a) {
+        try { if (a) localStorage.setItem(AUTH_KEY, JSON.stringify(a)); else localStorage.removeItem(AUTH_KEY); } catch (e) {}
+    }
+    function jwtPayload(jwt) {
+        try {
+            const p = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(p), c => c.charCodeAt(0))));
+        } catch (e) { return {}; }
+    }
+    // { sub, email, name } when logged in, else null
+    function currentUser() {
+        const a = readAuth();
+        return a && a.id ? jwtPayload(a.id) : null;
+    }
+
+    async function startLogin() {
+        const verifier = randomString(48);
+        const state = randomString(16);
+        const challenge = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
+        sessionStorage.setItem('mate_pkce', JSON.stringify({ verifier, state }));
+        location.href = AUTH_CFG.domain + '/oauth2/authorize?' + new URLSearchParams({
+            response_type: 'code',
+            client_id: AUTH_CFG.clientId,
+            redirect_uri: AUTH_CFG.redirect,
+            scope: AUTH_CFG.scope,
+            state,
+            code_challenge_method: 'S256',
+            code_challenge: challenge,
+            identity_provider: 'Google'     // skip the Cognito chooser, go straight to Google
+        });
+    }
+
+    async function tokenRequest(params) {
+        const res = await fetch(AUTH_CFG.domain + '/oauth2/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ client_id: AUTH_CFG.clientId, ...params })
+        });
+        if (!res.ok) throw new Error('token endpoint ' + res.status);
+        return res.json();
+    }
+
+    function storeTokens(t, old) {
+        const a = {
+            access:  t.access_token,
+            id:      t.id_token      || (old && old.id),
+            refresh: t.refresh_token || (old && old.refresh),   // refresh grant doesn't return a new one
+            exp:     Date.now() + (t.expires_in || 3600) * 1000
+        };
+        writeAuth(a);
+        return a;
+    }
+
+    // Runs on page load: finishes the redirect back from Cognito (?code=...&state=...)
+    async function handleAuthCallback() {
+        const p = new URLSearchParams(location.search);
+        if (!p.has('code') && !p.has('error')) return;
+
+        window.history.replaceState(null, '', location.pathname);
+        const saved = JSON.parse(sessionStorage.getItem('mate_pkce') || 'null');
+        sessionStorage.removeItem('mate_pkce');
+
+        if (p.has('error') || !saved || p.get('state') !== saved.state) {
+            authNote = "Login didn't go through, mate. Give it another crack.";
+            return;
+        }
+        try {
+            storeTokens(await tokenRequest({
+                grant_type: 'authorization_code',
+                code: p.get('code'),
+                redirect_uri: AUTH_CFG.redirect,
+                code_verifier: saved.verifier
+            }));
+            const u = currentUser();
+            authNote = "Logged in" + (u && u.email ? " as " + u.email : "") + ". No more guest limit!";
+        } catch (e) {
+            console.error(e);
+            authNote = "Login didn't go through, mate. Give it another crack.";
+        }
+    }
+
+    // Valid access token, refreshing it when it's about to expire. null = guest.
+    async function getAccessToken() {
+        let a = readAuth();
+        if (!a) return null;
+        if (Date.now() < a.exp - 60000) return a.access;
+        if (!a.refresh) { writeAuth(null); renderAuthUI(); return null; }
+        try {
+            a = storeTokens(await tokenRequest({ grant_type: 'refresh_token', refresh_token: a.refresh }), a);
+            return a.access;
+        } catch (e) {
+            writeAuth(null);
+            renderAuthUI();
+            return null;
+        }
+    }
+
+    async function authHeaders() {
+        const t = await getAccessToken();
+        return t ? { Authorization: 'Bearer ' + t } : {};
+    }
+
+    function logout() {
+        writeAuth(null);
+        location.href = AUTH_CFG.domain + '/logout?' + new URLSearchParams({
+            client_id: AUTH_CFG.clientId,
+            logout_uri: AUTH_CFG.redirect          // must be in Cognito "Allowed sign-out URLs"
+        });
+    }
+
+    function authClick() { if (readAuth()) logout(); else startLogin(); }
+
+    function renderAuthUI() {
+        const btn = document.getElementById('authBtn');
+        const hint = document.getElementById('hint');
+        const u = currentUser();
+        if (btn) {
+            btn.textContent = u ? 'Log out' : 'Log in';
+            btn.title = u && u.email ? u.email : 'Log in with Google';
+        }
+        if (hint) {
+            hint.textContent = u
+                ? 'Signed in' + (u.email ? ' as ' + u.email : '') + '. Keep this tab open to get reminded.'
+                : 'Guest mode: ' + GUEST_MAX + ' reminders max. Log in with Google for more. Keep this tab open to get reminded.';
+        }
+    }
+
+    function historyKey() {
+        const u = currentUser();
+        return u && u.sub ? 'mate_chat_history_' + u.sub : 'mate_chat_history';
+    }
 
     /*  Sound  */
     let isSoundEnabled = false;
@@ -423,26 +577,29 @@
     }
 
     /* Chat history */
-    window.onload = () => {
-        const history = JSON.parse(localStorage.getItem('mate_chat_history') || '[]');
+    window.onload = async () => {
+        await handleAuthCallback();
+        renderAuthUI();
+        const history = JSON.parse(localStorage.getItem(historyKey()) || '[]');
         if (history.length === 0) {
             appendMessage("Scarnon? Put a task in and I'll remind ya! ✨", 'bot', null, false);
         } else {
             history.forEach(m => appendMessage(m.txt, m.side, null, false));
             chips.style.display = 'none';
         }
+        if (authNote) appendMessage(authNote, 'bot', null, false);
         autoCheck();
     };
 
     function saveHistory(txt, side) {
-        const history = JSON.parse(localStorage.getItem('mate_chat_history') || '[]');
+        const history = JSON.parse(localStorage.getItem(historyKey()) || '[]');
         history.push({ txt, side });
-        localStorage.setItem('mate_chat_history', JSON.stringify(history.slice(-50)));
+        localStorage.setItem(historyKey(), JSON.stringify(history.slice(-50)));
     }
 
     function clearHistory() {
         if (confirm("Delete all chat history?")) {
-            localStorage.removeItem('mate_chat_history');
+            localStorage.removeItem(historyKey());
             chatBox.innerHTML = '';
             appendMessage("History cleared, mate!", 'bot', null, false);
             chips.style.display = 'flex';
@@ -466,6 +623,7 @@
         try {
             const res = await fetch(SEND_URL, {
                 method: 'POST',
+                headers: await authHeaders(),
                 body: JSON.stringify({ user_id: USER_ID, voice_mode: voiceMode, ...payload }),
                 signal: controller.signal
             });
@@ -473,8 +631,14 @@
             const loadingMsg = document.getElementById(tid);
             if (loadingMsg) loadingMsg.remove();
 
-            if (data.needs_confirm && data.pending_id) {
+            if (res.status === 401) {
+                writeAuth(null);
+                renderAuthUI();
+                appendLoginPrompt(data.message || "Your login's expired, mate. Log in again.");
+            } else if (data.needs_confirm && data.pending_id) {
                 appendConfirm(data.message || "Keep this tab open, yeah?", data.pending_id);
+            } else if (data.login_required) {
+                appendLoginPrompt(data.message || "Log in with Google for more, mate.");
             } else {
                 appendMessage(data.message || "Righto!", 'bot');
             }
@@ -503,6 +667,23 @@
         userInput.value = '';
 
         await talkToBot({ task_input: text });
+    }
+
+    // Bot message with a "Log in with Google" button (guest limit hit or session expired).
+    function appendLoginPrompt(txt) {
+        const row = appendMessage(txt, 'bot');
+        const wrap = document.createElement('div');
+        wrap.className = 'confirm-row';
+
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'confirm-btn yes';
+        b.textContent = 'Log in with Google';
+        b.addEventListener('click', startLogin);
+
+        wrap.appendChild(b);
+        row.querySelector('.msg').appendChild(wrap);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     // Far-away reminder: nothing is saved until the user picks one of these.
@@ -555,7 +736,11 @@
         if (checking) return;
         checking = true;
         try {
-            const res = await fetch(CHECK_URL + '?userId=' + encodeURIComponent(USER_ID), { cache: 'no-store' });
+            const res = await fetch(CHECK_URL + '?userId=' + encodeURIComponent(USER_ID), {
+                cache: 'no-store',
+                headers: await authHeaders()
+            });
+            if (res.status === 401) { writeAuth(null); renderAuthUI(); return; }
             if (!res.ok) return;
             const data = await res.json();
             const list = data.reminders || [];
