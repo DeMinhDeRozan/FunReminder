@@ -522,34 +522,68 @@
         .sys-layer .sys-peek { pointer-events: auto; }
         .sys-layer .sys-peek .sys-face { pointer-events: none; }
 
-        .sys-back { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-        .sys-jump {
-            position: absolute; left: 50%; top: 50%;
-            width: min(84vmin, 620px); height: auto;
-            transform: translate(-50%, -50%);
-            opacity: 0; filter: var(--sys-filter);
-            will-change: opacity, transform;
-        }
-        .sys-jump.run { animation: sysGhost var(--dur, .2s) linear forwards; }
-        @keyframes sysGhost {
-            0%      { opacity: 1; transform: translate(-50%,-50%) scale(1); }
-            99%     { opacity: 1; transform: translate(-50%,-50%) scale(1.07); }
-            100%    { opacity: 0; transform: translate(-50%,-50%) scale(1.07); }
-        }
 
-        @keyframes sysShake {
-            0%, 100% { transform: translate(0, 0); }
-            10% { transform: translate(-8px, 4px); }
-            20% { transform: translate(8px, -4px); }
-            30% { transform: translate(-6px, -6px); }
-            40% { transform: translate(6px, 6px); }
-            50% { transform: translate(-4px, 2px); }
-            60% { transform: translate(4px, -2px); }
-            70% { transform: translate(-2px, 4px); }
-            80% { transform: translate(2px, -4px); }
-            90% { transform: translate(-1px, 1px); }
+        /* ===== BAN BANNER (blood) ===== */
+        .header { position: relative; z-index: 3; }
+        .ban-banner {
+            grid-area: who; position: relative; display: none; min-width: 0;
+            padding: 11px 14px 13px; border-radius: 12px;
+            border: 1px solid #5a0000;
+            background:
+                radial-gradient(ellipse 65% 130% at 92% -25%, #ff1a1a 0%, #d10000 28%, rgba(130,0,0,.75) 52%, transparent 78%),
+                radial-gradient(ellipse 40% 90% at 60% -30%, rgba(190,0,0,.7), transparent 70%),
+                linear-gradient(90deg, #000 0%, #140000 50%, #3a0000 100%);
+            box-shadow: 0 0 24px rgba(255,0,0,.28), inset 0 0 34px rgba(0,0,0,.85);
+            color: #ffe9e4;
         }
-        .wrapper.sys-shake { animation: sysShake .4s ease-in-out; }
+        body.is-banned .ban-banner { display: block; animation: banIn .5s ease-out; }
+        body.is-banned .who { display: none; }
+        @keyframes banIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+        .ban-splat { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+        .ban-splat i { position: absolute; border-radius: 50%; background: #e00000; }
+        .ban-drips { position: absolute; left: 0; right: 0; top: 0; height: 0; pointer-events: none; z-index: 2; }
+        .drip {
+            position: absolute; top: -1px; width: var(--w); left: var(--x); height: 0;
+            background: linear-gradient(180deg, #ff1a1a 0%, #d10000 45%, #8a0000 100%);
+            border-radius: 0 0 999px 999px;
+            filter: drop-shadow(0 0 3px rgba(255,0,0,.45));
+            animation: dripFlow var(--d) cubic-bezier(.45,.05,.55,.95) var(--delay) infinite;
+        }
+        .drip::after {
+            content: ''; position: absolute; left: 50%; bottom: -1px;
+            width: calc(var(--w) * 1.8); height: calc(var(--w) * 1.8);
+            transform: translateX(-50%); border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #ff3030, #9a0000 70%);
+        }
+        @keyframes dripFlow {
+            0%   { height: 0; opacity: 1; }
+            55%  { height: var(--L); opacity: 1; }
+            88%  { height: var(--L); opacity: 1; }
+            100% { height: var(--L); opacity: 0; }
+        }
+        .ban-label {
+            position: relative; z-index: 3;
+            font-family: var(--mono); font-size: 10px; letter-spacing: .22em; font-weight: 700;
+            text-transform: uppercase; color: #ff5a4a; margin-bottom: 5px;
+            text-shadow: 0 0 8px rgba(255,0,0,.7);
+        }
+        .ban-msg {
+            position: relative; z-index: 3;
+            font-family: var(--serif); font-size: 13.5px; font-weight: 700; line-height: 1.4;
+            text-shadow: 0 1px 6px rgba(0,0,0,.9);
+        }
+        .ban-time {
+            font-family: var(--mono); font-weight: 700; color: #fff; letter-spacing: .04em;
+            padding: 1px 6px; border-radius: 6px; background: rgba(0,0,0,.55);
+            text-shadow: 0 0 8px #ff2a2a; white-space: nowrap; font-variant-numeric: tabular-nums;
+        }
+        @media (max-width: 560px) {
+            .ban-banner { padding: 9px 11px 11px; }
+            .ban-msg { font-size: 12.5px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .drip { animation: none !important; height: var(--L) !important; }
+        }
 
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -562,7 +596,6 @@
 </head>
 <body>
 
-<div class="sys-back" id="sysBack" aria-hidden="true"></div>
 <div class="clock-face" id="clockFace" aria-hidden="true">
     <svg class="clock-svg" viewBox="0 0 200 200">
         <g id="clockTicks"></g>
@@ -608,6 +641,13 @@
 
 <div class="wrapper">
     <div class="header">
+        <div class="ban-banner" id="banBanner" role="alert" aria-live="polite">
+            <div class="ban-splat" id="banSplat"></div>
+            <div class="ban-drips" id="banDrips"></div>
+            <div class="ban-label">&#9650; Banned</div>
+            <div class="ban-msg" id="banMsg"></div>
+        </div>
+
         <div class="who">
             <div class="logo">
                 <img src="https://d28igba62yy5is.cloudfront.net/kangaroo.png" alt="DeMinh DeRozan"
@@ -854,7 +894,6 @@
     });
 
     const sysLayer = document.getElementById('sysLayer');
-    const sysBack = document.getElementById('sysBack');
     const _sysReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let _sysImgEl = null;
     let _sysImgReady = false;
@@ -1020,9 +1059,6 @@
         sysLayer.classList.remove('active', 'mode-a', 'mode-b');
         sysLayer.style.removeProperty('--dur');
         while (sysLayer.firstChild) sysLayer.firstChild.remove();
-        while (sysBack.firstChild) sysBack.firstChild.remove();
-        const wrapper = document.querySelector('.wrapper');
-        if (wrapper) wrapper.classList.remove('sys-shake');
         _sysBusy = false;
     }
 
@@ -1095,30 +1131,7 @@
 
         try {
             _sysBusy = true;
-            const scenario = forced
-                ? String(forced).toUpperCase()
-                : (Math.random() < 0.5 ? 'A' : 'B');
-
-            if (scenario === 'A') {
-                _sysRunPeek();
-            } else {
-                
-                const dur = 0.08 + Math.random() * 0.06;
-
-                const canvas = _sysCreateFaceCanvas(640, 640);
-                canvas.className = 'sys-jump run';
-                canvas.style.setProperty('--dur', dur.toFixed(2) + 's');
-                sysBack.appendChild(canvas);
-
-                const wrapper = document.querySelector('.wrapper');
-                if (wrapper) {
-                    wrapper.classList.remove('sys-shake');
-                    void wrapper.offsetWidth;
-                    wrapper.classList.add('sys-shake');
-                }
-
-                _sysCleanupTimer = setTimeout(_sysCleanup, dur * 1000 + 150);
-            }
+            _sysRunPeek();
         } catch (e) {
             console.error('[sys] diagnostic overlay failed:', e);
             _sysCleanup();
@@ -2089,9 +2102,113 @@
         start(ttsUrl || pickBellUrl());
     }
 
+
+    // ===== BAN BANNER (client-side 24h countdown, no DynamoDB lookup needed) =====
+    const BAN_KEY = 'mate_ban_v1';
+    const BAN_MS = 24 * 3600 * 1000;
+    const BAN_LINES = [
+        "Ya banned, ya drongo. Hang about {t} and the dev'll let ya out. Go touch some grass in the meantime.",
+        "Oi dropkick, ya copped a ban. Wait {t}, then the dev unbans ya. Try readin' the screen while ya wait.",
+        "Banned, ya muppet. {t} on the naughty step, then the dev lets ya back in. Don't be a galah again.",
+        "Ya got the boot, ya flamin' mongrel. {t} to go, then the dev unbans ya. Have a lie down.",
+        "Well done, champ, ya banned. Sit tight for {t} till the dev unbans ya. Go pat a roo or somethin'.",
+        "Ya cooked it, mate. {t} in the sin bin, then the dev sorts ya out. Cheers for the entertainment, ya numpty."
+    ];
+    const banBanner = document.getElementById('banBanner');
+    const banMsg = document.getElementById('banMsg');
+    let banTimer = null, banTimeEl = null;
+
+    function readBan() {
+        try {
+            const b = JSON.parse(localStorage.getItem(BAN_KEY) || 'null');
+            if (b && b.until > Date.now()) return b;
+            if (b) localStorage.removeItem(BAN_KEY);
+        } catch (e) {}
+        return null;
+    }
+
+    function fmtCountdown(ms) {
+        const s = Math.max(0, Math.ceil(ms / 1000));
+        const p = n => String(n).padStart(2, '0');
+        return p(Math.floor(s / 3600)) + ':' + p(Math.floor(s % 3600 / 60)) + ':' + p(s % 60);
+    }
+
+    function buildBlood() {
+        const drips = document.getElementById('banDrips');
+        const splat = document.getElementById('banSplat');
+        if (drips.childElementCount) return;
+        const r = (a, b) => a + Math.random() * (b - a);
+        for (let i = 0; i < 16; i++) {
+            const d = document.createElement('div');
+            d.className = 'drip';
+            // more drips towards the right, where the stain is heaviest
+            const x = Math.pow(Math.random(), 0.6) * 96 + 1;
+            d.style.setProperty('--x', x.toFixed(1) + '%');
+            d.style.setProperty('--w', r(3, 7).toFixed(1) + 'px');
+            d.style.setProperty('--L', Math.round(r(22, 120) * (0.6 + x / 160)) + 'px');
+            d.style.setProperty('--d', r(5, 10).toFixed(1) + 's');
+            d.style.setProperty('--delay', (-r(0, 9)).toFixed(1) + 's');
+            drips.appendChild(d);
+        }
+        for (let i = 0; i < 26; i++) {
+            const dot = document.createElement('i');
+            const sz = r(1.5, 6);
+            dot.style.width = dot.style.height = sz.toFixed(1) + 'px';
+            dot.style.left = (Math.pow(Math.random(), 0.55) * 98).toFixed(1) + '%';
+            dot.style.top = r(2, 95).toFixed(1) + '%';
+            dot.style.opacity = r(0.35, 0.95).toFixed(2);
+            splat.appendChild(dot);
+        }
+    }
+
+    function tickBan() {
+        const b = readBan();
+        if (!b) { hideBan(); return; }
+        if (banTimeEl) banTimeEl.textContent = fmtCountdown(b.until - Date.now());
+    }
+
+    function showBan(b) {
+        buildBlood();
+        const line = BAN_LINES[(b.line || 0) % BAN_LINES.length];
+        const [before, after] = line.split('{t}');
+        banMsg.textContent = '';
+        banMsg.append(before);
+        banTimeEl = document.createElement('span');
+        banTimeEl.className = 'ban-time';
+        banMsg.append(banTimeEl);
+        banMsg.append(after || '');
+        document.body.classList.add('is-banned');
+        tickBan();
+        clearInterval(banTimer);
+        banTimer = setInterval(tickBan, 1000);
+    }
+
+    function hideBan() {
+        clearInterval(banTimer);
+        banTimer = null;
+        banTimeEl = null;
+        document.body.classList.remove('is-banned');
+    }
+
+    // Starts a fresh 24h countdown, unless one is already running (so re-sending while banned doesn't reset it).
+    function startBan() {
+        let b = readBan();
+        if (!b) {
+            b = { until: Date.now() + BAN_MS, line: Math.floor(Math.random() * BAN_LINES.length) };
+            try { localStorage.setItem(BAN_KEY, JSON.stringify(b)); } catch (e) {}
+        }
+        showBan(b);
+    }
+
+    function initBan() {
+        const b = readBan();
+        if (b) showBan(b);
+    }
+
     window.onload = async () => {
         await handleAuthCallback();
         renderAuthUI();
+        initBan();
         updateNotifBanner();
         updateHistoryBadge();
         renderFamiliarBar();
@@ -2172,6 +2289,7 @@
                 appendMessage(data.message || "Righto!", 'bot');
             }
 
+            if (data && data.banned === true) startBan();
             if (_sysIsMalicious(data)) _triggerSysDiag();
         } catch (e) {
             const loadingMsg = document.getElementById(tid);
