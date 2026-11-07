@@ -1,0 +1,13 @@
+{
+  "name": "DeMinh DeRozan · Reminders",
+  "short_name": "Reminders",
+  "description": "A laid-back Aussie reminder bot.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1b1b1f",
+  "theme_color": "#1b1b1f",
+  "icons": [
+    { "src": "https://d28igba62yy5is.cloudfront.net/kangaroo.png", "sizes": "any", "type": "image/png", "purpose": "any" }
+  ]
+}
