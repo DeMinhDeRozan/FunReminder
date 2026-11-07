@@ -1257,6 +1257,7 @@
     }
 
     async function logout() {
+        try { hideBan(); } catch (e) {}
         try { await Promise.race([pushUnsubscribeQuiet(), new Promise(r => setTimeout(r, 2000))]); } catch (e) {}
         writeAuth(null);
         try { sessionStorage.setItem('mate_bye', '1'); } catch (e) {}
@@ -1280,6 +1281,7 @@
                 ? 'Signed in' + (u.email ? ' as ' + u.email : '') + '. Keep this tab open to get reminded.'
                 : 'Guest: ' + GUEST_MAX + ' reminders max. Log in with Google for more. Keep this tab open.';
         }
+        try { initBan(); } catch (e) {} // banner follows the signed-in account
         renderProfile();
     }
 
@@ -2079,7 +2081,13 @@
 
 
     // ===== BAN BANNER (client-side 24h countdown, no DynamoDB lookup needed) =====
-    const BAN_KEY = 'mate_ban_v1';
+    // Ban is tied to the signed-in Google account (Cognito `sub`). Guests / logged-out = no banner.
+    const BAN_KEY_PREFIX = 'mate_ban_v2:';
+    function banKey() {
+        const u = currentUser();
+        return u && u.sub ? BAN_KEY_PREFIX + u.sub : null;
+    }
+    try { localStorage.removeItem('mate_ban_v1'); } catch (e) {} // old global key (leaked across accounts / logout)
     const BAN_MS = 24 * 3600 * 1000;
     const BAN_LINES = [
         "Ya banned, ya drongo. Hang about {t} and the dev'll let ya out. Go touch some grass in the meantime.",
@@ -2094,10 +2102,12 @@
     let banTimer = null, banTimeEl = null;
 
     function readBan() {
+        const key = banKey();
+        if (!key) return null;
         try {
-            const b = JSON.parse(localStorage.getItem(BAN_KEY) || 'null');
+            const b = JSON.parse(localStorage.getItem(key) || 'null');
             if (b && b.until > Date.now()) return b;
-            if (b) localStorage.removeItem(BAN_KEY);
+            if (b) localStorage.removeItem(key);
         } catch (e) {}
         return null;
     }
@@ -2138,17 +2148,20 @@
 
     // Starts a fresh 24h countdown, unless one is already running (so re-sending while banned doesn't reset it).
     function startBan() {
+        const key = banKey();
+        if (!key) return; // not signed in: no banner
         let b = readBan();
         if (!b) {
             b = { until: Date.now() + BAN_MS, line: Math.floor(Math.random() * BAN_LINES.length) };
-            try { localStorage.setItem(BAN_KEY, JSON.stringify(b)); } catch (e) {}
+            try { localStorage.setItem(key, JSON.stringify(b)); } catch (e) {}
         }
         showBan(b);
     }
 
+    // Show the banner only if the CURRENT account is banned; hide it otherwise (logout, expired session, other account).
     function initBan() {
         const b = readBan();
-        if (b) showBan(b);
+        if (b) showBan(b); else hideBan();
     }
 
     window.onload = async () => {
