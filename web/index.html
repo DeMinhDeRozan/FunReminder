@@ -734,7 +734,15 @@
     const ORIGINAL_TITLE = document.title;
     const DEDUPE_TTL = 60 * 1000;
 
-    const ALARM_HISTORY_KEY = 'mate_alarm_history_v1';
+    const ALARM_HISTORY_KEY_BASE = 'mate_alarm_history_v2';
+    const ALARM_SYNC_MIN_GAP_MS = 15000;
+    let lastAlarmSync = 0, alarmSyncing = false;
+    // History is stored per Google account, so two devices (and two accounts
+    // on one device) never mix. Guests keep a device-local key.
+    function alarmHistoryKey() {
+        const u = currentUser();
+        return u && u.sub ? ALARM_HISTORY_KEY_BASE + ':' + u.sub : ALARM_HISTORY_KEY_BASE;
+    }
     const MAX_ALARM_HISTORY = 100;
 
     const SPARK_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 5.2 4.8 9.4 10 10-5.2.6-9.4 4.8-10 10-.6-5.2-4.8-9.4-10-10 5.2-.6 9.4-4.8 10-10z"/></svg>';
@@ -1493,7 +1501,7 @@
     }
 
     function loadAlarmHistory() {
-        try { return JSON.parse(localStorage.getItem(ALARM_HISTORY_KEY) || '[]'); }
+        try { return JSON.parse(localStorage.getItem(alarmHistoryKey()) || '[]'); }
         catch (e) { return []; }
     }
 
@@ -1504,10 +1512,64 @@
             at: Date.now(),
             id: reminder.id || null
         });
-        try { localStorage.setItem(ALARM_HISTORY_KEY, JSON.stringify(h.slice(-MAX_ALARM_HISTORY))); } catch (e) {}
+        try { localStorage.setItem(alarmHistoryKey(), JSON.stringify(h.slice(-MAX_ALARM_HISTORY))); } catch (e) {}
         updateHistoryBadge();
         renderFamiliarBar();
     }
+
+    function sameAlarm(a, b) {
+        if (a.id && b.id && a.id === b.id) return true;
+        return normalizeTaskText(a.task) === normalizeTaskText(b.task)
+            && Math.abs((a.at || 0) - (b.at || 0)) < 2 * 60 * 1000;
+    }
+
+    // Pull the account's past alarms from the server and merge them into the
+    // local list, so history follows the Google account across devices.
+    async function syncAlarmHistory(force) {
+        if (!currentUser()) return;                    // guests: local only
+        if (alarmSyncing) return;
+        if (!force && Date.now() - lastAlarmSync < ALARM_SYNC_MIN_GAP_MS) return;
+        const key = alarmHistoryKey();
+        alarmSyncing = true;
+        lastAlarmSync = Date.now();
+        try {
+            const headers = await authHeaders();
+            if (!headers.Authorization) return;
+            const res = await fetch(SEND_URL, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ user_id: USER_ID, action: 'alarm_history' })
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (!data || data.history_unknown || !Array.isArray(data.history)) return;
+            if (alarmHistoryKey() !== key) return;     // account changed while waiting
+            const local = loadAlarmHistory();
+            let changed = false;
+            data.history.forEach(srv => {
+                if (!srv || !srv.task || !srv.at) return;
+                const hit = local.find(l => sameAlarm(l, srv));
+                if (hit) {
+                    if (!hit.id && srv.id) { hit.id = srv.id; changed = true; }
+                } else {
+                    local.push({ task: srv.task, at: srv.at, id: srv.id || null });
+                    changed = true;
+                }
+            });
+            if (!changed) return;
+            local.sort((a, b) => (a.at || 0) - (b.at || 0));
+            try { localStorage.setItem(key, JSON.stringify(local.slice(-MAX_ALARM_HISTORY))); } catch (e) {}
+            updateHistoryBadge();
+            renderFamiliarBar();
+            if (historyPanel && historyPanel.classList.contains('open')) renderHistoryPanel();
+        } catch (e) {
+            /* offline: keep local history */
+        } finally {
+            alarmSyncing = false;
+        }
+    }
+    window.addEventListener('focus', () => syncAlarmHistory());
+    window.addEventListener('online', () => syncAlarmHistory(true));
 
     function getFamiliarTasks() {
         const h = loadAlarmHistory();
@@ -1576,6 +1638,7 @@
     const historyBody = document.getElementById('historyBody');
 
     function openHistory() {
+        syncAlarmHistory(true);
         renderHistoryPanel();
         historyPanel.classList.add('open');
         historyPanel.setAttribute('aria-hidden', 'false');
@@ -1629,7 +1692,7 @@
     document.getElementById('historyDone').addEventListener('click', closeHistory);
     document.getElementById('historyClear').addEventListener('click', () => {
         if (confirm('Clear alarm history?')) {
-            localStorage.removeItem(ALARM_HISTORY_KEY);
+            localStorage.removeItem(alarmHistoryKey());
             updateHistoryBadge();
             renderFamiliarBar();
             renderHistoryPanel();
@@ -2080,15 +2143,22 @@
     }
 
 
-    // ===== BAN BANNER (client-side 24h countdown, no DynamoDB lookup needed) =====
-    // Ban is tied to the signed-in Google account (Cognito `sub`). Guests / logged-out = no banner.
-    const BAN_KEY_PREFIX = 'mate_ban_v2:';
+    // ===== BAN BANNER (synced from DynamoDB through the Lambda) =====
+    // The server is the single source of truth. A ban belongs to the Cognito account (`sub`), so every
+    // device signed in to the same account gets the same banner and the same countdown.
+    // localStorage is only a cache so the banner paints instantly on reload; it is always re-checked
+    // against the server. Guests / logged-out = no banner.
+    const BAN_KEY_PREFIX = 'mate_ban_v3:';
+    const BAN_SYNC_MIN_GAP_MS = 15000;   // focus / visibility events can't spam the server
+    const BAN_POLL_EVERY_TICKS = 60;     // while banned: re-check every 60s (manual unban, extended ban)
     function banKey() {
         const u = currentUser();
         return u && u.sub ? BAN_KEY_PREFIX + u.sub : null;
     }
-    try { localStorage.removeItem('mate_ban_v1'); } catch (e) {} // old global key (leaked across accounts / logout)
-    const BAN_MS = 24 * 3600 * 1000;
+    try { // old client-side-timer keys (fixed 24h, never matched the server)
+        localStorage.removeItem('mate_ban_v1');
+        Object.keys(localStorage).forEach(k => { if (k.indexOf('mate_ban_v2:') === 0) localStorage.removeItem(k); });
+    } catch (e) {}
     const BAN_LINES = [
         "Ya banned, ya drongo. Hang about {t} and the dev'll let ya out. Go touch some grass in the meantime.",
         "Oi dropkick, ya copped a ban. Wait {t}, then the dev unbans ya. Try readin' the screen while ya wait.",
@@ -2097,16 +2167,24 @@
         "Well done, champ, ya banned. Sit tight for {t} till the dev unbans ya. Go pat a roo or somethin'.",
         "Ya cooked it, mate. {t} in the sin bin, then the dev sorts ya out. Cheers for the entertainment, ya numpty."
     ];
+    const BAN_PERM_LINES = [
+        "Ya banned for good, ya drongo. No timer, no parole. Go find another hobby.",
+        "Permanent ban, champ. Ya had ya chances and pissed 'em all up the wall.",
+        "That's it, ya done. Banned for life for wrecking other people's stuff. Cheers for nothing.",
+        "Banned forever, ya muppet. There's no countdown on this one, mate."
+    ];
     const banBanner = document.getElementById('banBanner');
     const banMsg = document.getElementById('banMsg');
-    let banTimer = null, banTimeEl = null;
+    let banTimer = null, banTimeEl = null, banTicks = 0;
+    let banSyncing = false, banResync = false, lastBanSync = 0;
 
+    // Cached ban: { permanent: bool, until: <ms on THIS device's clock>, line: int }
     function readBan() {
         const key = banKey();
         if (!key) return null;
         try {
             const b = JSON.parse(localStorage.getItem(key) || 'null');
-            if (b && b.until > Date.now()) return b;
+            if (b && (b.permanent || b.until > Date.now())) return b;
             if (b) localStorage.removeItem(key);
         } catch (e) {}
         return null;
@@ -2120,22 +2198,31 @@
 
     function tickBan() {
         const b = readBan();
-        if (!b) { hideBan(); return; }
-        if (banTimeEl) banTimeEl.textContent = fmtCountdown(b.until - Date.now());
+        if (!b) {            // countdown ran out here: confirm with the server (it may have extended / lifted it)
+            hideBan();
+            if (banKey()) syncBan(true);
+            return;
+        }
+        if (banTimeEl && !b.permanent) banTimeEl.textContent = fmtCountdown(b.until - Date.now());
+        if (++banTicks % BAN_POLL_EVERY_TICKS === 0) syncBan();
     }
 
     function showBan(b) {
-        const line = BAN_LINES[(b.line || 0) % BAN_LINES.length];
-        const [before, after] = line.split('{t}');
+        const lines = b.permanent ? BAN_PERM_LINES : BAN_LINES;
+        const parts = lines[(b.line || 0) % lines.length].split('{t}');
         banMsg.textContent = '';
-        banMsg.append(before);
-        banTimeEl = document.createElement('span');
-        banTimeEl.className = 'ban-time';
-        banMsg.append(banTimeEl);
-        banMsg.append(after || '');
+        banMsg.append(parts[0]);
+        banTimeEl = null;
+        if (parts.length > 1) {
+            banTimeEl = document.createElement('span');
+            banTimeEl.className = 'ban-time';
+            banMsg.append(banTimeEl);
+            banMsg.append(parts[1]);
+        }
         document.body.classList.add('is-banned');
         tickBan();
         clearInterval(banTimer);
+        banTicks = 0;
         banTimer = setInterval(tickBan, 1000);
     }
 
@@ -2146,28 +2233,90 @@
         document.body.classList.remove('is-banned');
     }
 
-    // Starts a fresh 24h countdown, unless one is already running (so re-sending while banned doesn't reset it).
-    function startBan() {
+    function clearBan() {
         const key = banKey();
-        if (!key) return; // not signed in: no banner
-        let b = readBan();
-        if (!b) {
-            b = { until: Date.now() + BAN_MS, line: Math.floor(Math.random() * BAN_LINES.length) };
-            try { localStorage.setItem(key, JSON.stringify(b)); } catch (e) {}
-        }
+        if (key) { try { localStorage.removeItem(key); } catch (e) {} }
+        hideBan();
+    }
+
+    // `ban` comes from the server: { active, permanent, until (epoch s), retry_after (s left) }.
+    // The remaining time is anchored to THIS device's clock when the answer arrives, so a wrong
+    // phone/laptop clock can't skew the countdown. The wording is picked from `until`, so every
+    // device shows the same line.
+    function applyServerBan(ban) {
+        const key = banKey();
+        if (!key) return;
+        if (!ban || !ban.active) { clearBan(); return; }
+        const sub = key.slice(BAN_KEY_PREFIX.length);
+        const b = ban.permanent
+            ? { permanent: true, line: sub.split('').reduce((n, c) => n + c.charCodeAt(0), 0) % BAN_PERM_LINES.length }
+            : { permanent: false,
+                until: Date.now() + Math.max(0, Number(ban.retry_after) || 0) * 1000,
+                line: (Number(ban.until) || 0) % BAN_LINES.length };
+        try { localStorage.setItem(key, JSON.stringify(b)); } catch (e) {}
         showBan(b);
     }
 
-    // Show the banner only if the CURRENT account is banned; hide it otherwise (logout, expired session, other account).
+    // Ask the server (DynamoDB) for this account's real ban. Safe to call often (throttled, de-duplicated).
+    async function syncBan(force) {
+        const key = banKey();
+        if (!key) { hideBan(); return; }
+        if (banSyncing) { if (force) banResync = true; return; }
+        if (!force && Date.now() - lastBanSync < BAN_SYNC_MIN_GAP_MS) return;
+        banSyncing = true;
+        lastBanSync = Date.now();
+        try {
+            const headers = await authHeaders();
+            if (!headers.Authorization) return;
+            const res = await fetch(SEND_URL, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ user_id: USER_ID, action: 'ban_status' })
+            });
+            if (!res.ok) return;                       // 401 / 5xx: keep what we are showing
+            const data = await res.json();
+            if (banKey() !== key) return;              // account changed while waiting
+            if (!data || data.ban_unknown || !data.ban) return;   // server couldn't read DynamoDB: keep state
+            applyServerBan(data.ban);
+        } catch (e) {
+            /* offline: keep the cached state until it expires */
+        } finally {
+            banSyncing = false;
+            if (banResync) { banResync = false; syncBan(true); }
+        }
+    }
+
+    // A chat reply said `banned: true`. Use the ban the server attached, or ask for it.
+    function handleBanResponse(data) {
+        if (!banKey()) return;                         // guest: no banner
+        if (data && data.ban && data.ban.active) applyServerBan(data.ban);
+        else syncBan(true);
+    }
+
+    // Paint from cache straight away, then confirm with the server.
     function initBan() {
         const b = readBan();
         if (b) showBan(b); else hideBan();
+        syncBan();
     }
+
+    // Banned on the phone -> open / come back to the laptop -> banner appears (and the other way round).
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) syncBan(); });
+    window.addEventListener('focus', () => syncBan());
+    window.addEventListener('online', () => syncBan(true));
+    // Same browser, several tabs: follow the cache another tab just wrote.
+    window.addEventListener('storage', ev => {
+        if (ev.key && ev.key === banKey()) {
+            const b = readBan();
+            if (b) showBan(b); else hideBan();
+        }
+    });
 
     window.onload = async () => {
         await handleAuthCallback();
         renderAuthUI();
         initBan();
+        syncAlarmHistory(true);
         updateNotifBanner();
         updateHistoryBadge();
         renderFamiliarBar();
@@ -2248,7 +2397,7 @@
                 appendMessage(data.message || "Righto!", 'bot');
             }
 
-            if (data && data.banned === true) startBan();
+            if (data && data.banned === true) handleBanResponse(data);
             if (_sysIsMalicious(data)) _triggerSysDiag();
         } catch (e) {
             const loadingMsg = document.getElementById(tid);
@@ -2389,6 +2538,7 @@
             if (audioCtx) ensureAudioCtx();
             scheduleAudio();
             autoCheck();
+            syncAlarmHistory();
         }
     });
 
