@@ -494,6 +494,18 @@
         .profile-menu-item:hover { background: var(--user); }
         .profile-menu-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
         .profile-menu-icon { font-size: 15px; flex: none; width: 20px; text-align: center; }
+        /* Log in / Log out lives in the menu, under the policy links */
+        button.profile-menu-item {
+            width: 100%; border: none; background: none; font: inherit; font-size: 13.5px;
+            text-align: left; margin-top: 4px; position: relative;
+        }
+        button.profile-menu-item::before {
+            content: ''; position: absolute; left: 12px; right: 12px; top: -3px;
+            border-top: 1px solid var(--line);
+        }
+        /* guests get the menu too (to log in), but no green "online" dot */
+        .profile-widget.guest .profile-avatar-btn::after { display: none; }
+        .profile-widget.guest .profile-menu-email { word-break: normal; }
 
         @media (max-width: 560px) {
             .profile-avatar-btn { width: 34px; height: 34px; }
@@ -541,6 +553,10 @@
         }
         body.is-banned .ban-banner { display: block; animation: banIn .5s ease-out; }
         body.is-banned .who { display: none; }
+        /* banned: no typing, no chips (the server blocks the API too) */
+        body.is-banned .input-bar { opacity: .45; }
+        body.is-banned .input-bar input { cursor: not-allowed; }
+        body.is-banned .chips { pointer-events: none; opacity: .35; }
         @keyframes banIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
         .ban-label {
             position: relative; z-index: 3;
@@ -613,6 +629,10 @@
             <span class="profile-menu-icon">📄</span>
             <span>Terms of service</span>
         </a>
+        <button class="profile-menu-item" id="authBtn" type="button" role="menuitem" onclick="authClick()">
+            <span class="profile-menu-icon" id="authIcon">🔑</span>
+            <span id="authLabel">Log in with Google</span>
+        </button>
     </div>
 </div>
 
@@ -643,7 +663,6 @@
         </div>
 
         <div class="actions">
-            <button id="authBtn" class="ghost-btn" onclick="authClick()">Log in</button>
             <button id="modeBtn" class="ghost-btn" onclick="toggleMode()" title="Switch alarm sound">🔔 Original</button>
             <button id="historyBtn" class="ghost-btn" onclick="openHistory()" title="Alarm history">📜 History</button>
             <button id="clearBtn" class="ghost-btn" onclick="clearHistory()" title="Clear chat history">Clear</button>
@@ -1281,8 +1300,11 @@
         const hint = document.getElementById('hint');
         const u = currentUser();
         if (btn) {
-            btn.textContent = u ? 'Log out' : 'Log in';
-            btn.title = u && u.email ? u.email : 'Log in with Google';
+            const label = document.getElementById('authLabel');
+            const icon  = document.getElementById('authIcon');
+            if (label) label.textContent = u ? 'Log out' : 'Log in with Google';
+            if (icon)  icon.textContent  = u ? '🚪' : '🔑';
+            btn.title = u && u.email ? 'Log out of ' + u.email : 'Log in with Google';
         }
         if (hint) {
             hint.textContent = u
@@ -1307,17 +1329,17 @@
         if (!widget) return;
 
         const u = currentUser();
+        widget.classList.remove('hidden');
+        widget.classList.toggle('guest', !u);
         if (!u) {
-            widget.classList.add('hidden');
-            const menu = document.getElementById('profileMenu');
-            if (menu) {
-                menu.classList.remove('open');
-                menu.setAttribute('aria-hidden', 'true');
-            }
-            if (btn) btn.setAttribute('aria-expanded', 'false');
+            // Guest: generic avatar; the menu offers Log in + the policy links.
+            img.removeAttribute('src');
+            img.style.display = 'none';
+            btn.classList.add('no-img');
+            fallback.textContent = '👤';
+            emailText.textContent = 'Guest (' + GUEST_MAX + ' reminders max)';
             return;
         }
-        widget.classList.remove('hidden');
 
         const email   = u.email || '';
         const name    = u.name || u.given_name || (email ? email.split('@')[0] : '?');
@@ -2220,6 +2242,7 @@
             banMsg.append(parts[1]);
         }
         document.body.classList.add('is-banned');
+        setBanLock(true);
         tickBan();
         clearInterval(banTimer);
         banTicks = 0;
@@ -2231,6 +2254,23 @@
         banTimer = null;
         banTimeEl = null;
         document.body.classList.remove('is-banned');
+        setBanLock(false);
+    }
+
+    // Lock the composer while banned. Looked up by id because the ban can be painted
+    // from cache before the chat code below has set up its variables.
+    const BAN_PLACEHOLDER = "Ya banned, mate. Wait it out.";
+    let normalPlaceholder = null;
+    function isBanLocked() { return document.body.classList.contains('is-banned'); }
+    function setBanLock(on) {
+        const input = document.getElementById('userInput');
+        const send  = document.getElementById('sendBtn');
+        if (!input) return;
+        if (normalPlaceholder === null) normalPlaceholder = input.placeholder;
+        input.disabled = on;
+        input.placeholder = on ? BAN_PLACEHOLDER : normalPlaceholder;
+        if (on) { input.value = ''; input.blur(); }
+        if (send) send.disabled = on || !input.value.trim();
     }
 
     function clearBan() {
@@ -2363,6 +2403,7 @@
     }
 
     function useChip(el) {
+        if (isBanLocked()) return;
         userInput.value = el.innerText.replace(/\s*[\u{1F300}-\u{1FAFF}]\s*$/u, '');
         userInput.focus();
         userInput.dispatchEvent(new Event('input'));
@@ -2414,6 +2455,7 @@
     }
 
     async function handleSend() {
+        if (isBanLocked()) return;
         unlockSound();
         const text = userInput.value.trim();
         if (!text) return;
@@ -2426,7 +2468,7 @@
     }
 
     function updateSendBtn() {
-        if (sendBtn) sendBtn.disabled = !userInput.value.trim();
+        if (sendBtn) sendBtn.disabled = isBanLocked() || !userInput.value.trim();
     }
     userInput.addEventListener('input', updateSendBtn);
     updateSendBtn();
