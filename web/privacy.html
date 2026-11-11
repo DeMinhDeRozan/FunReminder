@@ -78,7 +78,7 @@
     <p class="meta">Effective 6 November 2026. FunReminder is a personal, non-commercial project run by DeMinh DeRozan Le, based in Melbourne, Australia. The app lives at <a href="https://deminh.com/1/">deminh.com/1/</a>.</p>
 
     <div class="tldr">
-        <strong>The TL;DR:</strong> I'm a reminder bot, not a data broker. I need your info to yell at you about your tasks. I don't sell your data, I don't spam you, and I don't want your Google password. Here's the boring legal stuff down below so Google stays happy.
+        <strong>The TL;DR:</strong> I'm a reminder bot, not a data broker. I need your info to yell at you about your tasks. I don't sell your data, I don't spam you, and I don't want your Google or Microsoft password. Here's the boring legal stuff down below so Google stays happy.
     </div>
 
     <p>FunReminder is a small web app that sets spoken or ringing reminders. This page explains what info I handle, why I need it, and how you can tell me to bugger off and delete it.</p>
@@ -86,6 +86,7 @@
     <h2>👀 What I collect (and why)</h2>
     <ul>
         <li><strong>Google Sign-in details:</strong> If you log in with Google, I get your email, name, and a unique account ID via Amazon Cognito. I use this to know it's you. <em>I do not get your Google password, your contacts, your files, or your search history.</em></li>
+        <li><strong>Microsoft Sign-in details:</strong> If you log in with a Microsoft work account (Microsoft Entra ID), I get the same three things: your email, name, and a unique account ID, via Amazon Cognito. <em>I do not get your Microsoft password, your mailbox, your OneDrive files, or your Teams chats.</em></li>
         <li><strong>Your reminders:</strong> The text you type (e.g., "buy milk"), the time it's due, and if it actually fired.</li>
         <li><strong>Guest ID:</strong> If you don't log in, your browser generates a random ID stored locally so I can find your stuff. Guests get a limited number of free reminders.</li>
         <li><strong>Message logs (The bouncer):</strong> Every message is logged with your IP, browser type, and rough country. I only look at this to spot abuse, stop hackers, and fix bugs. I'm not tracking your every move.</li>
@@ -105,6 +106,7 @@
     <ul>
         <li><strong>Amazon Web Services (AWS):</strong> Hosts the app and stores data in Sydney. Cognito handles the login, and Bedrock (US East) processes your message with an AI model to understand what the hell you want.</li>
         <li><strong>Google:</strong> Provides the Sign-in with Google service. A Google Cloud server in Melbourne generates the speech audio.</li>
+        <li><strong>Microsoft:</strong> Provides the Sign-in with Microsoft (Entra ID) service.</li>
         <li><strong>Cloudflare:</strong> Acts as the bouncer for DNS and website security.</li>
     </ul>
     <p>These providers process data on my behalf to keep the app alive. Your data may transit outside Australia because the internet is a global thing.</p>
@@ -118,7 +120,7 @@
     </ul>
 
     <h2>✋ Your choices</h2>
-    <p>You can ask to see or delete your data by emailing me. You can stop using the app, log out, or clear your browser data at any time. You can also revoke FunReminder's access from your <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google Account settings</a>.</p>
+    <p>You can ask to see or delete your data by emailing me. You can stop using the app, log out, or clear your browser data at any time. You can also revoke FunReminder's access from your <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google Account settings</a>, or from <a href="https://myapps.microsoft.com" target="_blank" rel="noopener">My Apps</a> for a Microsoft account.</p>
 
     <h2>🧒 Children</h2>
     <p>FunReminder is not for kids under 13. I don't knowingly collect their info.</p>

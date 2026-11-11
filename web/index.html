@@ -503,6 +503,9 @@
             content: ''; position: absolute; left: 12px; right: 12px; top: -3px;
             border-top: 1px solid var(--line);
         }
+        button.profile-menu-item + button.profile-menu-item { margin-top: 0; }
+        button.profile-menu-item + button.profile-menu-item::before { display: none; }
+        .profile-menu-item.hidden { display: none; }
         /* guests get the menu too (to log in), but no green "online" dot */
         .profile-widget.guest .profile-avatar-btn::after { display: none; }
         .profile-widget.guest .profile-menu-email { word-break: normal; }
@@ -632,6 +635,10 @@
         <button class="profile-menu-item" id="authBtn" type="button" role="menuitem" onclick="authClick()">
             <span class="profile-menu-icon" id="authIcon">🔑</span>
             <span id="authLabel">Log in with Google</span>
+        </button>
+        <button class="profile-menu-item" id="authMsBtn" type="button" role="menuitem" onclick="startLogin('EntraID')">
+            <span class="profile-menu-icon">🪟</span>
+            <span>Log in with Microsoft</span>
         </button>
     </div>
 </div>
@@ -1197,7 +1204,11 @@
         return a && a.id ? jwtPayload(a.id) : null;
     }
 
-    async function startLogin() {
+    // Cognito provider names (User pool > Social and external providers).
+    const AUTH_PROVIDERS = { Google: 'Google', EntraID: 'EntraID' };
+
+    async function startLogin(provider) {
+        const idp = AUTH_PROVIDERS[provider] || 'Google'; // click events pass an Event -> Google
         const verifier = randomString(48);
         const state = randomString(16);
         const challenge = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
@@ -1210,7 +1221,7 @@
             state,
             code_challenge_method: 'S256',
             code_challenge: challenge,
-            identity_provider: 'Google'
+            identity_provider: idp
         });
     }
 
@@ -1306,10 +1317,12 @@
             if (icon)  icon.textContent  = u ? '🚪' : '🔑';
             btn.title = u && u.email ? 'Log out of ' + u.email : 'Log in with Google';
         }
+        const msBtn = document.getElementById('authMsBtn');
+        if (msBtn) msBtn.classList.toggle('hidden', !!u);
         if (hint) {
             hint.textContent = u
                 ? 'Signed in' + (u.email ? ' as ' + u.email : '') + '. Keep this tab open to get reminded.'
-                : 'Guest: ' + GUEST_MAX + ' reminders max. Log in with Google for more. Keep this tab open.';
+                : 'Guest: ' + GUEST_MAX + ' reminders max. Log in with Google or Microsoft for more. Keep this tab open.';
         }
         try { initBan(); } catch (e) {} // banner follows the signed-in account
         renderProfile();
@@ -2036,7 +2049,7 @@
     const LOGIN_FAIL = [
         "Login's gone belly up, mate. Give it another crack.",
         "Ya login didn't work, ya numpty. Try again.",
-        "Google said nah. Have another go, will ya?",
+        "The login mob said nah. Have another go, will ya?",
         "Bugger, that didn't work. Not me fault, I swear. Try again.",
         "Something carked it during login. Chuck it at me again.",
         "Flat as a tack. Login failed, mate. Have another crack."
@@ -2047,9 +2060,9 @@
         "Time's up on ya login, champ. Back through the front door ya go."
     ];
     const LOGIN_NEEDED = [
-        "Ya hit the guest limit, mate. Log in with Google and I'll keep nagging ya.",
-        "That's ya lot as a guest. Log in with Google, it's free, ya tightarse.",
-        "Guests get the bare minimum, mate. Log in with Google for more."
+        "Ya hit the guest limit, mate. Log in (Google or Microsoft) and I'll keep nagging ya.",
+        "That's ya lot as a guest. Log in with Google or Microsoft, it's free, ya tightarse.",
+        "Guests get the bare minimum, mate. Log in with Google or Microsoft for more."
     ];
     const LOGOUT_LINES = [
         "Logged out. Don't let the door hit ya on the way out, mate.",
@@ -2481,8 +2494,14 @@
         b.type = 'button';
         b.className = 'confirm-btn yes';
         b.textContent = 'Log in with Google';
-        b.addEventListener('click', startLogin);
+        b.addEventListener('click', () => startLogin('Google'));
         wrap.appendChild(b);
+        const ms = document.createElement('button');
+        ms.type = 'button';
+        ms.className = 'confirm-btn yes';
+        ms.textContent = 'Log in with Microsoft';
+        ms.addEventListener('click', () => startLogin('EntraID'));
+        wrap.appendChild(ms);
         row.querySelector('.msg').appendChild(wrap);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
