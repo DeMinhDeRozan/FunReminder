@@ -61,7 +61,7 @@
 - 📈 Observability: CloudWatch monitors the Lambda, and an alarm only emails me (via SNS) when something breaks.
 - ❌ Missed alarms are caught by an EventBridge-triggered sweeper and reported to me (admin).
 - 🏗️ Infrastructure is fully managed as code (Terraform) and deployed automatically (GitHub Actions).
-- 🔑 Sign in with Google or Microsoft (Entra ID, OIDC) through Cognito Hosted UI with PKCE; guests get a small free quota. Setup: [ENTRA_SETUP.md](ENTRA_SETUP.md).
+- 🔑 Sign in with Google or Microsoft (Entra ID, OIDC) through Cognito Hosted UI with PKCE; guests get a small free quota.
 - ☁️ Hybrid architecture: AWS serverless website + GCP TTS server.
 
 <p align="center">
