@@ -5,7 +5,7 @@
 </h1>
 
 ## 🔀 Architecture & Workflow
-> 💡 A hybrid-cloud reminder app for developers working with hundreds of tabs at a time: a serverless web tier on AWS (S3, CloudFront, API Gateway, Lambda, Bedrock, DynamoDB) plus a text-to-speech server on Google Cloud, so your alarm can literally talk back.
+> 💡 A hybrid-cloud reminder app for developers working with hundreds of tabs at a time: a serverless web tier on AWS (S3, CloudFront, API Gateway, Lambda, Bedrock, DynamoDB) plus a text-to-speech server on Google Cloud, so your alarm can literally talk back. Around it sits a small security lab on Azure that watches the app's own logs: Elasticsearch, Kibana, Sigma detection rules and n8n automation.
 
 <p align="center">
   <img src="asset/architecture.svg" width="900" alt="FunReminder architecture: Portfolio + Fun Reminder + Text-to-Speech">
@@ -43,6 +43,22 @@
   <img src="asset/GitHub%20Actions.svg" width="63" height="63" alt="GitHub Actions" title="GitHub Actions">
 </p>
 
+<p align="center"><sub>Identity, security monitoring and automation</sub></p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Amazon_Cognito-DD344C?style=flat&logo=amazonaws&logoColor=white" alt="Amazon Cognito">&nbsp;
+  <img src="https://img.shields.io/badge/Google_Sign--in-4285F4?style=flat&logo=google&logoColor=white" alt="Google Sign--in">&nbsp;
+  <img src="https://img.shields.io/badge/Microsoft_Entra_ID-0078D4?style=flat&logo=microsoftazure&logoColor=white" alt="Microsoft Entra ID">&nbsp;
+  <img src="https://img.shields.io/badge/Azure_VM-0078D4?style=flat&logo=microsoftazure&logoColor=white" alt="Azure VM">&nbsp;
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker">&nbsp;
+  <img src="https://img.shields.io/badge/Elasticsearch-005571?style=flat&logo=elasticsearch&logoColor=white" alt="Elasticsearch">&nbsp;
+  <img src="https://img.shields.io/badge/Kibana-005571?style=flat&logo=kibana&logoColor=white" alt="Kibana">&nbsp;
+  <img src="https://img.shields.io/badge/Sigma_rules-4B5563?style=flat" alt="Sigma rules">&nbsp;
+  <img src="https://img.shields.io/badge/n8n-EA4B71?style=flat&logo=n8n&logoColor=white" alt="n8n">&nbsp;
+  <img src="https://img.shields.io/badge/DeepSeek-4D6BFE?style=flat" alt="DeepSeek">&nbsp;
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white" alt="Python">
+</p>
+
 <p align="center">
   <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
   <img src="asset/dark_dino.svg#gh-dark-mode-only" width="800" height="90" alt="">
@@ -63,6 +79,11 @@
 - 🏗️ Infrastructure is fully managed as code (Terraform) and deployed automatically (GitHub Actions).
 - 🔑 Sign in with Google or Microsoft (Entra ID, OIDC) through Cognito Hosted UI with PKCE; guests get a small free quota.
 - ☁️ Hybrid architecture: AWS serverless website + GCP TTS server.
+- 🚨 Prompt-injection defence: three detection layers (regex, a pre-Bedrock gate, and Claude itself). Every caught injection adds a strike, and three strikes give a temporary ban stored per account on the server, so it follows the user between devices.
+- 🧾 Structured security logs (ECS JSON) sent to CloudWatch. Prompt text is never logged, only a hash and a length.
+- 🔎 Detection-as-code: 11 Sigma rules kept in Git ([FRSec](https://github.com/DeMinhDeRozan/FRSec)), linted and tested in CI, then deployed to Kibana's Detection Engine.
+- 🤖 n8n automation: a daily LLM triage of new alerts and a weekly security report by email. Numbers come from Elasticsearch aggregations, words come from the LLM.
+- 🖥️ Azure SIEM lab: Elasticsearch, Kibana and n8n in Docker on a VM that GitHub Actions (OIDC) starts and deallocates on a schedule.
 
 <p align="center">
   <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
@@ -85,6 +106,12 @@
 
 7️⃣ CloudWatch watches the Lambda. When its alarm fires, or the sweeper finds something missing, SNS emails me. No errors, no email.
 
+8️⃣ Every message is checked for prompt injection before it can create an alarm. A caught attempt is rejected (flag), adds a strike to the account, and after three strikes the account is temporarily banned. Each step writes one JSON log line to CloudWatch.
+
+9️⃣ A cron job on the Azure VM pulls those log lines into Elasticsearch every 10 minutes (the VM pulls, nothing connects into it). Sigma rules, converted to Kibana detection rules, raise alerts.
+
+🔟 n8n polls Elasticsearch every morning, enriches each new alert with the account's recent activity, asks an LLM for a verdict, and stores it. Every Monday it emails me a weekly security report.
+
 <p align="center">
   <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
   <img src="asset/dark_dino.svg#gh-dark-mode-only" width="800" height="90" alt="">
@@ -93,6 +120,12 @@
 ## 🔐 Security
 
 > 🛡️ All security configuration (least-privilege IAM roles, S3 access policies via OAC, Bedrock invoke permissions, SSM parameter access, etc.) is defined in Terraform and applied automatically through GitHub Actions. Buckets are private and only reachable through CloudFront.
+
+- 🧱 **Abuse prevention in the Lambda:** flag, strike and ban run at any hour, per account (per IP for guests who keep rotating IDs).
+- 🔑 **Identity:** Cognito Hosted UI with PKCE, Google and Microsoft Entra ID (OIDC). Every identity becomes the same kind of account ID on the server, so bans and limits work the same for both.
+- 🔒 **Locked-down SIEM:** Elasticsearch, Kibana and n8n listen on `127.0.0.1` only and are reached through an SSH tunnel. SSH accepts keys only, the VM uses a read-only IAM user to read logs, and the VM schedule signs in to Azure through OIDC with a managed identity that can manage only that one VM.
+- 🙈 **Privacy by design:** prompt text is never logged, and the LLM that writes the weekly report only sees anonymous totals, never account IDs, emails or IPs.
+- 🧪 **Honest limits:** this is a lab, not a production SIEM. The VM runs about 8 hours a day, so triage is not real time, while prevention in the Lambda is always on. The rules look at single events and time-window rules are not written yet.
 
 <p align="center">
   <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
@@ -104,10 +137,13 @@
 ```
 .
 ├── web/                # 🌐 Static web UI (S3)
-├── private/            # ⚡ serverless functions and 🧱 IaC, not available in this repo
+├── Lambda/             # ⚡ Sanitised serverless function samples
+├── private/            # 🧱 Full Lambda source and IaC, not available in this repo
 ├── asset/              # 🎨 Service icons and architecture diagram
 └── .github/workflows/  # 🤖 GitHub Actions pipelines
 ```
+
+Related repository: **[FRSec](https://github.com/DeMinhDeRozan/FRSec)** holds the Sigma detection rules, synthetic test events and the CI that deploys them to Kibana.
 
 <p align="center">
   <img src="asset/light_dino.svg#gh-light-mode-only" width="800" height="90" alt="">
@@ -163,4 +199,3 @@ This project includes <a href="https://github.com/supertone-oss-archive/superton
        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 </pre>
-                                                                              
