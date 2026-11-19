@@ -74,29 +74,33 @@
       box-shadow: inset 0 3px 0 rgba(255, 255, 255, .06);
     }
 
-    /* ---------- spotlight beams ---------- */
-    .beams { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-    .beams i {
-      position: absolute; top: -8%; height: 86%; width: 30vw;
+    /* ---------- ceiling lamps + their beams ---------- */
+    /* each lamp is a zero-width anchor at its own x; the shade and the beam
+       are both centred on that anchor, so every beam drops from its lamp */
+    .lamps { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .lamp { position: absolute; top: 4px; width: 0; }
+    .lamp .shade {
+      position: absolute; top: 0; left: -19px;
+      width: 38px; height: 11px; border-radius: 0 0 9px 9px;
+      background: linear-gradient(var(--brass-lo), var(--brass-hi));
+      box-shadow: 0 6px 14px rgba(255, 228, 170, .35), inset 0 -2px 0 rgba(255, 255, 255, .45);
+      z-index: 1;
+    }
+    .lamp .beam {
+      position: absolute; top: 11px; left: -13vw;
+      width: 26vw; height: min(80vh, 640px);
       transform-origin: 50% 0;
-      clip-path: polygon(43% 0, 57% 0, 100% 100%, 0 100%);
+      clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
       background: linear-gradient(to bottom, rgba(255, 241, 206, .34), rgba(255, 241, 206, .07) 52%, transparent 80%);
       filter: blur(12px);
       animation: sway 11s ease-in-out infinite;
     }
-    .beams i:nth-child(1) { left: 2%;  opacity: .5;  animation-delay: -1.5s; }
-    .beams i:nth-child(2) { left: 34%; opacity: .85; animation-delay: -5s; width: 34vw; }
-    .beams i:nth-child(3) { right: 4%; opacity: .55; animation-delay: -8s; }
-    /* the little ceiling lamps the beams come from */
-    .lamps { position: absolute; top: 4px; left: 0; right: 0; height: 18px; z-index: 2; pointer-events: none; }
-    .lamps i {
-      position: absolute; top: 0; width: 38px; height: 11px; border-radius: 0 0 9px 9px;
-      background: linear-gradient(var(--brass-lo), var(--brass-hi));
-      box-shadow: 0 6px 14px rgba(255, 228, 170, .35), inset 0 -2px 0 rgba(255, 255, 255, .45);
-    }
-    .lamps i:nth-child(1) { left: calc(2% + 11vw); }
-    .lamps i:nth-child(2) { left: calc(34% + 13vw); }
-    .lamps i:nth-child(3) { right: calc(4% + 11vw); }
+    .lamp:nth-child(1) { left: 20%; }
+    .lamp:nth-child(2) { left: 50%; }
+    .lamp:nth-child(3) { left: 80%; }
+    .lamp:nth-child(1) .beam { opacity: .5;  animation-delay: -1.5s; }
+    .lamp:nth-child(2) .beam { opacity: .85; animation-delay: -5s; }
+    .lamp:nth-child(3) .beam { opacity: .55; animation-delay: -8s; }
 
     /* ---------- party lights ---------- */
     .lights { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity .5s; }
@@ -149,17 +153,29 @@
       font-size: .7rem; letter-spacing: .3em; text-transform: uppercase;
       color: rgba(243, 236, 217, .62);
     }
+    /* illuminated EXIT sign (/exit.png) lit with layered drop-shadows */
     .exit-sign {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 12px; border-radius: 4px;
-      background: #0c2616; color: #86f5b0;
-      font-size: .72rem; font-weight: 800; letter-spacing: .24em;
-      text-decoration: none;
-      box-shadow: 0 0 0 2px #10452a, 0 0 22px rgba(60, 230, 140, .32);
-      text-shadow: 0 0 10px rgba(130, 255, 185, .85);
+      display: inline-block; width: 136px; line-height: 0;
+      border-radius: 14px; text-decoration: none;
+      filter:
+        drop-shadow(0 0 3px rgba(190, 255, 220, .9))
+        drop-shadow(0 0 12px rgba(0, 230, 120, .75))
+        drop-shadow(0 0 28px rgba(0, 200, 100, .45));
+      transition: filter .3s;
     }
-    .exit-sign small { font-size: .62rem; letter-spacing: .12em; opacity: .75; font-weight: 700; }
-    .exit-sign:hover { background: #0f3420; }
+    .exit-sign:hover {
+      filter:
+        drop-shadow(0 0 4px rgba(210, 255, 230, 1))
+        drop-shadow(0 0 18px rgba(0, 240, 130, .9))
+        drop-shadow(0 0 40px rgba(0, 210, 110, .6));
+    }
+    .sign-img { display: block; width: 100%; height: auto; animation: signHum 5s ease-in-out infinite; }
+    @keyframes signHum {
+      0%, 100% { filter: brightness(1); }
+      46% { filter: brightness(1.06); }
+      48% { filter: brightness(.98); }
+      50% { filter: brightness(1.1); }
+    }
 
     /* ---------- the painting ---------- */
     .art {
@@ -598,7 +614,7 @@
     /* ---------- calm mode ---------- */
     html.tab-hidden * { animation-play-state: paused !important; }
     @media (prefers-reduced-motion: reduce) {
-      .beams i, .lights i, .disco .ball, .frame .glint-frame, .neon, .cd .dot,
+      .lamp .beam, .lights i, .disco .ball, .sign-img, .frame .glint-frame, .neon, .cd .dot,
       .body, .glint, .roo img, .rig, .sway, .room,
       body.party .body, body.party .frame { animation: none !important; }
       .roo.zoom { animation: none !important; }
@@ -612,15 +628,16 @@
 <p class="sr">Error 404: this page does not exist. This page redirects to the homepage shortly; use the "Stay here" button to cancel the redirect, or "Take me home" to go now.</p>
 
 <main class="room" id="room">
-  <div class="beams" aria-hidden="true"><i></i><i></i><i></i></div>
-  <div class="lamps" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="lamps" aria-hidden="true"><div class="lamp"><span class="shade"></span><span class="beam"></span></div><div class="lamp"><span class="shade"></span><span class="beam"></span></div><div class="lamp"><span class="shade"></span><span class="beam"></span></div></div>
   <div class="lights" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="disco" aria-hidden="true"><div class="wire"></div><div class="ball"></div></div>
 
   <div class="wall">
     <div class="room-top">
       <p class="room-label">Deminh Gallery &middot; West Wing &middot; Room 404</p>
-      <a class="exit-sign" href="https://deminh.com">EXIT <small>&rarr; homepage</small></a>
+      <a class="exit-sign" href="https://deminh.com" aria-label="Exit to the deminh.com homepage">
+        <img class="sign-img" src="/exit.png" width="1634" height="898" alt="">
+      </a>
     </div>
 
     <div class="layout">
