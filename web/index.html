@@ -1101,6 +1101,63 @@
             }
             body.warn-shake .wrapper, body.warn-shake .clock-face { animation: none !important; }
         }
+    
+        /* ===== HOOP MODE (Basketball alarm): CSS. To remove the feature delete this block, the #hoopCourt markup,
+           the #hoopBtn button and the "HOOP MODE" script (all marked). ===== */
+        #hoopBtn::before { --i: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%2710%27%2F%3E%3Cpath%20d%3D%27M2%2012h20M12%202v20M5%204.5c3.5%203.5%203.5%2011.5%200%2015M19%204.5c-3.5%203.5-3.5%2011.5%200%2015%27%2F%3E%3C%2Fsvg%3E"); }
+        #hoopBtn[aria-pressed="true"] { color: var(--brass-hi); border-color: rgba(217, 164, 65, .55); }
+
+        /* the court takes the chat's place while the mode is on */
+        .court { display: none; flex: 1; min-height: 0; flex-direction: column; gap: 8px; padding: 14px 22px 2px; }
+        body.hoop-on .court { display: flex; }
+        body.hoop-on .chat-box, body.hoop-on .familiar-bar, body.hoop-on .chips, body.hoop-on .scroll-bottom, body.hoop-on #hint { display: none; }
+        /* in basketball mode the round send button reads OK */
+        body.hoop-on .send { width: auto; min-width: 54px; padding: 0 17px; border-radius: 999px; }
+        body.hoop-on .send svg { display: none; }
+        body.hoop-on .send::after { content: "OK"; font: 700 14px/1 var(--body); letter-spacing: .04em; }
+
+        .court-stage {
+            position: relative; flex: 1; min-height: 210px; border-radius: 20px; overflow: hidden;
+            background: radial-gradient(130% 95% at 50% 0%, #1B3A42, var(--dial-deep) 78%);
+            border: 1px solid var(--line); box-shadow: inset 0 2px 14px rgba(0, 0, 0, .55), var(--edge-light);
+            touch-action: none; user-select: none; -webkit-user-select: none;
+        }
+        .court-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+        body.hoop-armed .court-stage canvas { cursor: grab; }
+        .court-stage.dragging canvas { cursor: grabbing; }
+        .court-stage:focus-visible { outline: 2px solid var(--brass-hi); outline-offset: 2px; }
+        /* what Roo says, while the chat log is hidden behind the court */
+        .court-say {
+            position: absolute; left: 10px; right: 10px; top: 10px; z-index: 2;
+            display: flex; gap: 8px; align-items: flex-start; padding: 9px 12px; border-radius: 14px;
+            background: rgba(10, 27, 30, .92); border: 1px solid rgba(217, 164, 65, .35);
+            box-shadow: var(--lift-1); color: var(--ink); font: 500 13px/1.4 var(--body);
+            opacity: 0; transform: translateY(-6px); pointer-events: none; transition: opacity .25s, transform .25s var(--ease-out);
+        }
+        .court-say.show { opacity: 1; transform: none; }
+        .court-say.alarm { border-color: var(--brass); box-shadow: 0 0 0 3px rgba(217, 164, 65, .18), var(--lift-1); font-weight: 600; }
+        /* a speech bubble for what Roo says, the page's own bell for a fired alarm */
+        .court-say::before { content: ""; flex: none; width: 15px; height: 15px; margin-top: 1px; color: var(--brass);
+            --i: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M21%2012a8%207%200%200%201-8%207H9l-5%203%201.5-4.2A7%207%200%200%201%203%2012a8%207%200%200%201%208-7h2a8%207%200%200%201%208%207z%27%2F%3E%3C%2Fsvg%3E");
+            -webkit-mask: var(--i) center / contain no-repeat; mask: var(--i) center / contain no-repeat; background: currentColor; }
+        .court-say.alarm::before { --i: var(--i-bell); }
+        .court-status { min-height: 34px; display: flex; align-items: center; justify-content: center; text-align: center; font: 500 12.5px/1.35 var(--body); color: var(--muted); }
+        .court-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .court-btn {
+            flex: 1 1 140px; min-height: 42px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+            font: 600 13px/1.2 var(--body); color: var(--ink); border: 1px solid rgba(238, 231, 210, .18);
+            background: linear-gradient(180deg, var(--enamel-hi), var(--enamel-lo)); box-shadow: var(--edge-light);
+            transition: filter .15s, opacity .15s;
+        }
+        .court-btn.primary { color: var(--brass-ink); border-color: rgba(0, 0, 0, .4);
+            background: linear-gradient(180deg, var(--brass-hi), var(--brass) 55%, var(--brass-lo)); }
+        .court-btn.slim { flex: 0 1 108px; }
+        .court-btn:hover:not(:disabled) { filter: brightness(1.08); }
+        .court-btn:disabled { opacity: .4; cursor: default; }
+        .court-btn:focus-visible { outline: 2px solid var(--brass-hi); outline-offset: 2px; }
+        body.hoop-reduced #hoopShoot { display: none; }
+        @media (max-width: 560px) { .court { padding: 10px 12px 2px; } .court-btn { flex-basis: 120px; font-size: 12.5px; } }
+        /* ===== end HOOP MODE CSS ===== */
     </style>
     <!-- FunReminder 2: local-first features (css/app.css + js/main.js) -->
     <link rel="stylesheet" href="css/app.css">
@@ -1204,6 +1261,7 @@
 
         <div class="actions">
             <button id="modeBtn" class="ghost-btn" onclick="toggleMode()" title="Switch alarm sound">Original</button>
+            <button id="hoopBtn" class="ghost-btn" type="button" onclick="toggleHoopMode()" aria-pressed="false" title="Basketball mode: sink a shot to set your alarm">Basketball</button>   <!-- HOOP MODE -->
             <button id="historyBtn" class="ghost-btn" onclick="openHistory()" title="Alarm history">History</button>
             <button id="clearBtn" class="ghost-btn" onclick="clearHistory()" title="Clear chat history">Clear</button>
         </div>
@@ -1216,6 +1274,21 @@
     </div>
 
     <div class="chat-box" id="chatBox" role="log" aria-live="polite" aria-relevant="additions"></div>
+
+    <!-- ===== HOOP MODE (Basketball alarm): markup. Takes the chat's place while the mode is on. ===== -->
+    <div class="court" id="hoopCourt">
+        <div class="court-stage" id="hoopStage" tabindex="0" role="group"
+             aria-label="Basketball court. Type a reminder below and press OK to put it on the ball, then drag the ball back and let go to shoot. Space shoots for you.">
+            <canvas id="hoopCanvas"></canvas>
+            <div class="court-say" id="hoopSay" aria-hidden="true"></div>
+        </div>
+        <div class="court-status" id="hoopStatus" role="status" aria-live="polite"></div>
+        <div class="court-actions">
+            <button type="button" class="court-btn primary" id="hoopShoot" disabled>Shoot for me</button>
+            <button type="button" class="court-btn" id="hoopSkip" aria-label="Save without shooting" title="Save without shooting" disabled>Just save it</button>
+            <button type="button" class="court-btn slim" id="hoopEdit" disabled>Edit text</button>
+        </div>
+    </div>
 
     <div class="familiar-bar" id="familiarBar"></div>
 
@@ -3167,6 +3240,558 @@
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
     })();
 </script>
+
+<!-- ===== HOOP MODE (Basketball alarm): script =====
+     A second way to create an alarm, switched on with the #hoopBtn pill. While it is on, the chat log is replaced
+     by a court: you type the reminder in the normal input, press OK, and the text becomes the ball. Sink it (or press
+     "Save without shooting") and the alarm is saved by the page's OWN handleSend() - same validation, same
+     POST /reminder, same history and ringing. Switching the pill off puts the original chat UI back.
+     Nothing else in the page is changed. Preference key: mate_hoop_mode ('on' | 'off'), like mate_voice_mode. -->
+<script>
+(function () {
+    'use strict';
+    const HOOP_KEY = 'mate_hoop_mode';
+    const $ = id => document.getElementById(id);
+    const court = $('hoopCourt'), stage = $('hoopStage'), cv = $('hoopCanvas'), g = cv.getContext('2d');
+    const statusEl = $('hoopStatus'), sayEl = $('hoopSay');
+    const btnShoot = $('hoopShoot'), btnSkip = $('hoopSkip'), btnEdit = $('hoopEdit'), toggleBtn = $('hoopBtn');
+    const origSend = window.handleSend;          // the page's own alarm-creation path, reused untouched
+    const origPlaceholder = userInput.placeholder;
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+
+    /* ---------- state ---------- */
+    let on = false, armed = false, text = '', reduced = false, sayTimer = 0;
+    let raf = 0, lastT = 0, state = 'idle';   // idle | aim | drag | fly | return | scored
+    let W = 0, H = 0, dpr = 1, R = 18, G = 0, K = 0, maxPull = 0, rimY = 0, rimW = 0, floorY = 0;
+    let S = { x: 0, y: 0 }, RL = { x: 0, y: 0 }, RR = { x: 0, y: 0 }, board = { x: 0, y0: 0, y1: 0, w: 8 }, vAuto = null;
+    const b = { x: 0, y: 0, px: 0, py: 0, vx: 0, vy: 0, rot: 0 };
+    const net = { x: 0, vx: 0, y: 0, vy: 0 };
+    let drag = null, flyT = 0, scoreT = 0, retT = 0, retFrom = null, pulse = -1, pop = -1, parts = [], lastHit = 0, quiet = false;
+    let anchor = { x: 0, y: 0 }, autoFetch = false;        // anchor = where the ball lies now; it is shot from there
+    /* Roo's sledging when a shot misses (never the same one twice in a row, like the rest of his lines) */
+    const MISS_LINES = [
+        "Airball. Even the net's embarrassed for ya.",
+        "Oi, the hoop's the orange one. Just so we're clear.",
+        "Ya should watch more NBA, ey.",
+        "Ya threw that like it owed ya money.",
+        "Nice arc, mate. Wrong postcode.",
+        "Rim said nah, not today.",
+        "That's goin' straight on the blooper reel, champ.",
+        "All backboard, no dignity.",
+        "Me nan shoots better than that, and she's a kangaroo.",
+        "Bricked it. Have another crack, the ball's still warm.",
+        "Swing and a miss. Wrong sport, legend.",
+        "That ball's got more bounce than your effort, mate."
+    ];
+
+    const sfx = n => { if (quiet) return; try { if (window.FR && FR.playSfx) FR.playSfx(n); } catch (e) {} };
+    const setStatus = s => { if (!quiet) statusEl.textContent = s; };
+
+    /* ---------- the option: a pill next to Original / History / Clear, remembered like mate_voice_mode ---------- */
+    try { on = localStorage.getItem(HOOP_KEY) === 'on'; } catch (e) {}
+
+    function renderMode() {
+        document.body.classList.toggle('hoop-on', on);
+        if (toggleBtn) { toggleBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); toggleBtn.textContent = on ? 'Basketball: on' : 'Basketball'; }
+        userInput.placeholder = on ? 'Your reminder, then OK to load the ball…' : origPlaceholder;
+        sendBtn.setAttribute('aria-label', on ? 'OK: put this reminder on the ball' : 'Send');
+        sendBtn.title = on ? 'OK: put this reminder on the ball' : '';
+    }
+    window.toggleHoopMode = function () {
+        if (on && armed) unarm(true);                       // never swallow something already typed
+        on = !on;
+        try { localStorage.setItem(HOOP_KEY, on ? 'on' : 'off'); } catch (e) {}
+        renderMode();
+        if (on) { openCourt(); }
+        else { stopLoop(); hideSay(); appendMessage("Back to plain old chat, mate.", 'bot', null, false); }
+    };
+    /* OK / Enter: load the ball instead of sending. Everything else about the composer is untouched. */
+    window.handleSend = function () {
+        if (!on) return origSend();
+        if (isBanLocked()) return;
+        if (armed) { setStatus('One ball at a time, mate. Shoot it, or hit Edit text.'); return; }
+        const t = userInput.value.trim();
+        if (!t) return;
+        unlockSound();
+        arm(t);
+    };
+
+    /* ---------- court open / arm / unarm ---------- */
+    function openCourt() {
+        reduced = (typeof _frReduced === 'function') ? _frReduced() : window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        document.body.classList.toggle('hoop-reduced', reduced);
+        layout(); resetBall();
+        setStatus(reduced ? 'Type your reminder below, then hit OK.' : 'Type your reminder below, then hit OK to load the ball.');
+        draw(); startLoop();
+    }
+    function arm(t) {
+        armed = true; text = t; document.body.classList.add('hoop-armed');
+        userInput.value = ''; updateSendBtn();                 // the text is on the ball now
+        resetBall(); pop = 0;
+        btnSkip.disabled = false; btnEdit.disabled = false; btnShoot.disabled = reduced;
+        if (reduced) {
+            btnSkip.textContent = 'Confirm and save'; btnSkip.setAttribute('aria-label', 'Confirm and save'); btnSkip.classList.add('primary');
+            setStatus('Reduced motion is on, so there is nothing to throw. Confirm to save it.');
+            btnSkip.focus();
+        } else {
+            btnSkip.textContent = 'Just save it'; btnSkip.setAttribute('aria-label', 'Save without shooting'); btnSkip.classList.remove('primary');
+            setStatus('Drag the ball back and let go. Space shoots for you.');
+            stage.focus({ preventScroll: true });
+        }
+        sfx('tap'); startLoop();
+    }
+    /* take the ball away. giveBack = put the words back in the input (cancel), false = they were saved */
+    function unarm(giveBack) {
+        if (giveBack && text) { userInput.value = text; updateSendBtn(); }
+        armed = false; text = ''; document.body.classList.remove('hoop-armed');
+        btnShoot.disabled = btnSkip.disabled = btnEdit.disabled = true;
+        resetBall();
+        setStatus(giveBack ? 'Righto, your words are back in the box.' : 'Type your next reminder below, then hit OK.');
+        startLoop();
+    }
+    function commit() {
+        if (!armed) return;
+        const t = text;
+        unarm(false);
+        userInput.value = t; updateSendBtn();                  // the page's own flow does the rest
+        origSend();
+    }
+
+    /* ---------- what Roo says, while the chat log is behind the court ---------- */
+    function showSay(txt, alarm) {
+        if (!on || !txt || quiet) return;
+        if (sayEl.classList.contains('alarm') && !alarm) return;   // a fired alarm stays put until the next real message
+        sayEl.textContent = txt; sayEl.classList.toggle('alarm', !!alarm); sayEl.classList.add('show');
+        if (!quiet) try { if (alarm) sayEl.scrollTop = 0; } catch (e) {}
+        clearTimeout(sayTimer);
+        if (!alarm) sayTimer = setTimeout(hideSay, 9000);   // a fired alarm stays until the next message
+    }
+    function hideSay() { sayEl.classList.remove('show'); }
+    new MutationObserver(muts => {
+        if (!on) return;
+        muts.forEach(m => m.addedNodes.forEach(n => {
+            if (n.nodeType !== 1) return;
+            if (n.classList.contains('remind-alert')) {      // an alarm fired: it must not be hidden behind the court
+                const task = n.querySelector('.alarm-task');
+                if (task) showSay('Alarm: ' + task.innerText.trim(), true);
+                return;
+            }
+            if (!n.classList.contains('bot')) return;
+            const msg = n.querySelector('.msg');
+            const t = msg && msg.innerText.trim();
+            if (t) showSay(t);
+        }));
+    }).observe(chatBox, { childList: true });
+
+    /* ---------- layout: everything is relative to the stage, so it fits any screen ---------- */
+    function layout() {
+        W = stage.clientWidth; H = stage.clientHeight;
+        if (!W || !H) return;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+        g.setTransform(dpr, 0, 0, dpr, 0, 0);
+        R = clamp(Math.min(W * 0.05, H * 0.045), 12, 21);
+        rimY = H * 0.30; rimW = R * 4.4;                     // opening is ~2.2 ball widths: forgiving, like an arcade hoop
+        RL = { x: W * 0.50, y: rimY }; RR = { x: RL.x + rimW, y: rimY };
+        board = { x: RR.x + 3, y0: rimY - H * 0.20, y1: rimY + R * 0.7, w: 8 };
+        S = { x: Math.max(R + 12, W * 0.17), y: H * 0.60 };
+        floorY = H - R - 6;
+        G = H * 2.1;
+        vAuto = lob(S);                                      // the auto-throw (Space / "Shoot for me")
+        maxPull = clamp((floorY - S.y) * 0.95, 48, 150);   // the drag stays inside the court
+        /* Power curve: a pull of ~62% of the maximum, aimed the way the shot wants to go, IS the perfect shot.
+           The ball leaves from the PULLED point, not from the rack, and that point depends on the direction,
+           which depends on the shot: four passes settle it. */
+        const l0 = maxPull * 0.62;
+        let v0 = vAuto, pull = { x: 0, y: 0 };
+        for (let i = 0; i < 4; i++) {
+            const s = Math.hypot(v0.vx, v0.vy);
+            pull = { x: -v0.vx / s * l0, y: -v0.vy / s * l0 };
+            v0 = lob({ x: S.x + pull.x, y: S.y + pull.y });
+        }
+        K = Math.hypot(v0.vx, v0.vy) / l0;
+    }
+    /* where the ball waits: the rack, or resting in the net when there is nothing to throw */
+    function rest() { return (reduced && armed) ? { x: (RL.x + RR.x) / 2, y: rimY + R * 1.1 } : { x: S.x, y: S.y }; }
+    function resetBall() {
+        const r = rest();
+        anchor = { x: r.x, y: r.y }; autoFetch = false;
+        b.x = b.px = r.x; b.y = b.py = r.y; b.vx = b.vy = 0; b.rot = 0;
+        parts = []; pulse = -1; drag = null; stage.classList.remove('dragging');
+        state = armed ? 'aim' : 'idle';
+    }
+
+    /* ---------- aiming ---------- */
+    /* a lob from point P that drops through the middle of the rim (apex 16% of the court above it) */
+    function lob(P) {
+        const cx = (RL.x + RR.x) / 2, hAbove = H * 0.16;
+        const vy0 = -Math.sqrt(2 * G * (P.y - (rimY - hAbove)));
+        const T = -vy0 / G + Math.sqrt(2 * hAbove / G);
+        return { vx: (cx - P.x) / T, vy: vy0 };
+    }
+    function rimCross(x, y, vx, vy) {                  // where a free flight crosses the rim plane, falling
+        const disc = vy * vy - 2 * G * (y - rimY);
+        if (disc < 0) return null;
+        const t = (-vy + Math.sqrt(disc)) / G;
+        return t > 0 ? { t, x: x + vx * t } : null;
+    }
+    function launchVel(pullX, pullY) {
+        let vx = -pullX * K, vy = -pullY * K;
+        const from = { x: anchor.x + pullX, y: anchor.y + pullY };
+        const c = rimCross(from.x, from.y, vx, vy), mid = (RL.x + RR.x) / 2;
+        const ideal = from.y > rimY - H * 0.16 + 1 ? lob(from) : null;     // the perfect shot from where it is now
+        // assist: an upward shot (at least 40% of the perfect power) that lands within ~5 rim widths of the middle
+        // gets 90% of the way pulled in. The dotted preview uses this same function, so it shows the real path.
+        if (c && ideal && vy < ideal.vy * 0.4 && Math.abs(c.x - mid) < rimW * 5) vx -= ((c.x - mid) / c.t) * 0.9;
+        return { vx, vy };
+    }
+    function moveBall(p) {
+        let dx = p.x - anchor.x, dy = p.y - anchor.y; const len = Math.hypot(dx, dy);
+        if (len > maxPull) { dx *= maxPull / len; dy *= maxPull / len; }
+        b.x = clamp(anchor.x + dx, R, W - R); b.y = Math.min(anchor.y + dy, floorY);
+    }
+    function release() {
+        stage.classList.remove('dragging');
+        const px = b.x - anchor.x, py = b.y - anchor.y;
+        if (Math.hypot(px, py) < 16) { b.x = anchor.x; b.y = anchor.y; state = 'aim'; setStatus('Pull the ball back further, then let go.'); return; }
+        const v = launchVel(px, py);
+        shoot(v.vx, v.vy);
+    }
+    function shoot(vx, vy) {
+        b.vx = vx; b.vy = vy; b.px = b.x; b.py = b.y; flyT = 0; state = 'fly';
+        setStatus('…'); startLoop();
+    }
+    function autoThrow() {
+        if (!armed || reduced || state !== 'aim') return;
+        if (Math.hypot(b.x - S.x, b.y - S.y) > 2) {          // fetch it back first: a lob from the rack always drops in
+            autoFetch = true; retFrom = { x: b.x, y: b.y }; retT = 0; state = 'return';
+            setStatus('Righto, give it here…'); startLoop(); return;
+        }
+        anchor = { x: S.x, y: S.y };
+        shoot(vAuto.vx, vAuto.vy);
+        setStatus('Here goes nothing…');
+    }
+
+    /* ---------- physics ---------- */
+    function hitCircle(c, rad, e) {
+        const dx = b.x - c.x, dy = b.y - c.y, d = Math.hypot(dx, dy), min = R + rad;
+        if (d >= min || d === 0) return;
+        const nx = dx / d, ny = dy / d;
+        b.x = c.x + nx * min; b.y = c.y + ny * min;
+        const vn = b.vx * nx + b.vy * ny;
+        if (vn < 0) {
+            b.vx -= (1 + e) * vn * nx; b.vy -= (1 + e) * vn * ny;
+            b.vx *= 0.985;
+            if (-vn > 90) hitSound('rim');
+        }
+    }
+    function hitBoard() {
+        const x0 = board.x, x1 = board.x + board.w, y0 = board.y0, y1 = board.y1;
+        const cx = clamp(b.x, x0, x1), cy = clamp(b.y, y0, y1), dx = b.x - cx, dy = b.y - cy, d = Math.hypot(dx, dy);
+        if (d >= R) return;
+        let nx, ny;
+        if (d === 0) { nx = -1; ny = 0; } else { nx = dx / d; ny = dy / d; }
+        b.x = cx + nx * R; b.y = cy + ny * R;
+        const vn = b.vx * nx + b.vy * ny;
+        if (vn < 0) { b.vx -= 1.5 * vn * nx; b.vy -= 1.5 * vn * ny; if (-vn > 90) hitSound('bounce'); }
+    }
+    function hitSound(n) {
+        const now = performance.now();
+        if (now - lastHit < 90) return;
+        lastHit = now; sfx(n);
+    }
+    function physics(h) {
+        b.px = b.x; b.py = b.y;
+        b.vy += G * h;
+        b.x += b.vx * h; b.y += b.vy * h;
+        b.rot += (b.vx * h) / R;
+        if (b.x < R) { b.x = R; b.vx = Math.abs(b.vx) * 0.7; }
+        if (b.x > W - R) { b.x = W - R; b.vx = -Math.abs(b.vx) * 0.7; }
+        // no ceiling: a big lob is allowed to leave the top of the court and drop back in
+        if (b.y >= floorY) {
+            b.y = floorY;
+            if (b.vy > 0) {
+                if (b.vy > 80) hitSound('bounce');
+                b.vy = -b.vy * 0.6; b.vx *= 0.92;
+                if (Math.abs(b.vy) < 40) b.vy = 0;
+            }
+            b.vx *= 1 - 2.4 * h;                             // rolling friction, so it comes to rest on its own
+            if (Math.abs(b.vx) < 9) b.vx = 0;
+        }
+        hitCircle(RL, 4, 0.55); hitCircle(RR, 4, 0.55); hitBoard();
+        // the net slows the ball down and swings with it
+        const inNet = b.y > rimY && b.y < rimY + R * 3 && b.x > RL.x && b.x < RR.x;
+        if (inNet) { b.vx *= 1 - 3 * h; b.vy *= 1 - 1.1 * h; net.vx += (b.vx * 0.5 + (b.x - (RL.x + RR.x) / 2) * 6) * h * 6; net.vy += 260 * h; }
+        settleNet(h);
+        // score: falling through the rim, between its two ends
+        if (state === 'fly' && b.py < rimY && b.y >= rimY && b.vy > 0) {
+            const f = (rimY - b.py) / (b.y - b.py), xc = b.px + (b.x - b.px) * f;
+            if (xc > RL.x + 2 && xc < RR.x - 2) score();
+        }
+    }
+    function settleNet(h) {
+        net.vx += (-150 * net.x - 7 * net.vx) * h; net.x += net.vx * h;
+        net.vy += (-150 * net.y - 7 * net.vy) * h; net.y += net.vy * h;
+    }
+    function score() {
+        state = 'scored'; scoreT = 0; pulse = 0;
+        net.vy += 380; net.vx += b.vx * 0.4;
+        for (let i = 0; i < 46; i++) {
+            const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.5, sp = 160 + Math.random() * 360;
+            parts.push({ x: (RL.x + RR.x) / 2, y: rimY, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1.5 + Math.random() * 0.5,
+                         s: 4 + Math.random() * 4, r: Math.random() * 6, vr: (Math.random() - 0.5) * 12, c: ['#D9A441', '#F4D48A', '#EEE7D2', '#E8743B'][i % 4] });
+        }
+        sfx('swish'); if (!quiet) setTimeout(() => sfx('achievement'), 160);
+        setStatus(pick(['Nothing but net! Locking it in…', 'Swish! Saving that one…', 'Buckets! Setting it now…']));
+    }
+    /* a miss leaves the ball where it stopped: the next shot is taken from there */
+    function missed() {
+        state = 'aim';
+        anchor = { x: clamp(b.x, R, W - R), y: b.y };
+        b.x = anchor.x;
+        showSay(pickLine('hoopMiss', MISS_LINES));
+        setStatus("Ball's live where it lies. Shoot from there, or let me fetch it.");
+    }
+
+    function update(dt) {
+        const n = Math.max(1, Math.ceil(dt / (1 / 120))), h = dt / n;
+        if (state === 'fly' || state === 'scored') {
+            for (let i = 0; i < n; i++) physics(h);
+            if (state === 'fly') {
+                flyT += dt;
+                if (b.y >= floorY - 0.5 && b.vx === 0 && b.vy === 0) missed();
+                else if (flyT > 9) { b.y = floorY; b.vx = b.vy = 0; missed(); }   // safety net, should never fire
+            } else {
+                scoreT += dt;
+                if (scoreT > 1.3) commit();
+            }
+        } else {
+            settleNet(dt);
+        }
+        if (state === 'return') {                            // only used by "Shoot for me", to fetch the ball back
+            retT += dt / 0.4;
+            const e = 1 - Math.pow(1 - Math.min(retT, 1), 3);
+            b.x = retFrom.x + (S.x - retFrom.x) * e; b.y = retFrom.y + (S.y - retFrom.y) * e;
+            if (retT >= 1) {
+                b.x = S.x; b.y = S.y; b.vx = b.vy = 0; anchor = { x: S.x, y: S.y }; state = 'aim';
+                if (autoFetch) { autoFetch = false; shoot(vAuto.vx, vAuto.vy); setStatus('Here goes nothing…'); }
+                else setStatus('Drag the ball back and let go. Space shoots for you.');
+            }
+        }
+        if (pulse >= 0) { pulse += dt; if (pulse > 0.8) pulse = -1; }
+        if (pop >= 0) { pop += dt; if (pop > 0.3) pop = -1; }
+        for (let i = parts.length - 1; i >= 0; i--) {
+            const p = parts[i]; p.vy += G * 0.55 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += p.vr * dt; p.life -= dt;
+            if (p.life <= 0 || p.y > H + 20) parts.splice(i, 1);
+        }
+    }
+    /* the loop idles when nothing is moving: a still court costs nothing */
+    function busy() {
+        return state === 'fly' || state === 'scored' || state === 'return' || state === 'drag' ||
+               parts.length > 0 || pulse >= 0 || pop >= 0 ||
+               Math.abs(net.x) + Math.abs(net.y) + Math.abs(net.vx) + Math.abs(net.vy) > 0.4;
+    }
+
+    /* ---------- drawing ---------- */
+    function labelText(max) {
+        let s = text;
+        g.font = '600 12px "Be Vietnam Pro", system-ui, sans-serif';
+        if (g.measureText(s).width <= max) return s;
+        while (s.length > 1 && g.measureText(s + '…').width > max) s = s.slice(0, -1);
+        return s.trimEnd() + '…';
+    }
+    function drawPreview() {
+        const px = b.x - S.x, py = b.y - S.y;
+        if (Math.hypot(px, py) < 16) return;
+        const v = launchVel(px, py);
+        g.fillStyle = 'rgba(232, 116, 59, .85)';
+        for (let i = 1; i <= 22; i++) {
+            const t = i * 0.055, x = b.x + v.vx * t, y = b.y + v.vy * t + 0.5 * G * t * t;
+            if (y > H || x < 0 || x > W) break;
+            g.globalAlpha = 1 - i / 28;
+            g.beginPath(); g.arc(x, y, Math.max(1.6, 3.4 - i * 0.07), 0, 6.283); g.fill();
+        }
+        g.globalAlpha = 1;
+    }
+    function drawBoardAndRim(front) {
+        if (!front) {
+            g.fillStyle = '#EEE7D2'; g.strokeStyle = '#D9A441'; g.lineWidth = 2;
+            g.beginPath();
+            if (g.roundRect) g.roundRect(board.x, board.y0, board.w, board.y1 - board.y0, 3); else g.rect(board.x, board.y0, board.w, board.y1 - board.y0);
+            g.fill(); g.stroke();
+            g.fillStyle = 'rgba(217,164,65,.9)'; g.fillRect(board.x - 6, rimY - 3, 8, 6);          // bracket
+        } else {
+            g.lineCap = 'round'; g.strokeStyle = '#D9A441'; g.lineWidth = 5;
+            g.beginPath(); g.moveTo(RL.x, rimY); g.lineTo(RR.x, rimY); g.stroke();
+            g.strokeStyle = '#F4D48A'; g.lineWidth = 1.4;
+            g.beginPath(); g.moveTo(RL.x + 2, rimY - 1.2); g.lineTo(RR.x - 2, rimY - 1.2); g.stroke();
+            g.fillStyle = '#B9822D'; g.beginPath(); g.arc(RL.x, rimY, 4, 0, 6.283); g.fill();
+        }
+    }
+    function drawNet() {
+        const tl = RL.x + 2, tr = RR.x - 2, ty = rimY + 2, depth = R * 2.6 + net.y * 0.5, N = 6;
+        const bh = (tr - tl) * 0.3, bc = (tl + tr) / 2 + net.x * 0.6, by = ty + depth;
+        const strand = [];
+        for (let i = 0; i <= N; i++) {
+            const u = i / N, x0 = tl + (tr - tl) * u, x1 = bc - bh + 2 * bh * u;
+            strand.push({ x0, x1, cx: (x0 + x1) / 2 + net.x * 0.4, cy: ty + depth * 0.5 });
+        }
+        const q = (s, f) => ({ x: (1 - f) * (1 - f) * s.x0 + 2 * (1 - f) * f * s.cx + f * f * s.x1, y: (1 - f) * (1 - f) * ty + 2 * (1 - f) * f * s.cy + f * f * by });
+        g.strokeStyle = 'rgba(238,231,210,.78)'; g.lineWidth = 1.3; g.lineCap = 'round';
+        strand.forEach(s => { g.beginPath(); g.moveTo(s.x0, ty); g.quadraticCurveTo(s.cx, s.cy, s.x1, by); g.stroke(); });
+        for (let j = 1; j <= 3; j++) {
+            const f = j / 4; g.beginPath();
+            strand.forEach((s, i) => { const p = q(s, f + (i % 2 ? 0.06 : 0)); if (i) g.lineTo(p.x, p.y); else g.moveTo(p.x, p.y); });
+            g.stroke();
+        }
+        g.beginPath(); strand.forEach((s, i) => { if (i) g.lineTo(s.x1, by); else g.moveTo(s.x1, by); }); g.stroke();
+    }
+    function drawBall(scale) {
+        const r = R * scale, lift = clamp((floorY - b.y) / H, 0, 1);
+        g.fillStyle = 'rgba(0,0,0,' + (0.3 - lift * 0.22) + ')';
+        g.beginPath(); g.ellipse(b.x, H - 8, r * (1 - lift * 0.5), r * 0.22, 0, 0, 6.283); g.fill();
+        g.save(); g.translate(b.x, b.y); g.rotate(b.rot);
+        g.beginPath(); g.arc(0, 0, r, 0, 6.283); g.clip();
+        const gr = g.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.1, 0, 0, r * 1.1);
+        gr.addColorStop(0, '#F59A55'); gr.addColorStop(0.6, '#E0702B'); gr.addColorStop(1, '#B24E14');
+        g.fillStyle = gr; g.fillRect(-r, -r, r * 2, r * 2);
+        g.strokeStyle = 'rgba(40,16,4,.8)'; g.lineWidth = Math.max(1.3, r * 0.09);
+        g.beginPath(); g.moveTo(-r, 0); g.lineTo(r, 0); g.moveTo(0, -r); g.lineTo(0, r); g.stroke();
+        g.beginPath(); g.arc(-r * 1.3, 0, r * 1.02, -1.1, 1.1); g.stroke();
+        g.beginPath(); g.arc(r * 1.3, 0, r * 1.02, Math.PI - 1.1, Math.PI + 1.1); g.stroke();
+        g.restore();
+        g.strokeStyle = 'rgba(40,16,4,.55)'; g.lineWidth = 1; g.beginPath(); g.arc(b.x, b.y, r - 0.5, 0, 6.283); g.stroke();
+    }
+    function drawLabel() {
+        const max = Math.min(W - 24, 210), s = labelText(max - 20);
+        const w = g.measureText(s).width + 20, h = 22;
+        const x = clamp(b.x, w / 2 + 6, W - w / 2 - 6), y = Math.max(h / 2 + 6, b.y - R - 16);
+        g.fillStyle = 'rgba(15,36,39,.92)'; g.strokeStyle = 'rgba(217,164,65,.8)'; g.lineWidth = 1.2;
+        g.beginPath();
+        if (g.roundRect) g.roundRect(x - w / 2, y - h / 2, w, h, 11); else g.rect(x - w / 2, y - h / 2, w, h);
+        g.fill(); g.stroke();
+        g.fillStyle = '#EEE7D2'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s, x, y + 0.5);
+    }
+    function drawEmptySpot() {                       // the rack the ball comes from, before there is a ball
+        g.setLineDash([5, 5]); g.strokeStyle = 'rgba(217,164,65,.45)'; g.lineWidth = 2;
+        g.beginPath(); g.arc(S.x, S.y, R + 4, 0, 6.283); g.stroke(); g.setLineDash([]);
+        g.fillStyle = 'rgba(141,162,158,.9)'; g.font = '600 12px "Be Vietnam Pro", system-ui, sans-serif';
+        g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText('Your reminder lands here', clamp(S.x, 96, W - 96), S.y + R + 24);
+    }
+    function draw() {
+        if (!W || !H) return;
+        g.clearRect(0, 0, W, H);
+        g.strokeStyle = 'rgba(238,231,210,.10)'; g.lineWidth = 1; g.beginPath(); g.moveTo(10, H - 8); g.lineTo(W - 10, H - 8); g.stroke();
+        drawBoardAndRim(false);
+        if (state === 'drag') {                             // the band and the dotted path
+            g.strokeStyle = 'rgba(217,164,65,.55)'; g.lineWidth = 3; g.lineCap = 'round';
+            g.beginPath(); g.moveTo(anchor.x, anchor.y); g.lineTo(b.x, b.y); g.stroke();
+            drawPreview();
+        }
+        if (state === 'idle') drawEmptySpot();
+        else {
+            if (state === 'aim' || state === 'drag') { g.strokeStyle = 'rgba(217,164,65,.35)'; g.lineWidth = 2; g.beginPath(); g.arc(anchor.x, anchor.y, R + 5, 0, 6.283); g.stroke(); }
+            drawBall(pop >= 0 ? 0.2 + 0.8 * (1 - Math.pow(1 - pop / 0.3, 2)) : 1);
+        }
+        drawNet();
+        drawBoardAndRim(true);
+        if (pulse >= 0) {
+            const k = pulse / 0.8, cx = (RL.x + RR.x) / 2;
+            g.strokeStyle = 'rgba(244,212,138,' + (1 - k) + ')'; g.lineWidth = 3;
+            g.beginPath(); g.ellipse(cx, rimY, rimW * (0.5 + k * 0.9), rimW * (0.18 + k * 0.3), 0, 0, 6.283); g.stroke();
+        }
+        parts.forEach(p => { g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.globalAlpha = clamp(p.life, 0, 1); g.fillStyle = p.c; g.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); g.restore(); });
+        if (armed && state !== 'scored') drawLabel();
+    }
+
+    /* ---------- loop: only while the mode is on, the tab is visible and something is moving ---------- */
+    function frame(now) {
+        raf = 0;
+        if (!on || document.hidden) return;
+        const dt = Math.min((now - lastT) / 1000, 1 / 20); lastT = now;
+        update(dt); draw();
+        if (busy()) raf = requestAnimationFrame(frame);
+    }
+    function startLoop() {
+        if (raf || !on || document.hidden) return;
+        if (!busy()) { draw(); return; }
+        lastT = performance.now(); raf = requestAnimationFrame(frame);
+    }
+    function stopLoop() { if (raf) cancelAnimationFrame(raf); raf = 0; }
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stopLoop(); else if (on) { draw(); startLoop(); } });
+
+    /* ---------- buttons ---------- */
+    btnShoot.addEventListener('click', autoThrow);
+    btnSkip.addEventListener('click', () => { if (armed) commit(); });
+    btnEdit.addEventListener('click', () => { if (armed) { unarm(true); userInput.focus(); } });
+
+    /* ---------- input: Pointer Events (mouse and touch share this), keyboard ---------- */
+    const local = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height) }; };
+    cv.addEventListener('pointerdown', e => {
+        if (!armed || reduced || state !== 'aim') return;
+        const p = local(e);
+        if (Math.hypot(p.x - b.x, p.y - b.y) > R * 2.4) return;
+        e.preventDefault();
+        try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+        drag = e.pointerId; state = 'drag'; stage.classList.add('dragging'); moveBall(p);
+        setStatus('Pull back, aim along the dots, let go.'); startLoop();
+    });
+    cv.addEventListener('pointermove', e => { if (state === 'drag' && e.pointerId === drag) { e.preventDefault(); moveBall(local(e)); } });
+    cv.addEventListener('pointerup', e => { if (state === 'drag' && e.pointerId === drag) { drag = null; release(); } });
+    cv.addEventListener('pointercancel', e => {
+        if (state === 'drag' && e.pointerId === drag) { drag = null; stage.classList.remove('dragging'); b.x = S.x; b.y = S.y; state = 'aim'; }
+    });
+    stage.addEventListener('keydown', e => {
+        if (!on) return;
+        if ((e.key === ' ' || e.key === 'Enter') && !e.repeat && armed && state === 'aim') { e.preventDefault(); autoThrow(); }
+    });
+    court.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && armed) { e.preventDefault(); e.stopPropagation(); unarm(true); userInput.focus(); }
+    });
+    userInput.addEventListener('keydown', e => {
+        if (on && e.key === 'Escape' && armed) { e.preventDefault(); unarm(true); }
+    });
+
+    /* ---------- start ---------- */
+    renderMode();
+    function onResize() {
+        if (!on) return;
+        const w = W, h = H, fy = floorY, a = { x: anchor.x, y: anchor.y };
+        layout();
+        if (w === W && h === H) { draw(); return; }
+        if (!armed || reduced || state === 'idle') resetBall();
+        else if (state === 'aim') {                          // a resting ball keeps its place on the new court
+            anchor.x = clamp(a.x * (W / w), R, W - R);
+            anchor.y = Math.abs(a.y - fy) < 2 ? floorY : clamp(a.y * (H / h), R, floorY);
+            b.x = anchor.x; b.y = anchor.y; b.vx = b.vy = 0;
+        }
+        draw();
+    }
+    if (window.ResizeObserver) new ResizeObserver(onResize).observe(stage);
+    else window.addEventListener('resize', onResize);
+    if (on) requestAnimationFrame(() => openCourt());
+
+    /* ---------- test hook: run one shot through the real physics, no drawing or sound ---------- */
+    function trial(px, py) {
+        const keep = { b: Object.assign({}, b), net: Object.assign({}, net), state, flyT, parts, pulse, anchor };
+        quiet = true; parts = [];
+        anchor = { x: S.x, y: S.y };
+        b.x = S.x + px; b.y = S.y + py; b.px = b.x; b.py = b.y; b.rot = 0;
+        const v = launchVel(px, py); b.vx = v.vx; b.vy = v.vy; state = 'fly'; flyT = 0; net.x = net.vx = net.y = net.vy = 0;
+        for (let i = 0; i < 900 && state === 'fly'; i++) physics(1 / 120);
+        const hit = state === 'scored';
+        Object.assign(b, keep.b); Object.assign(net, keep.net); state = keep.state; flyT = keep.flyT; parts = keep.parts; pulse = keep.pulse; anchor = keep.anchor; quiet = false;
+        return hit;
+    }
+    window.__hoop = { trial, get state() { return state; }, get armed() { return armed; }, get on() { return on; }, get looping() { return raf !== 0; },
+                      ball: b, auto: () => vAuto, anchor: () => anchor, misses: () => MISS_LINES.length,
+                      layout: () => ({ W, H, R, rimY, S, RL, RR, K, maxPull, G }) };
+})();
+</script>
+<!-- ===== end HOOP MODE script ===== -->
+
 <script type="module" src="js/main.js"></script>
 </body>
 </html>

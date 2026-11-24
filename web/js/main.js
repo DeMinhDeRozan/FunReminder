@@ -38,6 +38,7 @@ FR.sceneAmbient = () => {
     return (h >= 6 && h < 19) ? 'meadow' : 'crickets';
 };
 FR.alarmVolume = () => store.getPreference('sound.alarmVolume');
+FR.playSfx = playSfx;   // used by the basketball alarm mode in index.html (respects Settings > Sound)
 FR.openPanel = openPanel; FR.closePanel = closePanel; FR.currentPanel = currentPanel;
 FR.openFocusMode = openFocusMode; FR.closeFocusMode = closeFocusMode;
 FR.openClockMode = openClockMode; FR.closeClockMode = closeClockMode;

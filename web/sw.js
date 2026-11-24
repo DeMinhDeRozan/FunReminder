@@ -6,7 +6,7 @@
  *    The reminder API, Cognito and every other cross-origin request are NOT touched,
  *    so private API responses are never stored here.
  */
-const VERSION = 'fr-v2.3.0';
+const VERSION = 'fr-v2.3.1';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 const ICON = 'icons/icon-192.png';

@@ -75,7 +75,18 @@ const EFFECTS = {
     achievement(t) { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => bell(f, t + i * 0.09, 0.15, 1.1)); tone('triangle', 2093, 0, t + 0.36, 0.5, 0.04); },
     focusStart(t) { bell(659.25, t, 0.16, 0.9); },
     focusEnd(t) { [784, 659.25, 784].forEach((f, i) => bell(f, t + i * 0.32, 0.2, 1.4)); },
-    breakEnd(t) { bell(523.25, t, 0.18, 1.0); bell(659.25, t + 0.2, 0.18, 1.2); }
+    breakEnd(t) { bell(523.25, t, 0.18, 1.0); bell(659.25, t + 0.2, 0.18, 1.2); },
+    /* basketball alarm mode (index.html "HOOP MODE") */
+    bounce(t) { tone('sine', 230, 70, t, 0.16, 0.32); tone('triangle', 460, 140, t, 0.08, 0.1); },
+    rim(t) { tone('triangle', 1500, 1050, t, 0.1, 0.13); tone('sine', 740, 0, t, 0.16, 0.1); },
+    swish(t) {
+        const s = ctx.createBufferSource(); s.buffer = noiseBuffer();
+        const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 0.8;
+        f.frequency.setValueAtTime(2600, t); f.frequency.exponentialRampToValueAtTime(900, t + 0.35);
+        const gn = ctx.createGain(); gn.gain.setValueAtTime(0.0001, t);
+        gn.gain.exponentialRampToValueAtTime(0.32, t + 0.04); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.42);
+        s.connect(f).connect(gn).connect(sfxBus); s.start(t); s.stop(t + 0.46);
+    }
 };
 
 export function playSfx(name) {
