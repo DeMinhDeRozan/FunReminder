@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunReminder · offline</title>
+<meta name="theme-color" content="#0F2427">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { display: grid; place-items: center; background: radial-gradient(70% 55% at 50% 45%, #1B3C43, #0B1D20); color: #EEE7D2; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; text-align: center; padding: 24px; box-sizing: border-box; }
+  img { width: 96px; height: 96px; border-radius: 50%; border: 3px solid #D9A441; object-fit: cover; object-position: center 12%; background: #17343B; }
+  h1 { font: 800 34px/1.1 "Arial Narrow", sans-serif; margin: 18px 0 8px; letter-spacing: .01em; }
+  p { color: #C8C1AC; max-width: 34ch; margin: 0 auto 18px; }
+  button { font: 600 14px system-ui, sans-serif; padding: 11px 20px; border-radius: 999px; border: 0; background: linear-gradient(180deg, #F4D48A, #D9A441); color: #261804; cursor: pointer; }
+</style>
+</head>
+<body>
+<main>
+  <img src="kangaroo.png" alt="">
+  <h1>No signal, mate.</h1>
+  <p>You're offline and this page hasn't been saved on this device yet. Reconnect and FunReminder will load. Your local tasks are safe in this browser.</p>
+  <button type="button" onclick="location.reload()">Try again</button>
+</main>
+</body>
+</html>

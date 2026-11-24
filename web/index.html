@@ -5,608 +5,1137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>DeMinh DeRozan · Reminders</title>
     <link rel="icon" type="image/png" sizes="64x64" href="https://d28igba62yy5is.cloudfront.net/kangaroo.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
     <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#1b1b1f">
+    <meta name="theme-color" content="#0F2427">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;1,400&subset=vietnamese&display=swap" rel="stylesheet">
     <style>
+        /* =========================================================
+           FunReminder · "bedside alarm clock at night"
+           petrol enamel dial · lume-cream ink · polished brass bell
+           ========================================================= */
         :root {
-            --bg: #000000;
-            --surface: #101010;
-            --ink: #e8e5dd;
-            --muted: #7d7a72;
-            --line: #222220;
-            --user: #1a1a18;
-            --accent: #d97757;
-            --accent-ink: #ffffff;
-            --alarm: #f5b800;
-            --alarm-bg: #0d0d0c;
-            --alarm-fg: #faf8f2;
-            --success: #34c759;
-            --fail: #ff453a;
-            --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-            --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+            --dial: #0F2427;
+            --dial-deep: #081619;
+            --enamel: #17343B;
+            --enamel-hi: #1F424B;
+            --enamel-lo: #122A30;
+            --well: #0A1B1E;
+            --ink: #EEE7D2;
+            --ink-dim: #C8C1AC;
+            --muted: #8DA29E;
+            --line: rgba(238, 231, 210, .09);
+            --groove: rgba(0, 0, 0, .38);
+            --brass: #D9A441;
+            --brass-hi: #F4D48A;
+            --brass-lo: #8F631C;
+            --brass-ink: #261804;
+            --paper: #EEE6CE;
+            --paper-ink: #182628;
+            --red: #E5342A;
+            --success: #7FD39A;
+            --fail: #FF6B5E;
+
+            /* kept for any code that still reads the old names */
+            --bg: var(--dial);
+            --surface: var(--enamel);
+            --user: var(--enamel-lo);
+            --accent: var(--brass);
+            --accent-ink: var(--brass-ink);
+            --alarm: var(--brass);
+
+            --display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", sans-serif;
+            --body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+            --serif: var(--display);
+            --mono: var(--display);
+
+            --edge-light: inset 0 1px 0 rgba(255, 255, 255, .07), inset 0 -1px 0 rgba(0, 0, 0, .28);
+            --lift-1: 0 1px 1px rgba(0, 0, 0, .35), 0 6px 16px -8px rgba(0, 0, 0, .65);
+            --lift-2: 0 2px 2px rgba(0, 0, 0, .3), 0 18px 40px -14px rgba(0, 0, 0, .75);
+            --ease-out: cubic-bezier(.2, .9, .25, 1);
+            --ease-spring: cubic-bezier(.34, 1.4, .5, 1);
+
+            --i-bell: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M6%208a6%206%200%200%201%2012%200c0%207%203%209%203%209H3s3-2%203-9%27%2F%3E%3Cpath%20d%3D%27M10.3%2021a1.94%201.94%200%200%200%203.4%200%27%2F%3E%3C%2Fsvg%3E");
+            --i-bell-off: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M8.7%203A6%206%200%200%201%2018%208a21.3%2021.3%200%200%200%20.6%205%27%2F%3E%3Cpath%20d%3D%27M17%2017H3s3-2%203-9a4.67%204.67%200%200%201%20.3-1.7%27%2F%3E%3Cpath%20d%3D%27M10.3%2021a1.94%201.94%200%200%200%203.4%200%27%2F%3E%3Cpath%20d%3D%27m2%202%2020%2020%27%2F%3E%3C%2Fsvg%3E");
+            --i-mic: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%279%27%20y%3D%272%27%20width%3D%276%27%20height%3D%2712%27%20rx%3D%273%27%2F%3E%3Cpath%20d%3D%27M19%2010v2a7%207%200%200%201-14%200v-2%27%2F%3E%3Cpath%20d%3D%27M12%2019v3%27%2F%3E%3C%2Fsvg%3E");
+            --i-history: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M3%2012a9%209%200%201%200%209-9%209.75%209.75%200%200%200-6.74%202.74L3%208%27%2F%3E%3Cpath%20d%3D%27M3%203v5h5%27%2F%3E%3Cpath%20d%3D%27M12%207v5l4%202%27%2F%3E%3C%2Fsvg%3E");
+            --i-sweep: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27m7%2021-4.3-4.3c-1-1-1-2.5%200-3.4l9.6-9.6c1-1%202.5-1%203.4%200l5.6%205.6c1%201%201%202.5%200%203.4L13%2021%27%2F%3E%3Cpath%20d%3D%27M22%2021H7%27%2F%3E%3Cpath%20d%3D%27m5%2011%209%209%27%2F%3E%3C%2Fsvg%3E");
+            --i-repeat: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27m17%202%204%204-4%204%27%2F%3E%3Cpath%20d%3D%27M3%2011v-1a4%204%200%200%201%204-4h14%27%2F%3E%3Cpath%20d%3D%27m7%2022-4-4%204-4%27%2F%3E%3Cpath%20d%3D%27M21%2013v1a4%204%200%200%201-4%204H3%27%2F%3E%3C%2Fsvg%3E");
+            --i-speaker: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolygon%20points%3D%2711%205%206%209%202%209%202%2015%206%2015%2011%2019%2011%205%27%2F%3E%3Cpath%20d%3D%27M15.54%208.46a5%205%200%200%201%200%207.07%27%2F%3E%3Cpath%20d%3D%27M19.07%204.93a10%2010%200%200%201%200%2014.14%27%2F%3E%3C%2Fsvg%3E");
+            --i-speaker-off: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolygon%20points%3D%2711%205%206%209%202%209%202%2015%206%2015%2011%2019%2011%205%27%2F%3E%3Cpath%20d%3D%27m23%209-6%206%27%2F%3E%3Cpath%20d%3D%27m17%209%206%206%27%2F%3E%3C%2Fsvg%3E");
+            --i-mail: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%272%27%20y%3D%274%27%20width%3D%2720%27%20height%3D%2716%27%20rx%3D%272%27%2F%3E%3Cpath%20d%3D%27m22%207-8.97%205.7a1.94%201.94%200%200%201-2.06%200L2%207%27%2F%3E%3C%2Fsvg%3E");
+            --i-lock: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%273%27%20y%3D%2711%27%20width%3D%2718%27%20height%3D%2711%27%20rx%3D%272%27%2F%3E%3Cpath%20d%3D%27M7%2011V7a5%205%200%200%201%2010%200v4%27%2F%3E%3C%2Fsvg%3E");
+            --i-doc: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M14.5%202H6a2%202%200%200%200-2%202v16a2%202%200%200%200%202%202h12a2%202%200%200%200%202-2V7.5L14.5%202z%27%2F%3E%3Cpath%20d%3D%27M14%202v6h6%27%2F%3E%3Cpath%20d%3D%27M16%2013H8%27%2F%3E%3Cpath%20d%3D%27M16%2017H8%27%2F%3E%3C%2Fsvg%3E");
+            --i-login: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M15%203h4a2%202%200%200%201%202%202v14a2%202%200%200%201-2%202h-4%27%2F%3E%3Cpath%20d%3D%27m10%2017%205-5-5-5%27%2F%3E%3Cpath%20d%3D%27M15%2012H3%27%2F%3E%3C%2Fsvg%3E");
+            --i-logout: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M9%2021H5a2%202%200%200%201-2-2V5a2%202%200%200%201%202-2h4%27%2F%3E%3Cpath%20d%3D%27m16%2017%205-5-5-5%27%2F%3E%3Cpath%20d%3D%27M21%2012H9%27%2F%3E%3C%2Fsvg%3E");
+            --i-person: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%278%27%20r%3D%274%27%2F%3E%3Cpath%20d%3D%27M4%2021a8%208%200%200%201%2016%200%27%2F%3E%3C%2Fsvg%3E");
+            --i-grid: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27black%27%3E%3Crect%20x%3D%273%27%20y%3D%273%27%20width%3D%278%27%20height%3D%278%27%20rx%3D%271%27%2F%3E%3Crect%20x%3D%2713%27%20y%3D%273%27%20width%3D%278%27%20height%3D%278%27%20rx%3D%271%27%2F%3E%3Crect%20x%3D%273%27%20y%3D%2713%27%20width%3D%278%27%20height%3D%278%27%20rx%3D%271%27%2F%3E%3Crect%20x%3D%2713%27%20y%3D%2713%27%20width%3D%278%27%20height%3D%278%27%20rx%3D%271%27%2F%3E%3C%2Fsvg%3E");
+            --i-hazard: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20fill%3D%27black%27%20fill-rule%3D%27evenodd%27%20d%3D%27M12%201.5%20.8%2021.5h22.4L12%201.5zM10.8%208.5h2.4l-.4%207.2h-1.6l-.4-7.2zM10.75%2017.4h2.5v2.4h-2.5z%27%2F%3E%3C%2Fsvg%3E");
+            --grain: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27180%27%20height%3D%27180%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%27.85%27%20numOctaves%3D%272%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20values%3D%270%200%200%200%201%20%200%200%200%200%20.95%20%200%200%200%200%20.85%20%200%200%200%20.55%20-.18%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23n%29%27%2F%3E%3C%2Fsvg%3E");
+            --paper-grain: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27140%27%20height%3D%27140%27%3E%3Cfilter%20id%3D%27p%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%27.7%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20values%3D%270%200%200%200%20.35%20%200%200%200%200%20.27%20%200%200%200%200%20.12%20%200%200%200%20.35%20-.12%27%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23p%29%27%2F%3E%3C%2Fsvg%3E");
+            --i-bell-dark: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%23261804%27%20stroke-width%3D%272.2%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M6%208a6%206%200%200%201%2012%200c0%207%203%209%203%209H3s3-2%203-9%27%2F%3E%3Cpath%20d%3D%27M10.3%2021a1.94%201.94%200%200%200%203.4%200%27%2F%3E%3C%2Fsvg%3E");
         }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg); color: var(--ink);
+            font-family: var(--body);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
         }
+        html { background: var(--dial-deep); }
+        body {
+            /* warm bedside-lamp light from the upper left, falling off across the enamel dial */
+            background:
+                radial-gradient(90% 60% at 8% -8%, rgba(255, 190, 110, .17), rgba(255, 190, 110, .05) 45%, transparent 70%),
+                radial-gradient(70% 55% at 50% 48%, rgba(40, 84, 92, .55), transparent 72%),
+                linear-gradient(180deg, var(--dial) 0%, #0B1D20 100%);
+        }
+        /* fine grain + vignette sit over the dial, under the UI */
+        body::after {
+            content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                var(--grain) repeat,
+                radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(2, 8, 9, .62) 100%);
+            background-size: 180px 180px, auto;
+            opacity: 1;
+        }
+        ::selection { background: rgba(217, 164, 65, .35); color: var(--ink); }
 
-        
+        /* ---------- big analog dial behind everything ---------- */
         .clock-face {
             position: fixed; inset: 0; z-index: 0;
             display: grid; place-items: center;
             pointer-events: none; color: var(--ink);
-            --clock-base: 0.10; opacity: var(--clock-base);
+            --clock-base: 0.11; opacity: var(--clock-base);
             transition: opacity .6s ease;
         }
-        .clock-svg { width: min(74vmin, 540px); height: min(74vmin, 540px); }
+        .clock-svg { width: min(78vmin, 600px); height: min(78vmin, 600px); overflow: visible; }
         .clock-svg line { stroke: currentColor; stroke-linecap: round; }
-        #hourHand { opacity: .92; }
-        #minuteHand { opacity: .80; }
-        #secondHand { opacity: .95; }
-        .clock-pin { fill: currentColor; }
+        .clock-ring { fill: none; stroke: currentColor; }
+        #hourHand { opacity: .95; }
+        #minuteHand { opacity: .85; }
+        #secondHand { stroke: var(--brass); opacity: 1; }
+        .clock-pin { fill: var(--brass); }
         @keyframes clockFlash {
-            0%   { opacity: var(--clock-base); filter: none; }
-            10%  { opacity: 1;   filter: drop-shadow(0 0 26px rgba(245,184,0,.9)); }
-            30%  { opacity: .45; filter: drop-shadow(0 0 10px rgba(245,184,0,.5)); }
-            50%  { opacity: .98; filter: drop-shadow(0 0 20px rgba(245,184,0,.7)); }
-            70%  { opacity: .55; filter: drop-shadow(0 0 8px rgba(245,184,0,.4)); }
-            100% { opacity: var(--clock-base); filter: none; }
+            0%   { opacity: var(--clock-base); }
+            10%  { opacity: .9; }
+            30%  { opacity: .35; }
+            50%  { opacity: .8; }
+            70%  { opacity: .4; }
+            100% { opacity: var(--clock-base); }
         }
-        .clock-face.flashing { animation: clockFlash 1.8s cubic-bezier(.2,.8,.2,1); }
+        .clock-face.flashing { animation: clockFlash 1.8s var(--ease-out); color: var(--brass-hi); }
 
         .alarm-flash {
             position: fixed; inset: 0; z-index: 9998;
             pointer-events: none; opacity: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(245,184,0,0.55), rgba(245,184,0,0.05) 55%, transparent 75%);
+            background: radial-gradient(circle at 50% 50%, rgba(244, 212, 138, .45), rgba(217, 164, 65, .06) 55%, transparent 75%);
         }
 
         .wrapper {
             position: relative; z-index: 1;
             display: flex; flex-direction: column; height: 100%;
-            max-width: 760px; margin: 0 auto;
+            max-width: 780px; margin: 0 auto;
         }
 
-        
+        /* ---------- shared icon helper (CSS masks, no emoji) ---------- */
+        .ico, .ghost-btn::before, .alarm-label::before, .sound-banner::before,
+        .familiar-label::before, .history-item-icon, #notifBannerIcon,
+        .profile-menu-icon, .warn-sign {
+            -webkit-mask: var(--i) center / contain no-repeat;
+                    mask: var(--i) center / contain no-repeat;
+            background-color: currentColor;
+        }
+
+        /* ---------- notification pill ---------- */
         .notif-banner {
-            position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+            position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%;
+            transform: translateX(-50%);
             z-index: 9990;
-            background: var(--surface);
-            border: 1px solid var(--accent);
+            background: linear-gradient(180deg, var(--enamel-hi), var(--enamel));
+            border: 1px solid rgba(217, 164, 65, .55);
             border-radius: 999px;
-            padding: 8px 16px;
-            font-size: 12.5px; font-weight: 600; color: var(--ink);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            padding: 8px 16px 8px 12px;
+            font-size: 12.5px; font-weight: 500; color: var(--ink);
+            box-shadow: var(--edge-light), var(--lift-2);
             cursor: pointer;
             display: flex; align-items: center; gap: 8px;
             max-width: calc(100vw - 100px);
-            transition: opacity .3s;
+            transition: border-color .2s, transform .2s var(--ease-out);
+            animation: pillIn .5s var(--ease-out) both;
         }
+        .notif-banner:hover { border-color: var(--brass); transform: translateX(-50%) translateY(-1px); }
+        .notif-banner:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
         .notif-banner.hidden { display: none; }
-        .notif-banner.blocked { border-color: var(--muted); color: var(--muted); cursor: default; }
+        .notif-banner.blocked { border-color: var(--line); color: var(--muted); cursor: default; }
+        #notifBannerIcon { --i: var(--i-bell); flex: none; width: 15px; height: 15px; font-size: 0; color: var(--brass); }
+        .notif-banner.blocked #notifBannerIcon { --i: var(--i-bell-off); color: var(--muted); }
+        @keyframes pillIn { from { opacity: 0; transform: translateX(-50%) translateY(-8px); } }
 
-        
+        /* ---------- header ---------- */
         .header {
-            padding: 14px 18px 10px;
+            position: relative; z-index: 3;
+            padding: 16px 22px 14px;
             display: grid;
             grid-template-columns: 1fr auto;
             grid-template-areas: "who clock" "actions progress";
-            gap: 8px 14px; align-items: start;
+            gap: 12px 16px; align-items: center;
         }
-        .who { grid-area: who; display: flex; align-items: center; gap: 10px; min-width: 0; }
+        /* engraved rule under the header */
+        .header::after {
+            content: ""; position: absolute; left: 22px; right: 22px; bottom: 0; height: 2px;
+            background: linear-gradient(180deg, var(--groove) 0 1px, rgba(255, 255, 255, .045) 1px 2px);
+        }
+        .who { grid-area: who; display: flex; align-items: center; gap: 12px; min-width: 0; }
         .logo {
-            width: 38px; height: 38px; border-radius: 50%;
+            width: 44px; height: 44px; border-radius: 50%;
             overflow: hidden; cursor: pointer; flex: none;
-            border: 1px solid var(--line); transition: transform .15s ease;
+            border: 2px solid transparent;
+            background:
+                linear-gradient(var(--enamel), var(--enamel)) padding-box,
+                conic-gradient(from 210deg, var(--brass-lo), var(--brass-hi), var(--brass), var(--brass-lo), var(--brass-hi), var(--brass-lo)) border-box;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .5), 0 4px 12px -2px rgba(0, 0, 0, .6);
+            transition: transform .18s var(--ease-spring);
+            display: grid; place-items: center; color: var(--brass);
         }
-        .logo:active, .spark:active { transform: scale(.94); }
+        .logo:hover { transform: rotate(-6deg) scale(1.04); }
+        .logo:active, .spark:active { transform: scale(.93); }
         .logo img { width: 100%; height: 100%; object-fit: cover; object-position: center 12%; display: block; }
         .logo svg { width: 18px; height: 18px; display: none; }
         .name {
-            font-family: var(--serif);
-            font-size: 16px; font-weight: 700; letter-spacing: -.2px;
+            font-family: var(--display);
+            font-size: 24px; font-weight: 800; letter-spacing: .005em; line-height: 1;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            color: var(--ink);
         }
-        .status { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px rgba(52,199,89,.2); }
+        .status { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-top: 5px; }
+        .dot {
+            width: 7px; height: 7px; border-radius: 50%; background: var(--success);
+            box-shadow: 0 0 0 3px rgba(127, 211, 154, .16), 0 0 8px rgba(127, 211, 154, .6);
+        }
 
         .clock-block { grid-area: clock; text-align: right; user-select: none; }
         .clock-main {
-            font-family: var(--mono); font-size: 26px; font-weight: 600;
-            letter-spacing: 0.02em; line-height: 1; font-variant-numeric: tabular-nums;
+            font-family: var(--display); font-size: 44px; font-weight: 700;
+            letter-spacing: .01em; line-height: .9; font-variant-numeric: tabular-nums;
             color: var(--ink); display: inline-flex; align-items: baseline; gap: 1px;
+            text-shadow: 0 0 22px rgba(238, 231, 210, .16), 0 1px 0 rgba(0, 0, 0, .5);
         }
-        .clock-main .sec { font-size: 14px; opacity: 0.55; font-weight: 500; }
+        .clock-main .sec { font-size: 22px; color: var(--brass); font-weight: 600; text-shadow: 0 0 14px rgba(217, 164, 65, .35); }
         .clock-date {
-            font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em;
-            text-transform: uppercase; color: var(--muted); margin-top: 4px;
+            font-family: var(--display); font-size: 14px; font-weight: 600; letter-spacing: .06em;
+            color: var(--muted); margin-top: 6px;
         }
 
         .progress {
             grid-area: progress; display: flex; align-items: center; gap: 8px;
-            font-family: var(--mono); font-size: 9.5px; color: var(--muted);
-            letter-spacing: 0.12em; text-transform: uppercase;
+            font-family: var(--display); font-size: 14px; font-weight: 600; color: var(--muted);
+            letter-spacing: .03em; min-width: 150px;
         }
-        .progress-track { flex: 1; height: 2px; background: var(--line); border-radius: 2px; overflow: hidden; min-width: 60px; }
-        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s linear; }
+        #progressPct { color: var(--ink-dim); font-variant-numeric: tabular-nums; min-width: 30px; text-align: right; }
+        .progress-track {
+            flex: 1; height: 5px; min-width: 70px; border-radius: 5px; overflow: hidden;
+            background: var(--well);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .7), 0 1px 0 rgba(255, 255, 255, .05);
+        }
+        .progress-fill {
+            height: 100%; width: 0%; border-radius: 5px;
+            background: linear-gradient(180deg, var(--brass-hi), var(--brass) 55%, var(--brass-lo));
+            box-shadow: 0 0 8px rgba(217, 164, 65, .45);
+            transition: width 1s linear;
+        }
 
-        .actions { grid-area: actions; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        .actions { grid-area: actions; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .ghost-btn {
-            background: transparent; border: 1px solid var(--line); color: var(--muted);
-            border-radius: 999px; padding: 5px 11px;
-            font-size: 11.5px; cursor: pointer; transition: .2s;
-            font-family: inherit; white-space: nowrap;
+            position: relative;
+            display: inline-flex; align-items: center; gap: 7px;
+            background: linear-gradient(180deg, var(--enamel-hi), var(--enamel-lo));
+            border: 1px solid rgba(0, 0, 0, .45);
+            color: var(--ink-dim);
+            border-radius: 999px; padding: 6px 13px 6px 11px;
+            font: 500 12.5px/1.2 var(--body); cursor: pointer; white-space: nowrap;
+            box-shadow: var(--edge-light), 0 1px 2px rgba(0, 0, 0, .45);
+            transition: color .15s, transform .15s var(--ease-out), box-shadow .15s;
         }
-        .ghost-btn:hover { color: var(--ink); border-color: var(--muted); }
-        .ghost-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-        .ghost-btn.has-badge { position: relative; }
+        .ghost-btn::before { content: ""; width: 14px; height: 14px; flex: none; --i: var(--i-bell); }
+        #modeBtn[data-mode="special"]::before { --i: var(--i-mic); }
+        #historyBtn::before { --i: var(--i-history); }
+        #clearBtn::before { --i: var(--i-sweep); }
+        .ghost-btn:hover { color: var(--ink); transform: translateY(-1px); }
+        .ghost-btn:active { transform: translateY(1px); box-shadow: inset 0 2px 4px rgba(0, 0, 0, .45); }
+        .ghost-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
         .ghost-btn.has-badge::after {
-            content: attr(data-badge); position: absolute; top: -4px; right: -4px;
-            background: var(--accent); color: var(--accent-ink);
-            font-family: var(--mono); font-size: 9px; font-weight: 700;
-            min-width: 16px; height: 16px; border-radius: 999px;
-            display: grid; place-items: center; padding: 0 4px;
+            content: attr(data-badge); position: absolute; top: -6px; right: -6px;
+            background: radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass) 50%, var(--brass-lo));
+            color: var(--brass-ink);
+            font: 700 11px/1 var(--display); letter-spacing: .02em;
+            min-width: 18px; height: 18px; border-radius: 999px;
+            display: grid; place-items: center; padding: 0 5px;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset, 0 2px 4px rgba(0, 0, 0, .5);
         }
 
         @media (max-width: 840px) {
-            .header { padding-right: 62px; }
+            .header { padding-right: 66px; }
+            .header::after { right: 66px; }
         }
         @media (max-width: 560px) {
-            .header { padding: 10px 12px 8px; padding-right: 56px; gap: 6px 10px; }
-            .clock-main { font-size: 22px; }
-            .clock-main .sec { font-size: 12px; }
-            .name { font-size: 14px; }
-            .ghost-btn { padding: 4px 8px; font-size: 10.5px; }
-            .actions { gap: 4px; }
+            .header { padding: 12px 14px 12px; padding-right: 58px; gap: 10px 10px; }
+            .header::after { left: 14px; right: 14px; }
+            .logo { width: 38px; height: 38px; }
+            .name { font-size: 20px; }
+            .clock-main { font-size: 34px; }
+            .clock-main .sec { font-size: 17px; }
+            .clock-date { font-size: 12.5px; }
+            .ghost-btn { padding: 5px 10px 5px 8px; font-size: 11.5px; gap: 5px; }
+            .ghost-btn::before { width: 12px; height: 12px; }
+            .actions { gap: 6px; }
+            .progress { min-width: 0; font-size: 13px; }
+            .progress-track { min-width: 44px; }
         }
 
-        
+        /* ---------- chat log ---------- */
         .chat-box {
-            flex: 1; overflow-y: auto;
-            padding: 12px 18px 20px;
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            padding: 22px 22px 22px;
             display: flex; flex-direction: column; gap: 0;
             scroll-behavior: smooth;
+            -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22px, #000 calc(100% - 14px), transparent 100%);
+                    mask-image: linear-gradient(180deg, transparent 0, #000 22px, #000 calc(100% - 14px), transparent 100%);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(217, 164, 65, .35) transparent;
         }
-        .chat-box::-webkit-scrollbar { width: 6px; }
-        .chat-box::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+        .chat-box::-webkit-scrollbar { width: 8px; }
+        .chat-box::-webkit-scrollbar-track { background: transparent; }
+        .chat-box::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(244, 212, 138, .45), rgba(143, 99, 28, .45));
+            border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+        }
+        .chat-box::-webkit-scrollbar-thumb:hover { background-color: rgba(217, 164, 65, .6); }
 
-        .row { display: flex; gap: 10px; animation: in .35s ease-out; align-items: flex-start; }
-        .row.user { justify-content: flex-end; }
-        .row.remind-alert { justify-content: center; margin: 8px 0; }
+        .row { display: flex; gap: 10px; align-items: flex-start; }
+        .row.bot  { animation: inBot .46s var(--ease-out) both; }
+        .row.user { justify-content: flex-end; animation: inUser .38s var(--ease-spring) both; }
+        .row.remind-alert { justify-content: center; margin: 12px 0; }
+        .row > div:last-child { min-width: 0; }
+        .row.user > div:last-child { align-items: flex-end; max-width: 82%; }
+        .row.bot > div:last-child { max-width: calc(100% - 44px); }
+        @keyframes inBot  { from { opacity: 0; transform: translate3d(-8px, 8px, 0) scale(.985); } }
+        @keyframes inUser { from { opacity: 0; transform: translate3d(10px, 10px, 0) scale(.94); } }
+        .row.user > div:last-child { transform-origin: 100% 100%; }
 
         .row .spark {
-            flex: none; width: 32px; height: 32px; border-radius: 50%;
-            overflow: hidden; cursor: pointer; transition: transform .15s ease;
+            flex: none; width: 34px; height: 34px; border-radius: 50%;
+            overflow: hidden; cursor: pointer; margin-top: 2px;
+            border: 1.5px solid transparent;
+            background:
+                linear-gradient(var(--enamel), var(--enamel)) padding-box,
+                conic-gradient(from 210deg, var(--brass-lo), var(--brass-hi), var(--brass-lo), var(--brass-hi), var(--brass-lo)) border-box;
+            box-shadow: 0 3px 8px -2px rgba(0, 0, 0, .6);
+            transition: transform .18s var(--ease-spring);
+            display: grid; place-items: center; color: var(--brass);
         }
         .spark img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center 12%; display: block; }
         .spark svg { width: 14px; height: 14px; }
 
-        .msg { font-size: 15.5px; line-height: 1.6; word-wrap: break-word; white-space: pre-wrap; max-width: 85%; }
-        .msg.bot { color: var(--ink); padding-top: 4px; }
-        .row.user .msg, .msg.user {
-            max-width: 80%; background: var(--user);
-            padding: 10px 16px; border-radius: 22px 22px 6px 22px;
+        .msg {
+            position: relative;
+            font-size: 15.5px; line-height: 1.6; letter-spacing: -.003em;
+            word-wrap: break-word; overflow-wrap: anywhere; white-space: pre-wrap;
         }
+        /* bot: raised enamel plate, lit from above */
+        .msg.bot {
+            color: var(--ink);
+            padding: 11px 16px 12px;
+            border-radius: 5px 18px 18px 18px;
+            background: linear-gradient(180deg, #1C3D45 0%, #16323A 100%);
+            border: 1px solid rgba(0, 0, 0, .3);
+            box-shadow: var(--edge-light), var(--lift-1);
+        }
+        /* user: a cream paper tag on the dark dial */
+        .msg.user {
+            color: var(--paper-ink);
+            padding: 10px 16px 11px;
+            border-radius: 18px 18px 5px 18px;
+            background:
+                var(--paper-grain),
+                linear-gradient(180deg, #F3ECD6 0%, #E5DCC1 100%);
+            background-size: 140px 140px, auto;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .75),
+                inset 0 -1px 0 rgba(120, 96, 50, .25),
+                0 1px 1px rgba(0, 0, 0, .35),
+                0 12px 24px -12px rgba(0, 0, 0, .8);
+        }
+        .msg.bot:has(.typing) { padding: 9px 16px; }
 
         .msg-time {
-            font-family: var(--mono); font-size: 10px; color: var(--muted);
-            letter-spacing: 0.04em; margin-top: 3px; padding: 0 4px;
-            opacity: 0.75; user-select: none;
+            font-family: var(--display); font-size: 12.5px; font-weight: 600; color: var(--muted);
+            letter-spacing: .05em; margin-top: 5px; padding: 0 6px;
+            opacity: .8; user-select: none; font-variant-numeric: tabular-nums;
         }
         .row.user .msg-time { text-align: right; }
 
-        .msg.aged  { opacity: 0.82; }
-        .msg.old   { opacity: 0.6; filter: saturate(0.9); }
-        .msg.fossil { opacity: 0.38; filter: saturate(0.6) blur(0.15px); }
-        .msg.fossil:hover { opacity: 0.75; filter: none; transition: .3s; }
+        .msg.aged  { opacity: .86; }
+        .msg.old   { opacity: .64; }
+        .msg.fossil { opacity: .42; filter: saturate(.6); }
+        .msg.fossil:hover { opacity: .8; filter: none; transition: .3s; }
 
         .time-gap-marker {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            font-family: var(--mono); font-size: 10px; color: var(--muted);
-            letter-spacing: 0.15em; text-transform: uppercase;
-            opacity: 0.65; padding: 0 8px;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            font-family: var(--display); font-size: 13px; font-weight: 600; color: var(--muted);
+            letter-spacing: .06em; opacity: .8; padding: 0 8px;
         }
         .time-gap-marker .line {
-            flex: 1; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--line) 30%, var(--line) 70%, transparent);
-            max-width: 90px;
+            flex: 1; max-width: 110px; height: 2px;
+            background: linear-gradient(180deg, var(--groove) 0 1px, rgba(255, 255, 255, .05) 1px 2px);
         }
 
-        
+        /* ---------- alarm card: a brass-bezelled plate that rings in ---------- */
         .alarm-card {
-            max-width: 95%; background: var(--alarm-bg); color: var(--alarm-fg);
-            border-radius: 14px; padding: 14px 18px 16px;
-            box-shadow: 0 6px 28px rgba(245,184,0,0.18), 0 2px 8px rgba(0,0,0,0.2);
-            animation: alarmPop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(245,184,0,0.35);
+            position: relative;
+            min-width: min(320px, 92%); max-width: 94%;
+            color: var(--ink);
+            border-radius: 16px; padding: 16px 22px 16px 20px;
+            background:
+                radial-gradient(120% 90% at 0% 0%, rgba(244, 212, 138, .16), transparent 55%),
+                linear-gradient(180deg, #1E3F47, #142D33);
+            border: 1px solid rgba(0, 0, 0, .45);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .08),
+                0 0 0 3px rgba(217, 164, 65, .55),
+                0 0 0 4px rgba(38, 24, 4, .9),
+                0 0 26px 2px rgba(217, 164, 65, .22),
+                var(--lift-2);
+            animation: alarmPop .62s var(--ease-spring) both;
         }
         .alarm-label {
-            font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
-            text-transform: uppercase; color: var(--alarm);
-            display: flex; align-items: center; gap: 6px;
-            font-weight: 700; margin-bottom: 8px;
+            font-family: var(--display); font-size: 15px; font-weight: 800; letter-spacing: .08em;
+            color: var(--brass);
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 6px;
         }
-        .alarm-label::before { content: "▲"; font-size: 11px; }
+        .alarm-label::before {
+            content: ""; width: 18px; height: 18px; --i: var(--i-bell);
+            transform-origin: 50% 10%;
+            animation: bellRing .9s ease-in-out .25s 2;
+        }
         .alarm-task {
-            font-family: var(--serif); font-size: 17px; font-weight: 700;
-            line-height: 1.3; letter-spacing: -.005em; word-wrap: break-word;
+            font-family: var(--display); font-size: 30px; font-weight: 700;
+            line-height: 1.08; letter-spacing: .005em; word-wrap: break-word; overflow-wrap: anywhere;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, .5);
         }
         .alarm-time {
-            font-family: var(--mono); font-size: 10px; opacity: 0.5;
-            letter-spacing: 0.1em; margin-top: 10px; text-transform: uppercase;
+            font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums;
         }
         @keyframes alarmPop {
-            from { opacity: 0; transform: translateY(6px) scale(.96); }
+            from { opacity: 0; transform: translateY(10px) scale(.92); }
             to   { opacity: 1; transform: none; }
         }
+        @keyframes bellRing {
+            0%, 100% { transform: rotate(0); }
+            15% { transform: rotate(16deg); }
+            30% { transform: rotate(-14deg); }
+            45% { transform: rotate(10deg); }
+            60% { transform: rotate(-7deg); }
+            75% { transform: rotate(3deg); }
+        }
 
-        .typing { display: inline-flex; gap: 4px; align-items: center; height: 24px; }
-        .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce 1.2s infinite; }
-        .typing i:nth-child(2) { animation-delay: .15s; }
-        .typing i:nth-child(3) { animation-delay: .3s; }
-        @keyframes bounce { 0%,60%,100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-5px); opacity: 1; } }
+        /* typing: three lume dots lighting up in turn, like an escapement */
+        .typing { display: inline-flex; gap: 6px; align-items: center; height: 24px; }
+        .typing i {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--ink);
+            box-shadow: 0 0 8px rgba(238, 231, 210, .7);
+            opacity: .22; transform: scale(.75);
+            animation: lume 1.2s ease-in-out infinite;
+        }
+        .typing i:nth-child(2) { animation-delay: .18s; }
+        .typing i:nth-child(3) { animation-delay: .36s; }
+        @keyframes lume { 0%, 70%, 100% { opacity: .22; transform: scale(.75); } 30% { opacity: 1; transform: scale(1); } }
         @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-        
-        .chips { display: flex; gap: 8px; overflow-x: auto; padding: 4px 18px 10px; scrollbar-width: none; }
+        /* ---------- suggestion chips ---------- */
+        .chips { display: flex; gap: 8px; overflow-x: auto; padding: 6px 22px 12px; scrollbar-width: none; }
         .chips::-webkit-scrollbar { display: none; }
-        .chip {
-            flex: none; background: var(--surface); border: 1px solid var(--line); color: var(--ink);
-            border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor: pointer;
-            transition: .2s; box-shadow: 0 1px 8px rgba(0,0,0,0.3); font-family: inherit;
+        .chip, .familiar-chip {
+            flex: none;
+            background: linear-gradient(180deg, var(--enamel-hi), var(--enamel-lo));
+            border: 1px solid rgba(0, 0, 0, .4); color: var(--ink-dim);
+            border-radius: 999px; font-family: var(--body); cursor: pointer;
+            box-shadow: var(--edge-light), 0 2px 6px -1px rgba(0, 0, 0, .5);
+            transition: color .15s, transform .18s var(--ease-out), box-shadow .18s;
         }
-        .chip:hover { border-color: var(--accent); transform: translateY(-1px); }
-        .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .chip { padding: 8px 15px; font-size: 13.5px; }
+        .chip:hover, .familiar-chip:hover {
+            color: var(--ink); transform: translateY(-2px);
+            box-shadow: var(--edge-light), 0 0 0 1px rgba(217, 164, 65, .5), 0 8px 16px -6px rgba(0, 0, 0, .6);
+        }
+        .chip:active, .familiar-chip:active { transform: translateY(1px); box-shadow: inset 0 2px 4px rgba(0, 0, 0, .45); }
+        .chip:focus-visible, .familiar-chip:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 
-        
         .familiar-bar {
-            display: none; gap: 6px; overflow-x: auto;
-            padding: 4px 18px 8px; scrollbar-width: none; align-items: center;
+            display: none; gap: 7px; overflow-x: auto;
+            padding: 4px 22px 10px; scrollbar-width: none; align-items: center;
         }
         .familiar-bar.show { display: flex; }
         .familiar-bar::-webkit-scrollbar { display: none; }
         .familiar-label {
-            font-family: var(--mono); font-size: 10px; color: var(--muted);
-            letter-spacing: 0.1em; text-transform: uppercase; flex: none;
+            font-size: 12px; font-weight: 500; color: var(--muted); flex: none;
+            display: inline-flex; align-items: center; gap: 5px; margin-right: 2px;
         }
-        .familiar-chip {
-            flex: none; background: var(--surface); border: 1px solid var(--line); color: var(--ink);
-            border-radius: 999px; padding: 6px 12px; font-size: 12px;
-            cursor: pointer; font-family: inherit; transition: .2s;
-            display: flex; align-items: center; gap: 6px;
-        }
-        .familiar-chip:hover { border-color: var(--accent); }
+        .familiar-label::before { content: ""; width: 13px; height: 13px; --i: var(--i-repeat); color: var(--brass); }
+        .familiar-chip { padding: 6px 7px 6px 13px; font-size: 12.5px; display: flex; align-items: center; gap: 8px; }
         .familiar-chip .count {
-            font-family: var(--mono); font-size: 9.5px; color: var(--muted);
-            padding: 1px 5px; background: var(--user); border-radius: 999px;
+            font: 700 12px/1 var(--display); letter-spacing: .03em; color: var(--brass);
+            padding: 3px 7px; background: var(--well); border-radius: 999px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .6);
         }
 
-        
-        .composer { padding: 0 18px calc(14px + env(safe-area-inset-bottom)); position: relative; }
+        /* ---------- composer ---------- */
+        .composer { padding: 2px 22px calc(14px + env(safe-area-inset-bottom)); position: relative; }
 
         .input-bar {
-            display: flex; align-items: center; gap: 8px; background: var(--surface);
-            border: 1px solid var(--line); border-radius: 28px; padding: 6px 6px 6px 20px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.4); transition: .2s;
+            display: flex; align-items: center; gap: 8px;
+            border-radius: 30px; padding: 6px 6px 6px 22px;
+            border: 1.5px solid transparent;
+            /* recessed well inside a turned-metal bezel */
+            background:
+                linear-gradient(180deg, #0A1A1D, #10272C) padding-box,
+                linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .04) 40%, rgba(0, 0, 0, .55)) border-box;
+            box-shadow:
+                inset 0 3px 8px rgba(0, 0, 0, .55),
+                0 1px 0 rgba(255, 255, 255, .05),
+                0 14px 30px -14px rgba(0, 0, 0, .8);
+            transition: box-shadow .25s, background .25s;
         }
         .input-bar:focus-within {
-            border-color: transparent;
-            box-shadow: 0 0 0 2px var(--accent), 0 6px 26px rgba(217,119,87,.18);
+            background:
+                linear-gradient(180deg, #0A1A1D, #10272C) padding-box,
+                linear-gradient(180deg, var(--brass-hi), var(--brass) 45%, var(--brass-lo)) border-box;
+            box-shadow:
+                inset 0 3px 8px rgba(0, 0, 0, .55),
+                0 0 0 4px rgba(217, 164, 65, .14),
+                0 0 30px -4px rgba(217, 164, 65, .28),
+                0 14px 30px -14px rgba(0, 0, 0, .8);
         }
         input {
             flex: 1; min-width: 0; border: none; background: transparent; color: var(--ink);
-            padding: 10px 0; outline: none; font-size: 16px; font-family: inherit;
+            padding: 11px 0; outline: none; font-size: 16px; font-family: var(--body);
+            caret-color: var(--brass);
         }
-        input::placeholder { color: var(--muted); }
+        input::placeholder { color: var(--muted); opacity: .85; }
+        input:disabled { cursor: not-allowed; }
+
+        /* brass bell-button: it physically presses down */
         .send {
-            flex: none; width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
-            background: var(--accent); color: var(--accent-ink);
-            display: flex; align-items: center; justify-content: center; transition: .2s;
+            flex: none; width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+            color: var(--brass-ink);
+            background: radial-gradient(circle at 34% 28%, #FBE6AE 0%, var(--brass-hi) 18%, var(--brass) 52%, var(--brass-lo) 100%);
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, .7),
+                inset 0 -3px 5px rgba(80, 50, 8, .45),
+                0 3px 0 #5E410F,
+                0 7px 14px -2px rgba(0, 0, 0, .55);
+            display: flex; align-items: center; justify-content: center;
+            transform: translateY(-1px);
+            transition: transform .12s var(--ease-out), box-shadow .12s, filter .2s;
         }
-        .send:hover:not(:disabled) { transform: scale(1.06); filter: brightness(1.05); }
-        .send:active:not(:disabled) { transform: scale(.94); }
-        .send:disabled { opacity: .35; cursor: default; }
-        .send:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-        .send svg { width: 18px; height: 18px; }
-        .hint { font-size: 11px; color: var(--muted); text-align: center; padding-top: 8px; }
-        .hint a { color: inherit; }
+        .send:hover:not(:disabled) { filter: brightness(1.07); transform: translateY(-2px); }
+        .send:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, .5),
+                inset 0 -1px 3px rgba(80, 50, 8, .4),
+                0 0 0 #5E410F,
+                0 2px 5px rgba(0, 0, 0, .5);
+        }
+        .send:disabled {
+            cursor: default; color: var(--muted); transform: none;
+            background: radial-gradient(circle at 34% 28%, #2A4F58, var(--enamel) 60%, var(--enamel-lo));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 1px 0 rgba(0, 0, 0, .5);
+        }
+        .send:focus-visible { outline: 2px solid var(--brass-hi); outline-offset: 3px; }
+        .send svg { width: 19px; height: 19px; transition: transform .2s var(--ease-spring); }
+        .send:not(:disabled) svg { transform: translateY(-1px); }
+
+        .hint { font-size: 11.5px; color: var(--muted); text-align: center; padding-top: 9px; line-height: 1.5; }
+        .hint + .hint { padding-top: 2px; opacity: .8; }
+        .hint a { color: var(--ink-dim); text-decoration-color: rgba(217, 164, 65, .5); text-underline-offset: 2px; }
+        .hint a:hover { color: var(--brass-hi); }
 
         .scroll-bottom {
-            position: absolute; top: -52px; right: 22px;
-            width: 34px; height: 34px; border-radius: 50%;
-            background: var(--surface); border: 1px solid var(--line);
-            color: var(--ink); cursor: pointer; font-size: 15px; line-height: 1;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.5);
-            opacity: 0; transform: scale(.85); pointer-events: none;
-            transition: opacity .2s, transform .2s; z-index: 10;
+            position: absolute; top: -54px; right: 26px;
+            width: 38px; height: 38px; border-radius: 50%;
+            background: linear-gradient(180deg, var(--enamel-hi), var(--enamel-lo));
+            border: 1px solid rgba(0, 0, 0, .45);
+            color: var(--brass); cursor: pointer; font-size: 17px; line-height: 1; font-weight: 700;
+            box-shadow: var(--edge-light), var(--lift-1);
+            opacity: 0; transform: translateY(6px) scale(.85); pointer-events: none;
+            transition: opacity .2s, transform .25s var(--ease-spring); z-index: 10;
             display: flex; align-items: center; justify-content: center;
         }
-        .scroll-bottom.show { opacity: 1; transform: scale(1); pointer-events: auto; }
-        .scroll-bottom:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .scroll-bottom.show { opacity: 1; transform: none; pointer-events: auto; }
+        .scroll-bottom:hover { color: var(--brass-hi); }
+        .scroll-bottom:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 
         .sound-banner {
-            margin: 0 18px 8px; padding: 9px 14px;
-            border-radius: 12px; text-align: center; cursor: pointer;
-            font-size: 13px; font-weight: 600; color: var(--ink); background: var(--surface);
-            border: 1px solid var(--accent);
-            box-shadow: 0 2px 10px rgba(217,119,87,.15); user-select: none;
+            margin: 0 22px 10px; padding: 10px 14px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            border-radius: 12px; cursor: pointer;
+            font-size: 13px; font-weight: 600; color: var(--ink);
+            background:
+                linear-gradient(90deg, rgba(217, 164, 65, .16), rgba(217, 164, 65, .04)),
+                linear-gradient(180deg, var(--enamel-hi), var(--enamel-lo));
+            border: 1px solid rgba(217, 164, 65, .45);
+            box-shadow: var(--edge-light), 0 4px 14px -6px rgba(0, 0, 0, .6);
+            user-select: none;
+            transition: transform .15s var(--ease-out), border-color .15s;
         }
+        .sound-banner::before { content: ""; width: 16px; height: 16px; flex: none; --i: var(--i-speaker); color: var(--brass); }
+        .sound-banner:hover { border-color: var(--brass); transform: translateY(-1px); }
+        .sound-banner:active { transform: translateY(1px); }
         .sound-banner.hidden { display: none; }
 
-        .confirm-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .confirm-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; white-space: normal; }
         .confirm-btn {
-            border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-            border-radius: 999px; padding: 9px 16px; font-size: 13.5px; font-family: inherit;
-            cursor: pointer; transition: .2s;
+            border: 1px solid rgba(0, 0, 0, .45);
+            background: linear-gradient(180deg, #24474F, var(--enamel-lo));
+            color: var(--ink);
+            border-radius: 999px; padding: 9px 17px; font: 500 13.5px/1.2 var(--body);
+            cursor: pointer;
+            box-shadow: var(--edge-light), 0 2px 4px rgba(0, 0, 0, .45);
+            transition: transform .15s var(--ease-out), box-shadow .15s, filter .15s;
         }
-        .confirm-btn.yes { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-        .confirm-btn:hover:not(:disabled) { transform: translateY(-1px); }
-        .confirm-btn:active:not(:disabled) { transform: scale(.96); }
-        .confirm-btn:disabled { opacity: .45; cursor: default; }
-        .confirm-btn.picked:disabled { opacity: 1; }
-        .confirm-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .confirm-btn.yes {
+            color: var(--brass-ink); font-weight: 600; border-color: rgba(60, 38, 6, .8);
+            background: linear-gradient(180deg, var(--brass-hi), var(--brass) 55%, #B9852D);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 2px 0 #5E410F, 0 4px 10px -2px rgba(0, 0, 0, .5);
+        }
+        .confirm-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.06); }
+        .confirm-btn:active:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 2px 4px rgba(0, 0, 0, .35); }
+        .confirm-btn:disabled { opacity: .4; cursor: default; filter: saturate(.4); }
+        .confirm-btn.picked:disabled { opacity: 1; filter: none; }
+        .confirm-btn:focus-visible { outline: 2px solid var(--brass-hi); outline-offset: 2px; }
 
-        
+        /* ---------- alarm history sheet ---------- */
         .history-panel {
             position: fixed; inset: 0; z-index: 9996;
-            background: rgba(0,0,0,.75);
-            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            background: rgba(3, 10, 12, .72);
             opacity: 0; visibility: hidden;
             transition: opacity .22s, visibility .22s;
             display: flex; align-items: flex-end; justify-content: center;
         }
         .history-panel.open { opacity: 1; visibility: visible; }
         .history-sheet {
-            width: 100%; max-width: 760px; max-height: 82vh;
-            background: var(--surface);
-            border-radius: 20px 20px 0 0;
+            position: relative;
+            width: 100%; max-width: 780px; max-height: 82vh;
+            background:
+                radial-gradient(80% 50% at 10% 0%, rgba(255, 190, 110, .08), transparent 60%),
+                linear-gradient(180deg, #1A3940, #12292F);
+            border-radius: 22px 22px 0 0;
+            border-top: 1px solid rgba(255, 255, 255, .1);
+            box-shadow: 0 -20px 60px -10px rgba(0, 0, 0, .7);
             display: flex; flex-direction: column;
-            transform: translateY(20px); transition: transform .22s;
+            transform: translateY(28px); transition: transform .32s var(--ease-out);
+        }
+        .history-sheet::before {
+            content: ""; position: absolute; top: 8px; left: 50%; width: 38px; height: 4px; margin-left: -19px;
+            border-radius: 4px; background: rgba(238, 231, 210, .18);
         }
         .history-panel.open .history-sheet { transform: none; }
         .history-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 20px; border-bottom: 1px solid var(--line);
+            padding: 22px 22px 14px; position: relative;
         }
-        .history-header h2 { font-family: var(--serif); font-size: 18px; margin: 0; letter-spacing: -.2px; }
+        .history-header::after, .history-footer::before {
+            content: ""; position: absolute; left: 22px; right: 22px; height: 2px;
+            background: linear-gradient(180deg, var(--groove) 0 1px, rgba(255, 255, 255, .045) 1px 2px);
+        }
+        .history-header::after { bottom: 0; }
+        .history-header h2 { font-family: var(--display); font-size: 28px; font-weight: 800; margin: 0; letter-spacing: .005em; }
         .history-close {
-            width: 32px; height: 32px; border: none; background: transparent;
-            color: var(--muted); font-size: 24px; cursor: pointer; border-radius: 50%;
+            width: 36px; height: 36px; border: none; background: transparent;
+            color: var(--muted); font-size: 26px; line-height: 1; cursor: pointer; border-radius: 50%;
+            transition: background .15s, color .15s;
         }
-        .history-close:hover { background: var(--user); color: var(--ink); }
-        .history-body { flex: 1; overflow-y: auto; padding: 8px 12px 20px; }
-        .history-empty { text-align: center; color: var(--muted); font-size: 14px; padding: 40px 20px; }
+        .history-close:hover { background: rgba(0, 0, 0, .25); color: var(--ink); }
+        .history-close:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
+        .history-body { flex: 1; overflow-y: auto; padding: 10px 12px 18px; scrollbar-width: thin; scrollbar-color: rgba(217, 164, 65, .35) transparent; }
+        .history-empty { text-align: center; color: var(--muted); font-size: 14px; padding: 44px 20px; }
         .history-item {
-            display: flex; align-items: flex-start; gap: 12px;
-            padding: 12px; border-radius: 12px; cursor: pointer; transition: .15s;
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 12px 12px; border-radius: 12px; cursor: pointer;
+            transition: background .15s, transform .15s var(--ease-out);
         }
-        .history-item:hover { background: var(--user); }
-        .history-item-icon { font-size: 18px; flex: none; }
-        .history-item-content { flex: 1; min-width: 0; }
-        .history-item-task { font-size: 14px; color: var(--ink); word-wrap: break-word; }
+        .history-item:hover { background: rgba(0, 0, 0, .2); transform: translateX(2px); }
+        .history-item-icon {
+            --i: var(--i-bell); flex: none; font-size: 0;
+            width: 34px; height: 34px; border-radius: 50%;
+            /* icon drawn on a brass disc */
+            -webkit-mask: none; mask: none;
+            background:
+                var(--i-bell-dark) center / 16px 16px no-repeat,
+                radial-gradient(circle at 34% 28%, var(--brass-hi), var(--brass) 50%, var(--brass-lo));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 2px 5px rgba(0, 0, 0, .45);
+        }
+        .history-item-content { flex: 1; min-width: 0; padding-top: 1px; }
+        .history-item-task { font-size: 14.5px; font-weight: 500; color: var(--ink); word-wrap: break-word; }
         .history-item-meta {
-            font-family: var(--mono); font-size: 10px; color: var(--muted);
-            letter-spacing: 0.04em; margin-top: 3px;
+            font-family: var(--display); font-size: 13px; font-weight: 600; color: var(--muted);
+            letter-spacing: .04em; margin-top: 2px;
         }
         .history-footer {
-            padding: 12px 20px; border-top: 1px solid var(--line);
+            position: relative;
+            padding: 14px 22px calc(14px + env(safe-area-inset-bottom));
             display: flex; gap: 8px; justify-content: flex-end;
         }
+        .history-footer::before { top: 0; }
         .history-footer button {
-            background: transparent; border: 1px solid var(--line); color: var(--muted);
-            border-radius: 999px; padding: 8px 16px;
-            font-size: 12.5px; font-family: inherit; cursor: pointer;
+            background: linear-gradient(180deg, var(--enamel-hi), var(--enamel-lo));
+            border: 1px solid rgba(0, 0, 0, .45); color: var(--ink-dim);
+            border-radius: 999px; padding: 8px 17px;
+            font: 500 13px/1.2 var(--body); cursor: pointer;
+            box-shadow: var(--edge-light), 0 2px 4px rgba(0, 0, 0, .4);
+            transition: color .15s, transform .15s var(--ease-out);
         }
-        .history-footer button:hover { color: var(--ink); border-color: var(--muted); }
-        .history-footer .danger { color: var(--fail); border-color: rgba(255,69,58,.4); }
-        .history-footer .danger:hover { background: rgba(255,69,58,.1); }
+        .history-footer button:hover { color: var(--ink); transform: translateY(-1px); }
+        .history-footer button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+        .history-footer .danger { color: var(--fail); }
+        .history-footer .danger:hover { color: #FF8A7F; }
 
-        
+        /* ---------- avatar lightbox ---------- */
         .lb {
             position: fixed; inset: 0; z-index: 9999;
             display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,.92);
-            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            background: rgba(3, 10, 12, .92);
             opacity: 0; visibility: hidden;
             transition: opacity .22s ease, visibility .22s;
         }
         .lb.open { opacity: 1; visibility: visible; }
         .lb img {
             max-width: 94vw; max-height: 86vh; object-fit: contain;
-            border-radius: 6px; box-shadow: 0 10px 50px rgba(0,0,0,.6);
+            border-radius: 10px;
+            box-shadow: 0 0 0 3px rgba(217, 164, 65, .5), 0 30px 80px rgba(0, 0, 0, .7);
             transform: scale(.88); opacity: .6;
-            transition: transform .25s cubic-bezier(.2,.8,.2,1), opacity .25s ease;
+            transition: transform .3s var(--ease-spring), opacity .25s ease;
             user-select: none;
         }
         .lb.open img { transform: scale(1); opacity: 1; }
         .lb-close {
             position: absolute; top: 14px; right: 16px;
-            width: 40px; height: 40px; border: none; border-radius: 50%;
-            background: rgba(255,255,255,.14); color: #fff;
-            font-size: 24px; line-height: 1; cursor: pointer;
+            width: 42px; height: 42px; border: none; border-radius: 50%;
+            background: rgba(238, 231, 210, .12); color: var(--ink);
+            font-size: 26px; line-height: 1; cursor: pointer;
         }
-        .lb-close:hover { background: rgba(255,255,255,.26); }
+        .lb-close:hover { background: rgba(238, 231, 210, .22); }
 
-        
+        /* ---------- profile widget ---------- */
         .profile-widget {
             position: fixed;
-            top: calc(10px + env(safe-area-inset-top, 0px));
-            right: calc(10px + env(safe-area-inset-right, 0px));
+            top: calc(14px + env(safe-area-inset-top, 0px));
+            right: calc(14px + env(safe-area-inset-right, 0px));
             z-index: 9995;
-            font-family: inherit;
+            font-family: var(--body);
         }
         .profile-widget.hidden { display: none; }
-
         .profile-avatar-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            border: 2px solid var(--line); background: var(--surface);
+            width: 42px; height: 42px; border-radius: 50%;
+            border: 2px solid transparent;
+            background:
+                linear-gradient(var(--enamel), var(--enamel)) padding-box,
+                linear-gradient(160deg, rgba(255, 255, 255, .3), rgba(0, 0, 0, .5)) border-box;
             cursor: pointer; padding: 0; overflow: hidden; position: relative;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,.4);
-            transition: border-color .2s, transform .15s;
+            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, .6);
+            transition: transform .18s var(--ease-spring), background .2s;
         }
-        .profile-avatar-btn:hover { border-color: var(--accent); }
-        .profile-avatar-btn:active { transform: scale(.94); }
-        .profile-avatar-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-        .profile-avatar-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .profile-avatar-btn:hover {
+            background:
+                linear-gradient(var(--enamel), var(--enamel)) padding-box,
+                conic-gradient(from 210deg, var(--brass-lo), var(--brass-hi), var(--brass-lo), var(--brass-hi), var(--brass-lo)) border-box;
+        }
+        .profile-avatar-btn:active { transform: scale(.93); }
+        .profile-avatar-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+        .profile-avatar-btn img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
         .profile-fallback {
-            font-family: var(--serif); font-weight: 700; font-size: 16px;
-            color: var(--accent); display: none;
+            font-family: var(--display); font-weight: 800; font-size: 19px;
+            color: var(--brass); display: none;
             align-items: center; justify-content: center;
-            width: 100%; height: 100%; background: var(--user);
+            width: 100%; height: 100%; background: var(--enamel-lo); border-radius: 50%;
         }
         .profile-avatar-btn.no-img .profile-fallback { display: flex; }
         .profile-avatar-btn.no-img img { display: none; }
+        .profile-widget.guest .profile-fallback { font-size: 0; color: var(--ink-dim); }
+        .profile-widget.guest .profile-fallback::before {
+            content: ""; width: 18px; height: 18px;
+            -webkit-mask: var(--i-person) center / contain no-repeat; mask: var(--i-person) center / contain no-repeat;
+            background: currentColor;
+        }
         .profile-avatar-btn::after {
-            content: ''; position: absolute; bottom: 0; right: 0;
+            content: ''; position: absolute; bottom: 1px; right: 1px;
             width: 10px; height: 10px; border-radius: 50%;
             background: var(--success);
-            border: 2px solid var(--surface);
+            border: 2px solid var(--dial);
             pointer-events: none;
         }
 
         .profile-menu {
-            position: absolute; top: calc(100% + 8px); right: 0;
-            background: var(--surface); border: 1px solid var(--line);
-            border-radius: 14px; min-width: 240px; padding: 6px;
-            box-shadow: 0 8px 30px rgba(0,0,0,.6), 0 2px 8px rgba(0,0,0,.3);
+            position: absolute; top: calc(100% + 10px); right: 0;
+            background:
+                radial-gradient(90% 60% at 0% 0%, rgba(255, 190, 110, .08), transparent 60%),
+                linear-gradient(180deg, #1D3E46, #14303A);
+            border: 1px solid rgba(0, 0, 0, .45);
+            border-radius: 16px; min-width: 250px; padding: 6px;
+            box-shadow: var(--edge-light), var(--lift-2);
             opacity: 0; visibility: hidden;
-            transform: translateY(-6px);
-            transition: opacity .18s, visibility .18s, transform .18s;
+            transform: translateY(-6px) scale(.97); transform-origin: top right;
+            transition: opacity .18s, visibility .18s, transform .22s var(--ease-out);
             overflow: hidden;
         }
         .profile-menu.open { opacity: 1; visibility: visible; transform: none; }
-
         .profile-menu-email {
-            padding: 10px 12px; border-bottom: 1px solid var(--line);
-            margin-bottom: 4px; display: flex; align-items: center; gap: 10px;
+            padding: 11px 12px; margin-bottom: 4px; position: relative;
+            display: flex; align-items: center; gap: 10px;
             font-size: 13px; color: var(--ink);
             word-break: break-all; line-height: 1.4;
         }
+        .profile-menu-email::after {
+            content: ""; position: absolute; left: 10px; right: 10px; bottom: -2px; height: 2px;
+            background: linear-gradient(180deg, var(--groove) 0 1px, rgba(255, 255, 255, .045) 1px 2px);
+        }
         .profile-menu-item {
             display: flex; align-items: center; gap: 10px;
-            padding: 10px 12px; border-radius: 8px;
-            color: var(--ink); text-decoration: none;
-            font-size: 13.5px; transition: background .15s; cursor: pointer;
+            padding: 10px 12px; border-radius: 10px;
+            color: var(--ink-dim); text-decoration: none;
+            font-size: 13.5px; transition: background .15s, color .15s; cursor: pointer;
         }
-        .profile-menu-item:hover { background: var(--user); }
-        .profile-menu-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-        .profile-menu-icon { font-size: 15px; flex: none; width: 20px; text-align: center; }
-        /* Log in / Log out lives in the menu, under the policy links */
+        .profile-menu-item:hover { background: rgba(0, 0, 0, .22); color: var(--ink); }
+        .profile-menu-item:focus-visible { outline: 2px solid var(--brass); outline-offset: -2px; }
+        .profile-menu-icon {
+            flex: none; width: 16px; height: 16px; font-size: 0; color: var(--brass);
+            --i: var(--i-doc);
+        }
+        .profile-menu-email .profile-menu-icon { --i: var(--i-mail); }
+        a[href="privacy.html"] .profile-menu-icon { --i: var(--i-lock); }
+        a[href="terms.html"] .profile-menu-icon { --i: var(--i-doc); }
+        #authIcon { --i: var(--i-logout); }
+        .profile-widget.guest #authIcon { --i: var(--i-login); }
+        #authMsBtn .profile-menu-icon { --i: var(--i-grid); }
+        #warnSoundBtn .profile-menu-icon { --i: var(--i-speaker); }
+        #warnSoundBtn.off .profile-menu-icon { --i: var(--i-speaker-off); color: var(--muted); }
+
         button.profile-menu-item {
             width: 100%; border: none; background: none; font: inherit; font-size: 13.5px;
-            text-align: left; margin-top: 4px; position: relative;
+            text-align: left; margin-top: 4px; position: relative; color: var(--ink-dim);
         }
+        button.profile-menu-item:hover { background: rgba(0, 0, 0, .22); color: var(--ink); }
         button.profile-menu-item::before {
             content: ''; position: absolute; left: 12px; right: 12px; top: -3px;
-            border-top: 1px solid var(--line);
+            height: 2px; background: linear-gradient(180deg, var(--groove) 0 1px, rgba(255, 255, 255, .045) 1px 2px);
         }
         button.profile-menu-item + button.profile-menu-item { margin-top: 0; }
         button.profile-menu-item + button.profile-menu-item::before { display: none; }
         .profile-menu-item.hidden { display: none; }
-        /* guests get the menu too (to log in), but no green "online" dot */
         .profile-widget.guest .profile-avatar-btn::after { display: none; }
         .profile-widget.guest .profile-menu-email { word-break: normal; }
 
         @media (max-width: 560px) {
-            .profile-avatar-btn { width: 34px; height: 34px; }
+            .notif-banner { max-width: calc(100vw - 24px); white-space: nowrap; }
+            .notif-banner:not(.hidden) ~ .wrapper .header { padding-top: 58px; }
+            .profile-widget { top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(10px + env(safe-area-inset-right, 0px)); }
+            .profile-avatar-btn { width: 38px; height: 38px; }
             .profile-avatar-btn::after { width: 8px; height: 8px; }
-            .profile-menu { min-width: 210px; }
+            .profile-menu { min-width: 220px; }
+            .chat-box { padding: 18px 14px 18px; }
+            .chips, .familiar-bar { padding-left: 14px; padding-right: 14px; }
+            .composer { padding-left: 12px; padding-right: 12px; }
+            .sound-banner { margin-left: 12px; margin-right: 12px; }
+            .msg { font-size: 15px; }
+            .alarm-task { font-size: 26px; }
+            .row.user > div:last-child { max-width: 88%; }
+            .scroll-bottom { right: 16px; }
         }
 
-        
-        :root { --sys-filter: grayscale(30%) contrast(150%) brightness(50%) drop-shadow(0 0 15px rgba(0,0,0,0.9)); }
-
-        .sys-layer {
-            position: fixed; inset: 0; z-index: 9997;
-            overflow: hidden; pointer-events: none; display: none;
-            user-select: none; -webkit-user-select: none;
-        }
-        .sys-layer.active { display: block; }
-        .sys-layer * { user-select: none; -webkit-user-drag: none; pointer-events: none; }
-
-        .sys-stage { position: absolute; inset: 0; }
-        .sys-face {
-            position: absolute; display: block;
-            filter: var(--sys-filter);
-            will-change: transform, opacity;
-        }
-        .sys-peek { position: absolute; border-radius: 50%; will-change: transform; }
-        .sys-layer .sys-peek { pointer-events: auto; }
-        .sys-layer .sys-peek .sys-face { pointer-events: none; }
-
-
-        /* ===== BAN BANNER (blood) ===== */
-        .header { position: relative; z-index: 3; }
+        /* ===== BAN BANNER ===== */
         .ban-banner {
             grid-area: who; position: relative; display: none; min-width: 0;
             padding: 12px 14px 14px; border-radius: 12px; overflow: hidden;
             border: 1px solid #4a0000;
-            /* blood-splatter image, anchored top-right so the splat + drips always show; scales to fit any banner size */
+            /* blood-splatter image, kept byte-for-byte from the original */
             background: #000 url("data:image/webp;base64,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") right 18% / cover no-repeat;
-            box-shadow: 0 0 22px rgba(255,0,0,.25), inset 0 0 26px rgba(0,0,0,.6);
+            box-shadow: 0 0 22px rgba(229, 52, 42, .25), inset 0 0 26px rgba(0, 0, 0, .6);
             color: #fff;
         }
-        /* darken the left side a bit so the text stays readable over the splat */
         .ban-banner::before {
             content: ''; position: absolute; inset: 0; pointer-events: none;
-            background: linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.25) 55%, transparent 85%);
+            background: linear-gradient(90deg, rgba(0, 0, 0, .55) 0%, rgba(0, 0, 0, .25) 55%, transparent 85%);
         }
         body.is-banned .ban-banner { display: block; animation: banIn .5s ease-out; }
         body.is-banned .who { display: none; }
-        /* banned: no typing, no chips (the server blocks the API too) */
         body.is-banned .input-bar { opacity: .45; }
         body.is-banned .input-bar input { cursor: not-allowed; }
         body.is-banned .chips { pointer-events: none; opacity: .35; }
         @keyframes banIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
         .ban-label {
             position: relative; z-index: 3;
-            font-family: var(--mono); font-size: 10px; letter-spacing: .22em; font-weight: 700;
-            text-transform: uppercase; color: #ff3b2f; margin-bottom: 5px;
-            text-shadow: 0 1px 4px #000, 0 0 8px rgba(255,0,0,.6);
+            font-family: var(--display); font-size: 15px; letter-spacing: .08em; font-weight: 800;
+            color: #ff4a3d; margin-bottom: 4px;
+            text-shadow: 0 1px 4px #000, 0 0 8px rgba(255, 0, 0, .6);
         }
         .ban-msg {
             position: relative; z-index: 3;
-            font-family: var(--serif); font-size: 13.5px; font-weight: 700; line-height: 1.4;
-            text-shadow: 0 1px 3px #000, 0 0 8px rgba(0,0,0,.9);
+            font-size: 13.5px; font-weight: 600; line-height: 1.45;
+            text-shadow: 0 1px 3px #000, 0 0 8px rgba(0, 0, 0, .9);
         }
         .ban-time {
-            font-family: var(--mono); font-weight: 700; color: #fff; letter-spacing: .04em;
-            padding: 1px 6px; border-radius: 6px; background: rgba(0,0,0,.55);
+            font-family: var(--display); font-size: 1.15em; font-weight: 700; color: #fff; letter-spacing: .04em;
+            padding: 0 6px; border-radius: 6px; background: rgba(0, 0, 0, .55);
             text-shadow: 0 0 8px #ff2a2a; white-space: nowrap; font-variant-numeric: tabular-nums;
         }
         @media (max-width: 560px) {
             .ban-banner { padding: 9px 11px 11px; }
             .ban-msg { font-size: 12.5px; }
         }
+
+        /* =========================================================
+           TAMPER ALARM — fires on prompt injection / abuse.
+           transform + opacity only, ~2.2s, never blocks input.
+           ========================================================= */
+        .warn-layer {
+            position: fixed; inset: 0; z-index: 9997;
+            pointer-events: none; visibility: hidden;
+            overflow: hidden; contain: strict;
+        }
+        .warn-layer.on { visibility: visible; }
+        .warn-layer > * { position: absolute; opacity: 0; }
+
+        /* red/black wash + glowing red frame (static paint, opacity animated) */
+        .warn-wash {
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 42% at 50% 46%, rgba(22, 0, 0, .82) 0%, rgba(60, 0, 0, .74) 55%, rgba(12, 0, 0, .92) 100%);
+            box-shadow: inset 0 0 0 2px rgba(229, 52, 42, .9), inset 0 0 140px rgba(229, 52, 42, .38);
+        }
+
+        /* hazard-tape edges */
+        .warn-edge { overflow: hidden; box-shadow: 0 0 22px rgba(229, 52, 42, .6), 0 0 0 1px rgba(0, 0, 0, .7); }
+        .warn-edge.top    { top: 0;    left: 0; right: 0; height: 14px; transform-origin: 0 50%; }
+        .warn-edge.bottom { bottom: 0; left: 0; right: 0; height: 14px; transform-origin: 100% 50%; }
+        .warn-edge.left   { left: 0;  top: 0; bottom: 0; width: 14px; transform-origin: 50% 100%; }
+        .warn-edge.right  { right: 0; top: 0; bottom: 0; width: 14px; transform-origin: 50% 0; }
+        .warn-edge i {
+            position: absolute; display: block;
+            background: repeating-linear-gradient(-45deg, var(--red) 0 10px, #140303 10px 20px);
+        }
+        .warn-edge.top i, .warn-edge.bottom i { top: 0; bottom: 0; left: -40px; right: -40px; }
+        .warn-edge.left i, .warn-edge.right i { left: 0; right: 0; top: -40px; bottom: -40px; }
+
+        .warn-panel {
+            left: 50%; top: 46%; width: min(92vw, 760px);
+            transform: translate(-50%, -50%);
+            text-align: center; color: #FFF1EC;
+        }
+        .warn-sign {
+            --i: var(--i-hazard);
+            width: 54px; height: 54px; margin: 0 auto 10px; color: var(--red);
+            filter: drop-shadow(0 0 10px rgba(229, 52, 42, .8));
+        }
+        .warn-head {
+            position: relative; display: inline-block;
+            font-family: var(--display); font-weight: 900;
+            font-size: clamp(54px, 13vw, 132px); line-height: .9; letter-spacing: .005em;
+            text-shadow: 0 0 30px rgba(229, 52, 42, .65), 0 3px 0 #3A0603;
+        }
+        .warn-head::before, .warn-head::after {
+            content: attr(data-text); position: absolute; inset: 0; opacity: 0;
+            text-shadow: none;
+        }
+        .warn-head::before { color: var(--red); }
+        .warn-head::after  { color: #FFFFFF; mix-blend-mode: normal; }
+        .warn-sub {
+            display: inline-block; margin-top: 18px; padding: 8px 16px; border-radius: 10px;
+            background: rgba(10, 0, 0, .72); box-shadow: 0 0 0 1px rgba(229, 52, 42, .45); font-size: 15.5px; font-weight: 500; line-height: 1.5; color: #FFD9D2;
+            text-shadow: 0 1px 3px #000;
+        }
+
+        /* --- the 2.2s sequence --- */
+        .warn-layer.on .warn-wash   { animation: warnWash  2.2s linear both; }
+        .warn-layer.on .warn-edge.top, .warn-layer.on .warn-edge.bottom { animation: warnEdgeX 2.2s var(--ease-out) both; }
+        .warn-layer.on .warn-edge.left, .warn-layer.on .warn-edge.right { animation: warnEdgeY 2.2s var(--ease-out) both; }
+        .warn-layer.on .warn-edge.top i, .warn-layer.on .warn-edge.bottom i { animation: tapeX .55s linear 4; }
+        .warn-layer.on .warn-edge.left i, .warn-layer.on .warn-edge.right i { animation: tapeY .55s linear 4; }
+        .warn-layer.on .warn-panel  { animation: warnPanel 2.2s var(--ease-out) both; }
+        .warn-layer.on .warn-head::before { animation: glitchA .6s steps(1) .12s both; }
+        .warn-layer.on .warn-head::after  { animation: glitchB .6s steps(1) .12s both; }
+        .warn-layer.on .warn-sign   { animation: signKick .5s var(--ease-spring) .08s both; }
+        body.warn-shake .wrapper    { animation: warnShake .5s cubic-bezier(.36, .07, .19, .97) both; }
+        body.warn-shake .clock-face { animation: warnDial .5s steps(2) both; }
+
+        @keyframes warnWash {
+            0%   { opacity: 0; }
+            3%   { opacity: 1; }
+            7%   { opacity: .45; }
+            11%  { opacity: 1; }
+            76%  { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        @keyframes warnEdgeX {
+            0%   { opacity: 1; transform: scaleX(0); }
+            11%  { opacity: 1; transform: scaleX(1); }
+            80%  { opacity: 1; transform: scaleX(1); }
+            100% { opacity: 0; transform: scaleX(1); }
+        }
+        @keyframes warnEdgeY {
+            0%   { opacity: 1; transform: scaleY(0); }
+            11%  { opacity: 1; transform: scaleY(1); }
+            80%  { opacity: 1; transform: scaleY(1); }
+            100% { opacity: 0; transform: scaleY(1); }
+        }
+        /* one stripe period along the axis = 20px * √2 */
+        @keyframes tapeX { to { transform: translateX(28.284px); } }
+        @keyframes tapeY { to { transform: translateY(28.284px); } }
+        @keyframes warnPanel {
+            0%   { opacity: 0; transform: translate(-50%, -50%) scale(1.14); }
+            7%   { opacity: 1; transform: translate(-50%, -50%) scale(.97); }
+            12%  { transform: translate(-50%, -50%) scale(1); }
+            78%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -54%) scale(.98); }
+        }
+        @keyframes glitchA {
+            0%   { opacity: .9; transform: translate(-7px, 2px); }
+            15%  { opacity: .9; transform: translate(5px, -3px); }
+            30%  { opacity: .8; transform: translate(-3px, 0); }
+            45%  { opacity: .9; transform: translate(9px, 1px); }
+            60%  { opacity: .6; transform: translate(-2px, -1px); }
+            80%  { opacity: 0;  transform: none; }
+            100% { opacity: 0; }
+        }
+        @keyframes glitchB {
+            0%   { opacity: .55; transform: translate(6px, -2px); }
+            20%  { opacity: 0; }
+            35%  { opacity: .5; transform: translate(-6px, 2px); }
+            50%  { opacity: 0; }
+            65%  { opacity: .4; transform: translate(3px, 0); }
+            80%  { opacity: 0; transform: none; }
+            100% { opacity: 0; }
+        }
+        @keyframes signKick {
+            from { opacity: 0; transform: scale(.4) rotate(-12deg); }
+            to   { opacity: 1; transform: none; }
+        }
+        .warn-layer.on .warn-sign { opacity: 1; position: relative; }
+        @keyframes warnShake {
+            0%   { transform: none; }
+            10%  { transform: translate3d(-11px, 0, 0) rotate(-.5deg); }
+            20%  { transform: translate3d(10px, -2px, 0) rotate(.45deg); }
+            30%  { transform: translate3d(-8px, 2px, 0) rotate(-.3deg); }
+            42%  { transform: translate3d(6px, 0, 0); }
+            55%  { transform: translate3d(-4px, 1px, 0); }
+            70%  { transform: translate3d(2px, 0, 0); }
+            100% { transform: none; }
+        }
+        @keyframes warnDial {
+            0%   { transform: translateX(6px) scale(1.02); opacity: .3; }
+            50%  { transform: translateX(-5px); opacity: .18; }
+            100% { transform: none; }
+        }
+
+        /* reduced motion: a still warning — frame + message, no movement */
+        .warn-layer.static .warn-wash,
+        .warn-layer.static .warn-edge,
+        .warn-layer.static .warn-panel,
+        .warn-layer.static .warn-sign { animation: none !important; opacity: 1; }
+        .warn-layer.static .warn-edge { transform: none; }
+        .warn-layer.static .warn-edge i { animation: none !important; }
+        .warn-layer.static .warn-head::before,
+        .warn-layer.static .warn-head::after { animation: none !important; opacity: 0; }
+
+
+        /* =========================================================
+           KANGAROO CAMEOS (lazy-loaded from cameos/, see PROJECT_PLAN.md)
+           ========================================================= */
+        .warn-layer.with-cameo.on .warn-wash,
+        .warn-layer.with-cameo.on .warn-edge,
+        .warn-layer.with-cameo.on .warn-panel { animation-duration: 1.6s; }
+        .frc-stage {
+            position: fixed; inset: 0; z-index: 9993;
+            pointer-events: none; overflow: hidden; contain: strict;
+        }
+        .frc-stage.still { animation: frcFade 2.6s linear both; }
+        @keyframes frcFade { 0% { opacity: 0; } 8%, 88% { opacity: 1; } 100% { opacity: 0; } }
+        .frc-svg { width: 100%; height: 100%; display: block; overflow: visible; }
+        .frc-bubble {
+            position: absolute; left: 0; top: 0; opacity: 0;
+            transform: translate(-50%, -100%);
+            padding: 12px 20px 14px;
+            background: var(--paper-grain), linear-gradient(180deg, #F3ECD6, #E5DCC1);
+            background-size: 140px 140px, auto;
+            color: var(--paper-ink);
+            font: 800 clamp(26px, 3.6vw, 38px)/1 var(--display); letter-spacing: .01em;
+            border: 3px solid var(--paper-ink); border-radius: 22px;
+            box-shadow: 0 4px 0 var(--paper-ink), 0 22px 36px -12px rgba(0, 0, 0, .75);
+            white-space: nowrap; will-change: transform, opacity;
+        }
+        .frc-bubble::after {
+            content: ""; position: absolute; left: 50%; bottom: -11px; margin-left: -10px;
+            width: 18px; height: 18px; background: #E5DCC1;
+            border-right: 3px solid var(--paper-ink); border-bottom: 3px solid var(--paper-ink);
+            transform: rotate(45deg); border-bottom-right-radius: 3px;
+        }
+        .frc-bubble span { display: inline-block; }
+        .frc-bubble.show span { animation: frcWord .34s var(--ease-spring) both; animation-delay: calc(var(--i) * 90ms + 140ms); }
+        @keyframes frcWord { from { opacity: 0; transform: translateY(10px) scale(.5) rotate(-8deg); } }
+        .frc-stage.still .frc-bubble { opacity: 1; }
+        .frc-stage.still .frc-bubble span { animation: none; }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
                 transition-duration: .01ms !important;
                 scroll-behavior: auto !important;
             }
+            body.warn-shake .wrapper, body.warn-shake .clock-face { animation: none !important; }
         }
     </style>
+    <!-- FunReminder 2: local-first features (css/app.css + js/main.js) -->
+    <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
 
 <div class="clock-face" id="clockFace" aria-hidden="true">
     <svg class="clock-svg" viewBox="0 0 200 200">
+        <circle class="clock-ring" cx="100" cy="100" r="97" stroke-width=".6"/>
+        <circle class="clock-ring" cx="100" cy="100" r="93.5" stroke-width="1.6" opacity=".55"/>
         <g id="clockTicks"></g>
         <g>
             <line id="hourHand"   x1="100" y1="100" x2="100" y2="64" stroke-width="3.6"/>
             <line id="minuteHand" x1="100" y1="100" x2="100" y2="45" stroke-width="2.2"/>
             <line id="secondHand" x1="100" y1="114" x2="100" y2="30" stroke-width="1.1"/>
-            <circle class="clock-pin" cx="100" cy="100" r="1.8"/>
+            <circle class="clock-pin" cx="100" cy="100" r="2.4"/>
         </g>
     </svg>
 </div>
 
 <div class="alarm-flash" id="alarmFlash" aria-hidden="true"></div>
 
-<div class="sys-layer" id="sysLayer" aria-hidden="true"></div>
+<!-- Tamper alarm: shown by triggerWarning() when a reply flags injection / abuse -->
+<div class="warn-layer" id="warnLayer" aria-hidden="true">
+    <div class="warn-wash"></div>
+    <div class="warn-edge top"><i></i></div>
+    <div class="warn-edge right"><i></i></div>
+    <div class="warn-edge bottom"><i></i></div>
+    <div class="warn-edge left"><i></i></div>
+    <div class="warn-panel">
+        <div class="warn-sign"></div>
+        <div class="warn-head" data-text="Not today, mate.">Not today, mate.</div>
+        <div class="warn-sub">That message tripped the tamper alarm. I only do reminders.</div>
+    </div>
+</div>
 
 <div class="notif-banner hidden" id="notifBanner" role="button" tabindex="0">
     <span id="notifBannerIcon">🔔</span>
@@ -621,24 +1150,28 @@
     </button>
     <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
         <div class="profile-menu-email">
-            <span class="profile-menu-icon">📧</span>
+            <span class="profile-menu-icon" aria-hidden="true"></span>
             <span id="profileMenuEmailText">—</span>
         </div>
         <a class="profile-menu-item" href="privacy.html" role="menuitem">
-            <span class="profile-menu-icon">🔒</span>
+            <span class="profile-menu-icon" aria-hidden="true"></span>
             <span>Privacy policy</span>
         </a>
         <a class="profile-menu-item" href="terms.html" role="menuitem">
-            <span class="profile-menu-icon">📄</span>
+            <span class="profile-menu-icon" aria-hidden="true"></span>
             <span>Terms of service</span>
         </a>
         <button class="profile-menu-item" id="authBtn" type="button" role="menuitem" onclick="authClick()">
-            <span class="profile-menu-icon" id="authIcon">🔑</span>
+            <span class="profile-menu-icon" id="authIcon" aria-hidden="true">🔑</span>
             <span id="authLabel">Log in with Google</span>
         </button>
         <button class="profile-menu-item" id="authMsBtn" type="button" role="menuitem" onclick="startLogin('EntraID')">
-            <span class="profile-menu-icon">🪟</span>
+            <span class="profile-menu-icon" aria-hidden="true"></span>
             <span>Log in with Microsoft</span>
+        </button>
+        <button class="profile-menu-item" id="warnSoundBtn" type="button" role="menuitem" onclick="toggleWarnSound()">
+            <span class="profile-menu-icon" aria-hidden="true"></span>
+            <span id="warnSoundLabel">Warning sound: on</span>
         </button>
     </div>
 </div>
@@ -670,15 +1203,15 @@
         </div>
 
         <div class="actions">
-            <button id="modeBtn" class="ghost-btn" onclick="toggleMode()" title="Switch alarm sound">🔔 Original</button>
-            <button id="historyBtn" class="ghost-btn" onclick="openHistory()" title="Alarm history">📜 History</button>
+            <button id="modeBtn" class="ghost-btn" onclick="toggleMode()" title="Switch alarm sound">Original</button>
+            <button id="historyBtn" class="ghost-btn" onclick="openHistory()" title="Alarm history">History</button>
             <button id="clearBtn" class="ghost-btn" onclick="clearHistory()" title="Clear chat history">Clear</button>
         </div>
 
         <div class="progress" aria-hidden="true">
             <span id="progressPct">0%</span>
             <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-            <span>day</span>
+            <span>of today</span>
         </div>
     </div>
 
@@ -687,12 +1220,12 @@
     <div class="familiar-bar" id="familiarBar"></div>
 
     <div class="chips" id="chips">
-        <button class="chip" onclick="useChip(this)">Remind me in 10 mins to drink water 💧</button>
+        <button class="chip" onclick="useChip(this)">Remind me in 10 mins to drink water</button>
         <button class="chip" onclick="useChip(this)">Tomorrow 9am team meeting</button>
         <button class="chip" onclick="useChip(this)">Today 6pm call mum</button>
     </div>
 
-    <div id="soundBanner" class="sound-banner" onclick="unlockSound()">🔊 Tap here to turn on alarm sound</div>
+    <div id="soundBanner" class="sound-banner" onclick="unlockSound()">Tap here to turn on alarm sound</div>
 
     <div class="composer">
         <button class="scroll-bottom" id="scrollBottom" aria-label="Scroll to bottom">↓</button>
@@ -825,14 +1358,18 @@
 
     let lastSec = -1;
     function tickClock() {
-        const now = new Date();
-        updateClockHands(now);
+        const FRc = window.FR && window.FR.clock;          // FR hook: clock prefs (format, timezone)
+        const FRf = window.FR && window.FR.clockFace;      // FR hook: which clock face is behind the chat
+        const now = FRc ? FRc.zoned(new Date()) : new Date();
+        if (!FRf || FRf.frame(now)) updateClockHands(now);  // per-frame hook; it answers whether the hands are in use
         const sec = now.getSeconds();
         if (sec !== lastSec) {
             lastSec = sec;
-            clockHM.textContent = fmtHM(now);
+            if (FRf) FRf.paint(now);                        // FR hook: digital / sundial repaint, once a second
+            clockHM.textContent = FRc ? FRc.hm(now) : fmtHM(now);
             clockSec.textContent = fmtSec(now);
-            clockDate.textContent = fmtDate(now);
+            clockDate.textContent = FRc ? FRc.date(now) : fmtDate(now);
+            if (FRc) FRc.after(now);
             const dayMs = 24 * 3600 * 1000;
             const passedMs = (now.getHours() * 3600 + now.getMinutes() * 60 + sec) * 1000;
             const pct = Math.min(100, (passedMs / dayMs) * 100);
@@ -842,6 +1379,9 @@
         requestAnimationFrame(tickClock);
     }
     tickClock();
+    // requestAnimationFrame already stops in a hidden tab; this makes the first
+    // frame after coming back repaint everything instead of waiting for the second to roll over
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) lastSec = -1; });
 
     let lastMessageAt = 0;
 
@@ -902,234 +1442,115 @@
         _assetToken: _sysConfigToken
     });
 
-    const sysLayer = document.getElementById('sysLayer');
+    // ===== TAMPER ALARM (replaces the old edge-peek face) =====
+    // _sysConfigToken / _sysRuntimeCfg_v2471 above are kept untouched but are no longer rendered.
+    // Detection is unchanged: _sysIsMalicious(data) -> injection / banned / offtopic.
+    // Test it from the console with  triggerWarning()  or open the page with  ?warntest
+    // Cameos alone:  playCameo('plumber' | 'dunk' | 'pirate')  or  ?cameo=dunk
+    const warnLayer = document.getElementById('warnLayer');
     const _sysReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let _sysImgEl = null;
-    let _sysImgReady = false;
+    const WARN_MS = 2200;          // full animated sequence
+    const WARN_STATIC_MS = 2600;   // reduced-motion: still frame + message
+    const WARN_SOUND_KEY = 'mate_warn_sound';
+    let warnSoundOn = true;
+    try { warnSoundOn = localStorage.getItem(WARN_SOUND_KEY) !== 'off'; } catch (e) {}
     let _sysBusy = false;
     let _sysLastAt = 0;
     let _sysQueued = false;
     let _sysCleanupTimer = null;
 
-    (function _sysPreloadAsset() {
-        try {
-            _sysImgEl = new Image();
-            _sysImgEl.onload = () => {
-                _sysImgReady = _sysImgEl.naturalWidth > 4 && _sysImgEl.naturalHeight > 4;
-                if (!_sysImgReady) {
-                    console.info('[sys] Ảnh quá nhỏ/không hợp lệ — dùng fallback procedural.');
-                }
-            };
-            _sysImgEl.onerror = () => {
-                _sysImgReady = false;
-                console.info('[sys] Resource decode failed — dùng fallback procedural.');
-            };
-            _sysImgEl.src = _sysRuntimeCfg_v2471._assetToken;
-        } catch (e) {
-            _sysImgReady = false;
-        }
-    })();
-
-    function _sysDrawFallbackFace(ctx, w, h) {
-        ctx.clearRect(0, 0, w, h);
-        const cx = w / 2, cy = h * 0.45;
-        const rx = w * 0.28, ry = h * 0.34;
-
-        const bg = ctx.createRadialGradient(cx, cy, rx * 0.4, cx, cy, Math.max(w, h) * 0.75);
-        bg.addColorStop(0, 'rgba(30,0,0,0.55)');
-        bg.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, w, h);
-
-        const faceGrad = ctx.createRadialGradient(cx, cy - ry * 0.25, 0, cx, cy, ry * 1.05);
-        faceGrad.addColorStop(0, '#efe6d4');
-        faceGrad.addColorStop(0.45, '#d4c8b4');
-        faceGrad.addColorStop(0.8, '#7a6f60');
-        faceGrad.addColorStop(1, '#000');
-        ctx.fillStyle = faceGrad;
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.ellipse(cx - rx * 0.34, cy - ry * 0.18, rx * 0.2, ry * 0.14, 0.12, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.ellipse(cx + rx * 0.34, cy - ry * 0.18, rx * 0.2, ry * 0.14, -0.12, 0, Math.PI * 2);
-        ctx.fill();
-
-        const pupil1 = ctx.createRadialGradient(cx - rx * 0.34, cy - ry * 0.18, 0, cx - rx * 0.34, cy - ry * 0.18, rx * 0.07);
-        pupil1.addColorStop(0, '#ff2a2a');
-        pupil1.addColorStop(0.6, 'rgba(150,10,10,0.7)');
-        pupil1.addColorStop(1, 'rgba(60,0,0,0)');
-        ctx.fillStyle = pupil1;
-        ctx.beginPath();
-        ctx.arc(cx - rx * 0.34, cy - ry * 0.18, rx * 0.07, 0, Math.PI * 2);
-        ctx.fill();
-        const pupil2 = ctx.createRadialGradient(cx + rx * 0.34, cy - ry * 0.18, 0, cx + rx * 0.34, cy - ry * 0.18, rx * 0.07);
-        pupil2.addColorStop(0, '#ff2a2a');
-        pupil2.addColorStop(0.6, 'rgba(150,10,10,0.7)');
-        pupil2.addColorStop(1, 'rgba(60,0,0,0)');
-        ctx.fillStyle = pupil2;
-        ctx.beginPath();
-        ctx.arc(cx + rx * 0.34, cy - ry * 0.18, rx * 0.07, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.ellipse(cx, cy + ry * 0.08, rx * 0.045, ry * 0.06, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        const mouthGrad = ctx.createRadialGradient(cx, cy + ry * 0.38, 0, cx, cy + ry * 0.38, rx * 0.35);
-        mouthGrad.addColorStop(0, '#000');
-        mouthGrad.addColorStop(1, 'rgba(0,0,0,0.35)');
-        ctx.fillStyle = mouthGrad;
-        ctx.beginPath();
-        ctx.ellipse(cx, cy + ry * 0.38, rx * 0.16, ry * 0.28, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.globalCompositeOperation = 'destination-in';
-        const mask = ctx.createRadialGradient(cx, cy, Math.min(rx, ry) * 0.55, cx, cy, Math.max(rx, ry) * 1.25);
-        mask.addColorStop(0, 'rgba(0,0,0,1)');
-        mask.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = mask;
-        ctx.fillRect(0, 0, w, h);
-        ctx.globalCompositeOperation = 'source-over';
-    }
-
-    const SYS_IN  = 0.6;
-    const SYS_OUT = 0.28;
-
-    let _sysFaceBase = null;
-    function _sysBuildFaceBase() {
-        if (_sysFaceBase) return _sysFaceBase;
-        if (!(_sysImgReady && _sysImgEl && _sysImgEl.naturalWidth > 4)) return null;
-        const S = 512;
-        const c = document.createElement('canvas');
-        c.width = c.height = S;
-        const ctx = c.getContext('2d');
-        ctx.drawImage(_sysImgEl, 0, 0, S, S);
-        try {
-            const id = ctx.getImageData(0, 0, S, S);
-            const d = id.data;
-            const cx = S * 0.52, cy = S * 0.5, rx = S * 0.27, ry = S * 0.4;
-            for (let y = 0; y < S; y++) {
-                for (let x = 0; x < S; x++) {
-                    const i = (y * S + x) * 4;
-                    const lum = Math.max(d[i], d[i + 1], d[i + 2]);
-                    let a = Math.min(1, Math.max(0, (lum - 10) / 70));
-                    const dx = (x - cx) / rx, dy = (y - cy) / ry;
-                    const e = Math.sqrt(dx * dx + dy * dy);
-                    const core = e <= 0.85 ? 1 : e >= 1.35 ? 0 : 1 - (e - 0.85) / 0.5;
-                    a = Math.max(a, core * 0.92);
-                    const ex = (x - S / 2) / (S / 2), ey = (y - S / 2) / (S / 2);
-                    const edge = Math.max(0, 1 - Math.pow(Math.hypot(ex, ey), 3));
-                    d[i + 3] = Math.round(a * edge * 255);
-                }
-            }
-            ctx.putImageData(id, 0, 0);
-        } catch (e) {
-            console.warn('[sys] luma-key failed, dùng mask radial:', e);
-            ctx.globalCompositeOperation = 'destination-in';
-            const m = ctx.createRadialGradient(S / 2, S / 2, S * 0.28, S / 2, S / 2, S * 0.52);
-            m.addColorStop(0, 'rgba(0,0,0,1)');
-            m.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = m;
-            ctx.fillRect(0, 0, S, S);
-            ctx.globalCompositeOperation = 'source-over';
-        }
-        _sysFaceBase = c;
-        return c;
-    }
-
-    function _sysCreateFaceCanvas(width, height) {
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        const base = _sysBuildFaceBase();
-        if (base) {
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(base, 0, 0, width, height);
-        } else {
-            _sysDrawFallbackFace(ctx, width, height);
-        }
-        return canvas;
-    }
-
     function _sysIsMalicious(data) {
         return !!(data && (data.injection === true || data.banned === true || data.offtopic === true));
     }
 
+    function renderWarnSoundBtn() {
+        const b = document.getElementById('warnSoundBtn');
+        const l = document.getElementById('warnSoundLabel');
+        if (b) b.classList.toggle('off', !warnSoundOn);
+        if (l) l.textContent = 'Warning sound: ' + (warnSoundOn ? 'on' : 'off');
+    }
+    function toggleWarnSound() {
+        warnSoundOn = !warnSoundOn;
+        try { localStorage.setItem(WARN_SOUND_KEY, warnSoundOn ? 'on' : 'off'); } catch (e) {}
+        renderWarnSoundBtn();
+    }
+    renderWarnSoundBtn();
+
+    // ~0.35s synthesized buzz through the existing AudioContext: no file to download,
+    // silent until the user has unlocked sound, and mutable from the profile menu.
+    function _playWarnSound() {
+        if (!warnSoundOn || typeof audioCtx === 'undefined' || !audioCtx || audioCtx.state !== 'running' || !_comp) return;
+        const ctx = audioCtx, t = ctx.currentTime + 0.01;
+        const out = ctx.createGain();
+        out.gain.setValueAtTime(0.0001, t);
+        out.gain.linearRampToValueAtTime(0.22, t + 0.012);
+        out.gain.setValueAtTime(0.22, t + 0.16);
+        out.gain.exponentialRampToValueAtTime(0.0001, t + 0.38);
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 1100;
+        lp.connect(out).connect(_comp);
+        [96, 101].forEach(f => {
+            const o = ctx.createOscillator();
+            o.type = 'square';
+            o.frequency.setValueAtTime(f * 1.6, t);
+            o.frequency.exponentialRampToValueAtTime(f, t + 0.12);
+            o.connect(lp);
+            o.start(t); o.stop(t + 0.4);
+        });
+        try { _click(t, 900, 0.7, 1.2, 0.06, out); } catch (e) {}
+    }
+
+    // ===== KANGAROO CAMEOS: lazy-loaded performances that follow the alarm =====
+    // Add a reaction: drop cameos/<id>.js (FRCameos.register({...})) and list its id here.
+    const CAMEO_BASE = 'cameos/';
+    const CAMEO_IDS = ['plumber', 'dunk', 'pirate'];
+    const CAMEOS_ON = true;
+    let _cameoCore = null;
+    function loadCameoCore() {
+        if (!_cameoCore) {
+            _cameoCore = new Promise((res, rej) => {
+                window.FRCameos = window.FRCameos || {};
+                window.FRCameos.base = CAMEO_BASE;
+                window.FRCameos.manifest = CAMEO_IDS;
+                const s = document.createElement('script');
+                s.src = CAMEO_BASE + 'cameo-core.js';
+                s.async = true;
+                s.onload = res;
+                s.onerror = () => { _cameoCore = null; rej(new Error('cameo core failed to load')); };
+                document.head.appendChild(s);
+            });
+        }
+        return _cameoCore;
+    }
+    function cameoAudio() {
+        return (warnSoundOn && typeof audioCtx !== 'undefined' && audioCtx && audioCtx.state === 'running' && _comp)
+            ? { ctx: audioCtx, out: _comp } : null;
+    }
+    function _frReduced() { return (window.FR && FR.reducedMotion) ? FR.reducedMotion() : _sysReduceMotion.matches; }   // FR hook
+    async function playCameo(id, extra) {
+        try {
+            await loadCameoCore();
+            const M = window.FR && FR.mascot;                  // FR hook: rotation, clean mode and lines from Settings
+            return await window.FRCameos.play(Object.assign({
+                id, ids: M ? M.rotation() : CAMEO_IDS, audio: cameoAudio, reduced: _frReduced(),
+                clean: M ? M.clean() : false, lineFor: M ? M.lineFor : null
+            }, extra || {}));
+        } catch (e) {
+            console.warn('[cameo] skipped:', e);
+            return false;
+        }
+    }
+    window.playCameo = playCameo;
+
     function _sysCleanup() {
         clearTimeout(_sysCleanupTimer);
         _sysCleanupTimer = null;
-        sysLayer.classList.remove('active', 'mode-a', 'mode-b');
-        sysLayer.style.removeProperty('--dur');
-        while (sysLayer.firstChild) sysLayer.firstChild.remove();
+        warnLayer.classList.remove('on', 'static', 'with-cameo');
+        document.body.classList.remove('warn-shake');
         _sysBusy = false;
     }
 
-    const _sysClamp = (v, a, b) => Math.min(b, Math.max(a, v));
-
-    function _sysRunPeek() {
-        const vw = window.innerWidth, vh = window.innerHeight;
-        const side = Math.random() < 0.5 ? 'left' : 'right';
-        const m = side === 'left' ? 1 : -1;
-
-        const FS = Math.round(_sysClamp(Math.min(vw, vh) * 0.16, 90, 140));
-        const FW = Math.round(FS * 0.46), FH = Math.round(FS * 0.84);
-        const FCX = 0.51, FCY = 0.5;
-
-        const topPct = 20 + Math.random() * 55;
-
-        const peek = document.createElement('div');
-        peek.className = 'sys-peek';
-        peek.style.width = FW + 'px';
-        peek.style.height = FH + 'px';
-        peek.style.top = topPct + '%';
-        peek.style.marginTop = (-FH / 2) + 'px';
-        peek.style[side] = (-FW / 2) + 'px';
-
-        const face = _sysCreateFaceCanvas(256, 256);
-        face.className = 'sys-face';
-        face.style.width = FS + 'px';
-        face.style.height = FS + 'px';
-        face.style.left = (FW / 2 - FCX * FS).toFixed(1) + 'px';
-        face.style.top  = (FH / 2 - FCY * FS).toFixed(1) + 'px';
-        face.style.transform = `rotate(${m * 8}deg)`;
-        peek.appendChild(face);
-
-        const HIDE = Math.round(FS * 0.62 + 16);
-        const hidden = `translateX(${-m * HIDE}px)`;
-        peek.style.transform = hidden;
-
-        sysLayer.appendChild(peek);
-        sysLayer.classList.add('active', 'mode-a');
-
-        void peek.offsetWidth;
-        peek.style.transition = `transform ${SYS_IN}s cubic-bezier(.22,.7,.25,1)`;
-        peek.style.transform = 'translateX(0)';
-
-        let leaving = false;
-        const retreat = () => {
-            if (leaving) return;
-            leaving = true;
-            peek.addEventListener('transitionend', (e) => {
-                if (e.target === peek && e.propertyName === 'transform') _sysCleanup();
-            });
-            peek.style.transition = `transform ${SYS_OUT}s cubic-bezier(.4,0,.8,.6)`;
-            peek.style.transform = hidden;
-            clearTimeout(_sysCleanupTimer);
-            _sysCleanupTimer = setTimeout(_sysCleanup, SYS_OUT * 1000 + 300);
-        };
-        peek.addEventListener('mouseenter', retreat);
-        peek.addEventListener('pointerdown', retreat);
-    }
-
-    function _triggerSysDiag(forced) {
-        if (_sysReduceMotion.matches) return;
+    function _triggerSysDiag(forced, mood) {
         if (document.hidden) {
             if (!forced) _sysQueued = true;
             return;
@@ -1137,17 +1558,35 @@
         if (_sysBusy) return;
         if (!forced && Date.now() - _sysLastAt < 2500) return;
         _sysLastAt = Date.now();
+        _sysBusy = true;
 
         try {
-            _sysBusy = true;
-            _sysRunPeek();
+            const still = _frReduced();
+            const cameosOn = CAMEOS_ON && !(window.FR && FR.mascot && !FR.mascot.reactionsOn());   // FR hook: Settings > Kangaroo
+            warnLayer.classList.remove('on', 'static');
+            document.body.classList.remove('warn-shake');
+            void warnLayer.offsetWidth;                 // restart the CSS animations
+            if (still) warnLayer.classList.add('static');
+            if (cameosOn && !still) warnLayer.classList.add('with-cameo');
+            warnLayer.classList.add('on');
+            if (!still) document.body.classList.add('warn-shake');
+            try { _playWarnSound(); } catch (e) {}
+            if (cameosOn) {
+                // FR hook: the server's roo_mood picks the performance whose line fits the reply
+                const pick = (window.FR && FR.mascot && mood) ? FR.mascot.moodToCameo(mood) : undefined;
+                loadCameoCore().then(() => window.FRCameos.preload(pick)).catch(() => {});
+                setTimeout(() => playCameo(pick, { moment: mood }), still ? WARN_STATIC_MS : 1150);
+            }
+            _sysCleanupTimer = setTimeout(_sysCleanup, still ? WARN_STATIC_MS : (cameosOn ? 1680 : WARN_MS + 80));
         } catch (e) {
-            console.error('[sys] diagnostic overlay failed:', e);
+            console.error('[warn] overlay failed:', e);
             _sysCleanup();
         }
     }
 
-    window.triggerSlendrina = _triggerSysDiag;
+    window.triggerWarning = () => _triggerSysDiag(true);
+    window.triggerSlendrina = _triggerSysDiag;          // old name, now the tamper alarm
+    window.triggerEdgePeek = () => _triggerSysDiag(true);
 
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden && _sysQueued) {
@@ -1155,7 +1594,13 @@
             setTimeout(() => _triggerSysDiag(), 400);
         }
     });
-    window.triggerEdgePeek = () => _triggerSysDiag('A');
+    try {
+        const cq = new URLSearchParams(location.search).get('cameo');
+        if (cq) window.addEventListener('load', () => setTimeout(() => playCameo(CAMEO_IDS.includes(cq) || cq === 'cheer' ? cq : undefined), 900));
+        if (new URLSearchParams(location.search).has('warntest')) {
+            window.addEventListener('load', () => setTimeout(window.triggerWarning, 900));
+        }
+    } catch (e) {}
 
     function getUserId() {
         try {
@@ -1647,7 +2092,7 @@
         familiarBar.innerHTML = '';
         const label = document.createElement('span');
         label.className = 'familiar-label';
-        label.textContent = '🔥 Often';
+        label.textContent = 'Often';
         familiarBar.appendChild(label);
         items.forEach(item => {
             const chip = document.createElement('button');
@@ -1688,7 +2133,7 @@
         if (items.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'history-empty';
-            empty.textContent = 'No alarms fired yet. Set one and wait for the bell 🔔';
+            empty.textContent = 'No alarms fired yet. Set one and wait for the bell.';
             historyBody.appendChild(empty);
             return;
         }
@@ -1926,7 +2371,7 @@
             if (c !== _lastBellMs && c > nowMs - 100 && c < nowMs + bellAhead) {
                 _lastBellMs = c;
                 playDingDong(ctx.currentTime + Math.max(0, (c - nowMs) / 1000));
-                setTimeout(() => _triggerSysDiag('A'), Math.max(0, c - Date.now()));
+                setTimeout(flashClock, Math.max(0, c - Date.now()));
             }
         }
 
@@ -2116,7 +2561,7 @@
 
     function renderModeBtn() {
         const b = document.getElementById('modeBtn');
-        if (b) b.textContent = voiceMode === 'special' ? '🎙️ Special' : '🔔 Original';
+        if (b) { b.dataset.mode = voiceMode; b.textContent = voiceMode === 'special' ? 'Special' : 'Original'; }
     }
     function toggleMode() {
         voiceMode = voiceMode === 'special' ? 'original' : 'special';
@@ -2144,7 +2589,7 @@
         if (!isSoundEnabled) {
             lockedQueue.push(...reminders);
             const b = document.getElementById('soundBanner');
-            if (b) { b.classList.remove('hidden'); b.textContent = '🔊 Reminder fired! Tap here to hear it'; }
+            if (b) { b.classList.remove('hidden'); b.textContent = 'Reminder fired! Tap here to hear it'; }
             try { if (navigator.vibrate) navigator.vibrate([300, 150, 300]); } catch (e) {}
             return;
         }
@@ -2162,7 +2607,7 @@
         const failed = {};
         const next = () => { el.onended = null; el.onerror = null; playNextInQueue(); };
         const start = url => {
-            el.src = url; el.currentTime = 0; el.volume = 0.8;
+            el.src = url; el.currentTime = 0; el.volume = (window.FR && FR.alarmVolume) ? FR.alarmVolume() : 0.8;   // FR hook: alarm volume
             el.play().catch(fail);
         };
         function fail(err) {
@@ -2452,7 +2897,7 @@
             }
 
             if (data && data.banned === true) handleBanResponse(data);
-            if (_sysIsMalicious(data)) _triggerSysDiag();
+            if (_sysIsMalicious(data)) _triggerSysDiag(false, data.roo_mood);   // FR hook: roo_mood (optional field)
         } catch (e) {
             const loadingMsg = document.getElementById(tid);
             if (loadingMsg) loadingMsg.remove();
@@ -2722,5 +3167,6 @@
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
     })();
 </script>
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
