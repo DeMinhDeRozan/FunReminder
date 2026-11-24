@@ -6,7 +6,7 @@
  *    The reminder API, Cognito and every other cross-origin request are NOT touched,
  *    so private API responses are never stored here.
  */
-const VERSION = 'fr-v2.3.1';
+const VERSION = 'fr-v2.5.1';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 const ICON = 'icons/icon-192.png';
@@ -21,6 +21,7 @@ const PRECACHE = [
   'js/core/ui.js', 'js/core/icons.js', 'js/core/time.js',
   'js/audio/audioManager.js',
   'js/features/clock.js', 'js/features/scenes.js', 'js/features/sceneKit.js', 'js/features/sceneLakeside.js',
+  'js/features/sceneFireflies.js', 'js/features/sceneGifs.js',
   'js/features/clockmode.js', 'js/features/rooLines.js', 'js/features/tasks.js', 'js/features/focus.js',
   'js/features/stats.js', 'js/features/countdowns.js', 'js/features/settings.js',
   'js/features/today.js', 'js/features/mascot.js',
@@ -71,6 +72,9 @@ self.addEventListener('fetch', event => {
     })());
     return;
   }
+
+  // the GIF backgrounds are far too big to keep in a cache: always straight from the network
+  if (url.pathname.endsWith('.gif')) return;
 
   // our static files: serve from cache, refresh in the background (stale-while-revalidate)
   if (/\.(js|css|png|webp|svg|jpg|jpeg|mp3|webmanifest|json|woff2?)$/i.test(url.pathname)) {

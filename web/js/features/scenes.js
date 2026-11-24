@@ -6,6 +6,8 @@
 import { store } from '../storage/localDataManager.js';
 import { W, H, L, defs, rng, glow, cloud, cloudDefs, waveBand, setCloudId } from './sceneKit.js';
 import { lakeside, lakesideTick } from './sceneLakeside.js';
+import { fireflies } from './sceneFireflies.js';
+import { GIF_SCENES } from './sceneGifs.js';
 
 /* ---------------------------------------------------------------- beach */
 function beach(p) {
@@ -163,15 +165,25 @@ export const SCENES = [
     { id: 'beach', name: 'Beach', blurb: 'Waves, palms, morning sun', ambient: 'ocean', draw: beach, tone: 'light' },
     { id: 'desert', name: 'Desert', blurb: 'Dunes at golden hour', ambient: 'wind', draw: desert, tone: 'light' },
     { id: 'grass', name: 'Grassfields', blurb: 'Wind through the meadow', ambient: 'meadow', draw: grass, tone: 'light' },
-    { id: 'night', name: 'Night sky', blurb: 'Stars over the ranges', ambient: 'crickets', draw: night, tone: 'dark' }
+    { id: 'night', name: 'Night sky', blurb: 'Stars over the ranges', ambient: 'crickets', draw: night, tone: 'dark' },
+    { id: 'fireflies', name: 'Fireflies', blurb: 'Mist, moonlight and fireflies', ambient: 'crickets', draw: fireflies, tone: 'dark' },
+    ...GIF_SCENES              // the GIFs in web/ASCII/ (pictures, not drawn scenes: see sceneGifs.js)
 ];
 export const sceneById = id => SCENES.find(s => s.id === id) || SCENES[0];
 
 let layer = null, currentId = null;
 
-function renderScene(s, prefix) {
+/* small = this is a picker thumbnail, so a scene may draw a cheaper version of itself */
+function renderScene(s, prefix, small) {
+    if (s.img) {
+        // the still stands in for the animation in the picker and whenever motion is reduced;
+        // it is also the <img> background, so something is on screen while a big GIF loads
+        const still = small || reducedMotion();
+        return `<img class="fr-photo" src="${still ? s.poster : s.img}" alt="" decoding="async" draggable="false"` +
+            (small ? ' loading="lazy"' : ` style="background-image:url(${s.poster})"`) + '>';
+    }
     setCloudId(prefix + 'cl');
-    return `<div class="fr-stage">${s.draw(prefix)}</div>`;
+    return `<div class="fr-stage">${s.draw(prefix, small)}</div>`;
 }
 /* the stage is 1600x1000 "units"; --u = px per unit so it covers the screen */
 function fit() {
@@ -188,6 +200,9 @@ export function reducedMotion() {
 function applyMotion() {
     const still = reducedMotion();
     document.body.classList.toggle('fr-still', still);
+    // a picture scene has no CSS animation to pause: swap the GIF for its still, or back
+    const s = sceneById(currentId || store.getPreference('scene'));
+    if (s.img && currentId) { currentId = null; applyScene(s.id); }
 }
 
 /* scenes that change with the time of day get a tick once a minute */
@@ -215,8 +230,8 @@ export function applyScene(id) {
     const b = document.body.classList;
     SCENES.forEach(x => b.remove('fr-scene-' + x.id));
     b.add('fr-scene-' + s.id);
-    b.toggle('fr-has-scene', !!s.draw);
-    if (!s.draw) { stopCycle(); layer.replaceChildren(); layer.hidden = true; return; }
+    b.toggle('fr-has-scene', !!(s.draw || s.img));
+    if (!s.draw && !s.img) { stopCycle(); layer.replaceChildren(); layer.hidden = true; return; }
     layer.hidden = false;
     const next = document.createElement('div');
     next.className = 'fr-scene-art';
@@ -237,7 +252,7 @@ export function sceneThumb(id) {
     // the stage is 1600 units wide: scale it to exactly fill this thumbnail
     const fitThumb = () => { const w = el.clientWidth; if (w) el.style.setProperty('--u', (w / W).toFixed(5)); };
     if (window.ResizeObserver) new ResizeObserver(fitThumb).observe(el); else setTimeout(fitThumb, 0);
-    if (s.draw) { el.innerHTML = renderScene(s, 'frt' + s.id + '-'); tickThumb(s, el); }
+    if (s.draw || s.img) { el.innerHTML = renderScene(s, 'frt' + s.id + '-', true); tickThumb(s, el); }
     else el.innerHTML = '<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="none" stroke="#EEE7D2" stroke-opacity=".35" stroke-width="2"/><line x1="100" y1="100" x2="100" y2="50" stroke="#EEE7D2" stroke-opacity=".5" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="100" x2="135" y2="112" stroke="#EEE7D2" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/><line x1="100" y1="110" x2="100" y2="35" stroke="#D9A441" stroke-width="1.5"/></svg>';
     return el;
 }

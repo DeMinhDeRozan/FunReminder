@@ -367,7 +367,7 @@ body:not(.fr-focus-dim) .fr-focus { background: radial-gradient(80% 70% at 50% 4
 .fr-scene-thumb { --u: .08; position: relative; width: 100%; aspect-ratio: 16 / 10; border-radius: 11px; overflow: hidden; background: linear-gradient(180deg, var(--dial), #0B1D20); display: grid; place-items: center; }
 .fr-scene-thumb > svg { width: 58%; height: 90%; }
 .fr-scene-thumb .fr-stage { transform: translate(-50%, -50%) scale(var(--u)); }
-.fr-scene-thumb .fr-layer { animation: none !important; }
+.fr-scene-thumb .fr-layer, .fr-scene-thumb :is(.fr-fly, .fr-fly-y, .fr-fly-b) { animation: none !important; }
 .fr-zone-edit { display: flex; flex-direction: column; gap: 6px; }
 
 /* ---------------------------------------------------------------- toasts + dialog */
@@ -412,6 +412,11 @@ body:not(.fr-focus-dim) .fr-focus { background: radial-gradient(80% 70% at 50% 4
 .fr-scene-art { position: absolute; inset: 0; opacity: 0; transition: opacity .9s ease; }
 .fr-scene-art.in { opacity: 1; }
 .fr-stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 1000px; transform: translate(-50%, -50%) scale(var(--u, 1)); transform-origin: 50% 50%; }
+/* picture backgrounds (the GIFs in web/ASCII/): one rule covers every one of them, full screen,
+   cropped rather than letterboxed, at any aspect ratio. .fr-scene is fixed + overflow:hidden,
+   so this can never add a scrollbar. The background-image is the still, showing while the GIF loads. */
+.fr-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center;
+    display: block; background: center / cover no-repeat; image-rendering: pixelated; }
 .fr-layer { position: absolute; overflow: visible; }
 /* readability scrim over every scene: darker at the top (header) and bottom (composer) */
 .fr-scene::after { content: ""; position: absolute; inset: 0; background:
@@ -466,8 +471,17 @@ body.fr-has-scene .wrapper {
 @keyframes frShoot { 0%, 88% { opacity: 0; transform: translate(0, 0); } 90% { opacity: 1; } 96% { opacity: 0; transform: translate(380px, 124px); } 100% { opacity: 0; transform: translate(380px, 124px); } }
 
 /* still: reduced motion (device or app setting), hidden tabs, thumbnails */
-.fr-still .fr-layer, .fr-hidden-tab .fr-layer { animation-play-state: paused !important; }
-.fr-still .fr-layer { animation: none !important; }
+/* --- Fireflies scene: each fly drifts across, drifts up and down, and blinks on its own clock --- */
+.fr-fly   { animation: frFlyX var(--d1, 18s) ease-in-out var(--o1, 0s) infinite alternate; }
+.fr-fly-y { animation: frFlyY var(--d2, 12s) ease-in-out var(--o2, 0s) infinite alternate; }
+.fr-fly-b { animation: frFlyB var(--d3, 3s) ease-in-out var(--o3, 0s) infinite; }
+@keyframes frFlyX { from { transform: translateX(calc(var(--ax, 40px) * -1)); } to { transform: translateX(var(--ax, 40px)); } }
+@keyframes frFlyY { from { transform: translateY(var(--ay, 30px)); } to { transform: translateY(calc(var(--ay, 30px) * -1)); } }
+@keyframes frFlyB { 0%, 100% { opacity: .1; } 12% { opacity: .85; } 28% { opacity: .25; } 46% { opacity: 1; } 70% { opacity: .18; } }
+
+.fr-still .fr-layer, .fr-hidden-tab .fr-layer,
+.fr-still :is(.fr-fly, .fr-fly-y, .fr-fly-b), .fr-hidden-tab :is(.fr-fly, .fr-fly-y, .fr-fly-b) { animation-play-state: paused !important; }
+.fr-still .fr-layer, .fr-still :is(.fr-fly, .fr-fly-y, .fr-fly-b) { animation: none !important; }
 .fr-still .fr-gust, .fr-still .fr-shoot { opacity: 0 !important; }
 .fr-still .fr-scene-art { transition: none; }
 .fr-still .fr-toast, .fr-still .fr-task, .fr-still .fr-bar-fill, .fr-still .fr-today { animation: none !important; }
@@ -597,6 +611,7 @@ body.fr-scene-lakeside .fr-scene::after { background: linear-gradient(180deg, rg
 /* ================================================================ panels you can close (chat + Today) */
 /* one control for both: a small enamel chevron */
 .fr-collapse {
+    position: absolute; top: 12px; right: 14px; z-index: 4;
     display: inline-grid; place-items: center; flex: none;
     width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
     background: linear-gradient(180deg, var(--enamel-hi), var(--enamel-lo));
@@ -606,7 +621,11 @@ body.fr-scene-lakeside .fr-scene::after { background: linear-gradient(180deg, rg
 }
 .fr-collapse:hover { color: var(--brass-hi); border-color: rgba(217, 164, 65, .5); transform: translateY(-1px); }
 .fr-collapse:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
-.fr-collapse .fr-i { width: 17px; height: 17px; }
+.fr-collapse .fr-i { width: 15px; height: 15px; }
+/* the profile avatar is fixed in that corner below 840px, and .header already reserves the room:
+   line the x up with that same reserved strip so the two can never overlap */
+@media (max-width: 840px) { .fr-collapse { right: 66px; } }
+@media (max-width: 560px) { .fr-collapse { top: 10px; right: 58px; } }
 
 /* chat: fade out in place, so nothing on the page moves */
 .wrapper { transition: opacity .34s var(--ease-out), transform .34s var(--ease-out); }

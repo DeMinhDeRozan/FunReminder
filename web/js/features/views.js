@@ -17,10 +17,10 @@ export const todayOpen = () => store.getPreference(TODAY) !== false;
 export function setChatOpen(on) { store.setPreference(CHAT, !!on); }
 export function setTodayOpen(on) { store.setPreference(TODAY, !!on); }
 
-/* the chat's own hide control, in the header next to the other buttons */
+/* the chat's own close control: an x in the top corner of its header */
 export function collapseBtn(label, onClick) {
     return h('button', { class: 'fr-collapse', type: 'button', title: label, 'aria-label': label, onclick: onClick },
-        iconEl('collapse'));
+        iconEl('close'));
 }
 
 let dock = null, edge = null;
@@ -48,8 +48,9 @@ export function initViews() {
         onclick: () => setTodayOpen(!todayOpen()) }, iconEl('chevron-left'));
     document.body.append(dock, edge);
 
-    const actions = document.querySelector('.wrapper .header .actions');
-    if (actions) actions.appendChild(collapseBtn('Hide the chat', () => setChatOpen(false)));
+    // the header is the positioned parent, so the button can sit in its corner
+    const header = document.querySelector('.wrapper .header');
+    if (header) header.appendChild(collapseBtn('Close the chat', () => setChatOpen(false)));
 
     paint();
     store.addEventListener('pref', e => {

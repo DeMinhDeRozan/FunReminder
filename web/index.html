@@ -179,7 +179,8 @@
         /* ---------- header ---------- */
         .header {
             position: relative; z-index: 3;
-            padding: 16px 22px 14px;
+            /* the right padding keeps the clock clear of the close button in the corner */
+            padding: 16px 52px 14px 22px;
             display: grid;
             grid-template-columns: 1fr auto;
             grid-template-areas: "who clock" "actions progress";
